@@ -208,3 +208,67 @@ max-height:90vh;
 overflow-y:auto;
 border-radius:10px;
 }
+.modal-content label {
+  font-size: 13px;
+  color: #333;
+  display: block;
+  margin-top: 10px;
+}
+
+.modal-content input,
+.modal-content textarea,
+.modal-content select {
+  width: 100%;
+  padding: 10px;
+  margin-top: 5px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+}
+
+.modal-content textarea {
+  height: 80px;
+}
+.modal-content p {
+  font-size: 12px;
+  color: gray;
+}
+/* 🔴 FORM TEXT STYLING */
+
+.modal-content label {
+  font-size: 13px;
+  color: #374151; /* dark grey */
+  font-weight: 500;
+}
+
+/* Inputs + textarea + select */
+.modal-content input,
+.modal-content textarea,
+.modal-content select {
+  font-size: 14px;
+  color: #111827; /* almost black */
+}
+
+/* Placeholder text */
+.modal-content input::placeholder,
+.modal-content textarea::placeholder {
+  color: #9ca3af; /* light grey */
+  font-size: 13px;
+}
+
+/* OR text */
+.modal-content p {
+  font-size: 12px;
+  color: #9ca3af;
+}
+
+/* File input fix */
+.modal-content input[type="file"] {
+  font-size: 13px;
+  color: #374151;
+}
+.modal-content input:focus,
+.modal-content textarea:focus,
+.modal-content select:focus {
+  outline: none;
+  border: 1px solid #3b82f6;
+}
