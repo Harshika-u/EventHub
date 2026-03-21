@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<title>EventHub Admin</title>
+
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/teacher.css">
+
+</head>
+
+<body>
+
+<div class="dashboard">
+
+<!-- SIDEBAR -->
+
+<div class="sidebar">
+
+<h2>EventHub Admin</h2>
+<p class="admin-email">admin@schoolhub.local</p>
+
+<ul class="sidebar-menu">
+<li class="active">Events</li>
+<li>Participants</li>
+</ul>
+
+<button class="logout-btn" onclick="logout()">Logout</button>
+
+</div>
+
+
+<!-- MAIN CONTENT -->
+
+<div class="dashboard-main">
+
+<div class="top-bar">
+
+<h1>Manage Events</h1>
+
+<button class="add-btn" onclick="openAddEvent()">Add Event</button>
+</div>
+
+
+<div class="events-container">
+
+<!-- EVENT CARD 1 -->
+
+<div class="admin-event-card">
+
+<img src="https://images.unsplash.com/photo-1508606572321-901ea443707f">
+
+<div class="event-info">
+
+<h3>Inter-School 400m Track Sprint</h3>
+
+<p>A high-speed sprint event completed during Sports Week.</p>
+
+<span>Sports · 0/18 · completed</span>
+
+</div>
+
+<div class="event-actions">
+
+<button class="edit">Edit</button>
+<button class="delete">Delete</button>
+
+</div>
+
+</div>
+
+
+<!-- EVENT CARD 2 -->
+
+<div class="admin-event-card">
+
+<img src="https://images.unsplash.com/photo-1506157786151-b8491531f063">
+
+<div class="event-info">
+
+<h3>Farewell Fusion Dance Finals</h3>
+
+<p>Group dance competition with house choreography.</p>
+
+<span>Cultural · 1/30 · completed</span>
+
+</div>
+
+<div class="event-actions">
+
+<button class="edit">Edit</button>
+<button class="delete">Delete</button>
+
+</div>
+
+</div>
+
+
+<!-- EVENT CARD 3 -->
+
+<div class="admin-event-card">
+
+<img src="https://images.unsplash.com/photo-1454165804606-c3d57bc86b40">
+
+<div class="event-info">
+
+<h3>Langvista</h3>
+
+<p>Represent your house in a debate showdown.</p>
+
+<span>Academic · 7/20 · upcoming</span>
+
+</div>
+
+<div class="event-actions">
+
+<button class="edit">Edit</button>
+<button class="delete">Delete</button>
+
+</div>
+
+</div>
+
+
+</div>
+
+</div>
+
+</div>
+
+
+<script src="js/teacher.js"></script>
+
+</body>
+
+</html>
