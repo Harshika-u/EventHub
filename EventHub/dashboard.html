@@ -198,16 +198,13 @@ function clearForm() {
 
 /* SAVE */
 async function saveEvent() {
-
   try {
-
     const { collection, addDoc, updateDoc, doc } = window.firebaseFns;
 
     const imageURL = document.getElementById("eventImageURL").value;
     const imageFile = document.getElementById("eventImageFile").files[0];
 
     let finalImage = "";
-
     if (imageURL) {
       finalImage = imageURL;
     } else if (imageFile) {
@@ -224,7 +221,9 @@ async function saveEvent() {
       eventDate: document.getElementById("eventDate").value,
       regDeadline: document.getElementById("eventRegDeadline").value,
       time: document.getElementById("eventTime").value,
-      image: finalImage
+      image: finalImage,
+      // Keep the current count if editing, otherwise start at 0
+      joined: editIndex === -1 ? 0 : events[editIndex].joined || 0 
     };
 
     if (editIndex === -1) {
@@ -235,7 +234,6 @@ async function saveEvent() {
     }
 
     alert("Event saved successfully ✅");
-
     document.getElementById("eventModal").style.display = "none";
     loadEvents();
 
@@ -244,7 +242,6 @@ async function saveEvent() {
     alert("Error saving event ❌");
   }
 }
-
 /* DELETE */
 async function deleteEvent(index) {
   try {
@@ -266,6 +263,9 @@ function renderEvents() {
   container.innerHTML = "";
 
   events.forEach((e, i) => {
+    // Track current and max participants
+    const currentParticipants = e.joined || 0;
+    const maxParticipants = e.seats || 0;
 
     container.innerHTML += `
     <div class="admin-event-card">
@@ -274,9 +274,9 @@ function renderEvents() {
 
       <div class="event-info">
         <h3>${e.name}</h3>
-        <p>${e.desc}</p>
         <span>
-            ${e.category} · ${e.seats} · ${e.status} <br>
+            <strong>Participants: ${currentParticipants}/${maxParticipants}</strong> <br>
+            ${e.category} · ${e.status} <br>
             Event: ${e.eventDate || ""} <br>
             Register by: ${e.regDeadline || ""}
         </span>
@@ -291,7 +291,6 @@ function renderEvents() {
     `;
   });
 }
-
 /* LOAD */
 async function loadEvents() {
   try {

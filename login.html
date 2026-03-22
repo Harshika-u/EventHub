@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Login | EventHub</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .login-container { max-width: 400px; margin: 100px auto; padding: 20px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); text-align: center; }
+        input { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
+        .error-msg { color: red; font-size: 14px; margin-bottom: 10px; display: none; }
+        .login-btn { width: 100%; padding: 12px; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+<div class="login-container">
+    <h2>Student Login</h2>
+    <p>Please use your school email</p>
+    
+    <div id="errorMessage" class="error-msg"></div>
+
+    <input type="email" id="loginEmail" placeholder="Enter School Email (e.g. name@jgsicse.org)" required>
+    <input type="password" id="loginPassword" placeholder="Enter Password" required>
+    
+    <button class="login-btn" onclick="handleLogin()">Login</button>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+    // Use your existing config
+    const firebaseConfig = {
+        apiKey: "AIzaSyDMkDxml0p9zUp6gZuo1SeVhmQ3BZamy9o",
+        authDomain: "eventhub-8a8dc.firebaseapp.com",
+        projectId: "eventhub-8a8dc",
+        storageBucket: "eventhub-8a8dc.firebasestorage.app",
+        messagingSenderId: "450946542344",
+        appId: "1:450946542344:web:e54c332ca5bf2358d01abd"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    window.handleLogin = async () => {
+        const email = document.getElementById("loginEmail").value;
+        const pass = document.getElementById("loginPassword").value;
+        const errorDiv = document.getElementById("errorMessage");
+
+        // 1. SPECIFY YOUR SCHOOL DOMAIN HERE
+        const allowedDomain = "@jgsicse.org"; 
+
+        errorDiv.style.display = "none";
+
+        // 2. DOMAIN VALIDATION
+        if (!email.endsWith(allowedDomain)) {
+            errorDiv.innerText = `Access Denied: You must use a ${allowedDomain} email address.`;
+            errorDiv.style.display = "block";
+            return;
+        }
+
+        try {
+            // 3. FIREBASE AUTHENTICATION
+            await signInWithEmailAndPassword(auth, email, pass);
+            alert("Login Successful! Redirecting...");
+            window.location.href = "student_dashboard.html"; // Change to your student page
+        } catch (error) {
+            errorDiv.innerText = "Invalid email or password.";
+            errorDiv.style.display = "block";
+            console.error(error.message);
+        }
+    };
+</script>
+
+</body>
+</html>
