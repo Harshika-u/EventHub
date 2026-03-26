@@ -1,118 +1,161 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-
-<title>EventHub Admin</title>
-
-<link rel="stylesheet" href="css/style.css">
-<link rel="stylesheet" href="css/teacher.css">
-
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EventHub Admin</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/teacher.css">
 </head>
-
 <body>
 
 <div class="dashboard">
 
-<!-- SIDEBAR -->
-<div class="sidebar">
-<h2>EventHub Admin</h2>
-<p class="admin-email">admin@schoolhub.local</p>
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div>
+      <h2>EventHub Admin</h2>
+      <p class="admin-email">admin@schoolhub.local</p>
+      <ul class="sidebar-menu">
+        <li id="tab-events" class="active" onclick="showTab('events')">Events</li>
+        <li id="tab-participants" onclick="showTab('participants')">Participants</li>
+      </ul>
+    </div>
+    <button class="logout-btn" onclick="logout()">Logout</button>
+  </div>
 
-<ul class="sidebar-menu">
-<li class="active">Events</li>
-<li>Participants</li>
-</ul>
+  <!-- MAIN CONTENT -->
+  <div class="dashboard-main">
 
-<button class="logout-btn" onclick="logout()">Logout</button>
-</div>
+    <!-- EVENTS TAB -->
+    <div id="panel-events">
+      <div class="top-bar">
+        <h1>Manage Events</h1>
+        <button class="add-btn" onclick="openAddEvent()">Add Event</button>
+      </div>
+      <div class="events-container" id="eventsContainer">
+        <p class="loading-text">Loading events...</p>
+      </div>
+    </div>
 
-<!-- MAIN CONTENT -->
-<div class="dashboard-main">
-
-<div class="top-bar">
-<h1>Manage Events</h1>
-<button class="add-btn" onclick="openAddEvent()">Add Event</button>
-</div>
-
-<div class="events-container" id="eventsContainer"></div>
-
-</div>
-</div>
-
-<!-- 🔴 MODAL -->
-<div class="modal" id="eventModal">
-  <div class="modal-content">
-
-    <h2 id="modalTitle">Add Event</h2>
-
-    <label>Event Name</label>
-    <input id="eventName" type="text">
-
-    <label>Description</label>
-    <textarea id="eventDesc"></textarea>
-
-    <div style="display:flex; gap:10px;">
-      <div style="flex:1;">
-        <label>Category</label>
-        <select id="eventCategory">
-          <option>Sports</option>
-          <option>Cultural</option>
-          <option>Academic</option>
+    <!-- PARTICIPANTS TAB -->
+    <div id="panel-participants" style="display:none;">
+      <div class="top-bar">
+        <h1>Participant Management</h1>
+      </div>
+      <div class="participants-toolbar">
+        <select id="eventSelectDropdown" onchange="loadParticipants()" class="filter-select">
+          <option value="">Select an event...</option>
         </select>
+        <button class="export-btn" onclick="exportCSV()">Export CSV</button>
+        <button class="export-btn excel" onclick="exportExcel()">Export Excel</button>
       </div>
-
-      <div style="flex:1;">
-        <label>Status</label>
-        <select id="eventStatus">
-          <option>Upcoming</option>
-          <option>Ongoing</option>
-          <option>Completed</option>
-        </select>
+      <div class="participants-stats" id="participantStats" style="display:none;">
+        <div class="stat-box">Interested: <strong id="statInterested">0</strong></div>
+        <div class="stat-box">Group regs: <strong id="statGroup">0</strong></div>
+        <div class="stat-box">Remaining slots: <strong id="statRemaining">â€”</strong></div>
       </div>
+      <table class="participants-table" id="participantsTable" style="display:none;">
+        <thead>
+          <tr>
+            <th>NAME</th>
+            <th>CLASS/SECTION</th>
+            <th>ROLL NUMBER</th>
+            <th>TYPE</th>
+            <th>GROUP DETAILS</th>
+          </tr>
+        </thead>
+        <tbody id="participantsBody"></tbody>
+      </table>
+      <p id="participantsMsg" class="loading-text"></p>
     </div>
-
-    <div style="display:flex; gap:10px;">
-      <div style="flex:1;">
-        <label>Max Participants</label>
-        <input id="eventSeats" type="number">
-      </div>
-
-      <div style="flex:1;">
-        <label>Venue</label>
-        <input id="eventVenue" type="text">
-      </div>
-    </div>
-
-    <div style="display:flex; gap:10px;">
-      <div style="flex:1;">
-        <label>Event Date</label>
-        <input id="eventDate" type="date">
-
-        <label>Registration Deadline</label>
-        <input id="eventRegDeadline" type="date">
-      </div>
-
-      <div style="flex:1;">
-        <label>Time</label>
-        <input id="eventTime" type="time">
-      </div>
-    </div>
-
-    <label>Event Image</label>
-    <input id="eventImageURL" type="text" placeholder="Paste Image URL (optional)">
-    <p style="text-align:center; margin:10px 0;">OR</p>
-    <input id="eventImageFile" type="file">
-
-    <button onclick="saveEvent()" class="add-btn" style="margin-top:15px;">
-      Save Event
-    </button>
 
   </div>
 </div>
 
-<script src="js/teacher.js"></script>
+<!-- MODAL -->
+<div class="modal" id="eventModal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2 id="modalTitle">Add New Event</h2>
+      <button class="modal-close" onclick="closeModal()">âœ•</button>
+    </div>
+    <p class="modal-sub">Add details, set participant limits, and configure registration deadlines.</p>
 
-<!-- ✅ FIREBASE -->
+    <label>Event Name</label>
+    <input id="eventName" type="text" placeholder="e.g. Prismatic Science Fest">
+
+    <label>Poster URL</label>
+    <input id="eventImageURL" type="text" placeholder="Paste image URL (optional)">
+
+    <label>Upload Poster</label>
+    <input id="eventImageFile" type="file" accept="image/*">
+
+    <div class="form-row">
+      <div>
+        <label>Start Date &amp; Time</label>
+        <input id="eventDate" type="datetime-local">
+      </div>
+      <div>
+        <label>End Date &amp; Time</label>
+        <input id="eventEndDate" type="datetime-local">
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div>
+        <label>Registration Deadline</label>
+        <input id="eventRegDeadline" type="datetime-local">
+      </div>
+      <div>
+        <label>Participant Limit</label>
+        <input id="eventSeats" type="number" min="1" placeholder="20">
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div>
+        <label>Venue</label>
+        <input id="eventVenue" type="text" placeholder="e.g. Main Auditorium">
+      </div>
+      <div>
+        <label>Organizer</label>
+        <input id="eventOrganizer" type="text" placeholder="e.g. Science Dept.">
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div>
+        <label>Category</label>
+        <select id="eventCategory">
+          <option>Cultural</option>
+          <option>Sports</option>
+          <option>Academic</option>
+          <option>Literary</option>
+          <option>Commerce</option>
+          <option>Science</option>
+          <option>Humanities</option>
+        </select>
+      </div>
+      <div style="display:flex; align-items:center; gap:8px; margin-top:28px;">
+        <input type="checkbox" id="allowGroup" style="width:auto;">
+        <label for="allowGroup" style="margin:0;">Allow Group Participation</label>
+      </div>
+    </div>
+
+    <label>Short Description</label>
+    <textarea id="eventShortDesc" placeholder="Brief summary..."></textarea>
+
+    <label>Description</label>
+    <textarea id="eventDesc" placeholder="Full event details..."></textarea>
+
+    <button onclick="saveEvent()" class="save-btn" id="saveBtn">Create Event</button>
+  </div>
+</div>
+
+<script src="../js/teacher.js"></script>
+
+<!-- FIREBASE -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
   import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
@@ -128,27 +171,78 @@
 
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
-
   window.db = db;
   window.firebaseFns = { collection, addDoc, getDocs, deleteDoc, doc, updateDoc };
 
-  // Load events AFTER Firebase is ready
   window.onload = () => {
+    // Protect dashboard
+    if (localStorage.getItem("admin") !== "true") {
+      window.location.href = "login.html";
+      return;
+    }
     loadEvents();
   };
 </script>
 
 <script>
-
-/* DATA */
 let events = [];
 let eventIds = [];
 let editIndex = -1;
 
+/* TAB SWITCHING */
+function showTab(tab) {
+  document.getElementById("panel-events").style.display = tab === "events" ? "block" : "none";
+  document.getElementById("panel-participants").style.display = tab === "participants" ? "block" : "none";
+  document.getElementById("tab-events").className = tab === "events" ? "active" : "";
+  document.getElementById("tab-participants").className = tab === "participants" ? "active" : "";
+
+  if (tab === "participants") populateEventDropdown();
+}
+
+/* POPULATE DROPDOWN FOR PARTICIPANTS */
+function populateEventDropdown() {
+  const sel = document.getElementById("eventSelectDropdown");
+  sel.innerHTML = '<option value="">Select an event...</option>';
+  events.forEach((e, i) => {
+    sel.innerHTML += `<option value="${i}">${e.name}</option>`;
+  });
+}
+
+/* LOAD PARTICIPANTS (stub - ready for expansion) */
+function loadParticipants() {
+  const idx = document.getElementById("eventSelectDropdown").value;
+  const statsDiv = document.getElementById("participantStats");
+  const table = document.getElementById("participantsTable");
+  const msg = document.getElementById("participantsMsg");
+
+  if (idx === "") {
+    statsDiv.style.display = "none";
+    table.style.display = "none";
+    msg.innerText = "";
+    return;
+  }
+
+  const e = events[idx];
+  statsDiv.style.display = "flex";
+  document.getElementById("statInterested").innerText = e.joined || 0;
+  document.getElementById("statGroup").innerText = 0;
+  document.getElementById("statRemaining").innerText = (e.seats || 0) - (e.joined || 0);
+
+  // For now show empty table
+  document.getElementById("participantsBody").innerHTML = "";
+  table.style.display = "table";
+  msg.innerText = `Viewing participants for: ${e.name}`;
+}
+
+/* EXPORT STUBS */
+function exportCSV() { alert("CSV export coming soon!"); }
+function exportExcel() { alert("Excel export coming soon!"); }
+
 /* OPEN ADD */
 function openAddEvent() {
   document.getElementById("eventModal").style.display = "flex";
-  document.getElementById("modalTitle").innerText = "Add Event";
+  document.getElementById("modalTitle").innerText = "Add New Event";
+  document.getElementById("saveBtn").innerText = "Create Event";
   clearForm();
   editIndex = -1;
 }
@@ -156,163 +250,156 @@ function openAddEvent() {
 /* OPEN EDIT */
 function openEditEvent(index) {
   const e = events[index];
-
   document.getElementById("eventModal").style.display = "flex";
   document.getElementById("modalTitle").innerText = "Edit Event";
+  document.getElementById("saveBtn").innerText = "Save Changes";
 
-  document.getElementById("eventName").value = e.name;
-  document.getElementById("eventDesc").value = e.desc;
-  document.getElementById("eventCategory").value = e.category;
-  document.getElementById("eventStatus").value = e.status;
-  document.getElementById("eventSeats").value = e.seats;
-  document.getElementById("eventVenue").value = e.venue;
-  document.getElementById("eventDate").value = e.eventDate;
-  document.getElementById("eventRegDeadline").value = e.regDeadline;
-  document.getElementById("eventTime").value = e.time;
-  document.getElementById("eventImageURL").value = e.image;
+  document.getElementById("eventName").value = e.name || "";
+  document.getElementById("eventDesc").value = e.desc || "";
+  document.getElementById("eventShortDesc").value = e.shortDesc || "";
+  document.getElementById("eventCategory").value = e.category || "Cultural";
+  document.getElementById("eventSeats").value = e.seats || "";
+  document.getElementById("eventVenue").value = e.venue || "";
+  document.getElementById("eventOrganizer").value = e.organizer || "";
+  document.getElementById("eventDate").value = e.eventDate || "";
+  document.getElementById("eventEndDate").value = e.eventEndDate || "";
+  document.getElementById("eventRegDeadline").value = e.regDeadline || "";
+  document.getElementById("eventImageURL").value = e.image || "";
+  document.getElementById("allowGroup").checked = e.allowGroup || false;
 
   editIndex = index;
 }
 
 /* CLOSE MODAL */
-window.onclick = function(e){
-  if(e.target.id === "eventModal"){
-    document.getElementById("eventModal").style.display = "none";
-  }
+function closeModal() {
+  document.getElementById("eventModal").style.display = "none";
+}
+
+window.onclick = function(e) {
+  if (e.target.id === "eventModal") closeModal();
 }
 
 /* CLEAR */
 function clearForm() {
-  document.getElementById("eventName").value = "";
-  document.getElementById("eventDesc").value = "";
-  document.getElementById("eventCategory").value = "Sports";
-  document.getElementById("eventStatus").value = "Upcoming";
-  document.getElementById("eventSeats").value = "";
-  document.getElementById("eventVenue").value = "";
-  document.getElementById("eventDate").value = "";
-  document.getElementById("eventRegDeadline").value = "";
-  document.getElementById("eventTime").value = "";
-  document.getElementById("eventImageURL").value = "";
+  ["eventName","eventDesc","eventShortDesc","eventSeats","eventVenue",
+   "eventOrganizer","eventDate","eventEndDate","eventRegDeadline","eventImageURL"].forEach(id => {
+    document.getElementById(id).value = "";
+  });
+  document.getElementById("eventCategory").value = "Cultural";
+  document.getElementById("allowGroup").checked = false;
   document.getElementById("eventImageFile").value = "";
 }
 
 /* SAVE */
 async function saveEvent() {
+  const name = document.getElementById("eventName").value.trim();
+  if (!name) { alert("Event name is required!"); return; }
+
   try {
     const { collection, addDoc, updateDoc, doc } = window.firebaseFns;
-
     const imageURL = document.getElementById("eventImageURL").value;
     const imageFile = document.getElementById("eventImageFile").files[0];
+    let finalImage = imageURL || (imageFile ? URL.createObjectURL(imageFile) : "");
 
-    let finalImage = "";
-    if (imageURL) {
-      finalImage = imageURL;
-    } else if (imageFile) {
-      finalImage = URL.createObjectURL(imageFile);
+    // Determine status from dates
+    const now = new Date();
+    const startDate = document.getElementById("eventDate").value;
+    const endDate = document.getElementById("eventEndDate").value;
+    let status = "Upcoming";
+    if (startDate && endDate) {
+      if (now >= new Date(startDate) && now <= new Date(endDate)) status = "Ongoing";
+      else if (now > new Date(endDate)) status = "Completed";
+    } else if (startDate && now >= new Date(startDate)) {
+      status = "Ongoing";
     }
 
     const event = {
-      name: document.getElementById("eventName").value,
+      name,
       desc: document.getElementById("eventDesc").value,
+      shortDesc: document.getElementById("eventShortDesc").value,
       category: document.getElementById("eventCategory").value,
-      status: document.getElementById("eventStatus").value,
       seats: document.getElementById("eventSeats").value,
       venue: document.getElementById("eventVenue").value,
+      organizer: document.getElementById("eventOrganizer").value,
       eventDate: document.getElementById("eventDate").value,
+      eventEndDate: document.getElementById("eventEndDate").value,
       regDeadline: document.getElementById("eventRegDeadline").value,
-      time: document.getElementById("eventTime").value,
       image: finalImage,
-      // Keep the current count if editing, otherwise start at 0
-      joined: editIndex === -1 ? 0 : events[editIndex].joined || 0 
+      allowGroup: document.getElementById("allowGroup").checked,
+      status,
+      joined: editIndex === -1 ? 0 : (events[editIndex].joined || 0)
     };
 
     if (editIndex === -1) {
       await addDoc(collection(window.db, "events"), event);
     } else {
-      const id = eventIds[editIndex];
-      await updateDoc(doc(window.db, "events", id), event);
+      await updateDoc(doc(window.db, "events", eventIds[editIndex]), event);
     }
 
-    alert("Event saved successfully ✅");
-    document.getElementById("eventModal").style.display = "none";
+    closeModal();
     loadEvents();
-
   } catch (error) {
     console.error(error);
-    alert("Error saving event ❌");
+    alert("Error saving event âŒ");
   }
 }
+
 /* DELETE */
 async function deleteEvent(index) {
+  if (!confirm("Are you sure you want to delete this event?")) return;
   try {
     const { deleteDoc, doc } = window.firebaseFns;
-    const id = eventIds[index];
-
-    await deleteDoc(doc(window.db, "events", id));
-
+    await deleteDoc(doc(window.db, "events", eventIds[index]));
     loadEvents();
   } catch (error) {
     console.error(error);
+    alert("Error deleting event.");
   }
 }
 
 /* RENDER */
 function renderEvents() {
-
   const container = document.getElementById("eventsContainer");
-  container.innerHTML = "";
-
-  events.forEach((e, i) => {
-    // Track current and max participants
-    const currentParticipants = e.joined || 0;
-    const maxParticipants = e.seats || 0;
-
-    container.innerHTML += `
+  if (events.length === 0) {
+    container.innerHTML = '<p class="loading-text">No events yet. Click "Add Event" to create one.</p>';
+    return;
+  }
+  container.innerHTML = events.map((e, i) => `
     <div class="admin-event-card">
-
-      <img src="${e.image || 'https://via.placeholder.com/150'}">
-
+      <img src="${e.image || 'https://via.placeholder.com/180x100'}" alt="${e.name}">
       <div class="event-info">
         <h3>${e.name}</h3>
         <span>
-            <strong>Participants: ${currentParticipants}/${maxParticipants}</strong> <br>
-            ${e.category} · ${e.status} <br>
-            Event: ${e.eventDate || ""} <br>
-            Register by: ${e.regDeadline || ""}
+          ${e.category || ""} Â· ${e.seats || 0} slots Â· ${e.status || ""}<br>
+          ðŸ“… ${e.eventDate ? new Date(e.eventDate).toLocaleDateString('en-IN') : "â€”"} &nbsp;
+          â° Deadline: ${e.regDeadline ? new Date(e.regDeadline).toLocaleDateString('en-IN') : "â€”"}<br>
+          ðŸ‘¥ ${e.joined || 0}/${e.seats || 0} participants
         </span>
       </div>
-
       <div class="event-actions">
         <button class="edit" onclick="openEditEvent(${i})">Edit</button>
         <button class="delete" onclick="deleteEvent(${i})">Delete</button>
       </div>
-
     </div>
-    `;
-  });
+  `).join("");
 }
+
 /* LOAD */
 async function loadEvents() {
   try {
     const { collection, getDocs } = window.firebaseFns;
-
     const snapshot = await getDocs(collection(window.db, "events"));
-
     events = [];
     eventIds = [];
-
     snapshot.forEach(docSnap => {
       events.push(docSnap.data());
       eventIds.push(docSnap.id);
     });
-
     renderEvents();
-
   } catch (error) {
     console.error(error);
   }
 }
-
 </script>
 
 </body>
