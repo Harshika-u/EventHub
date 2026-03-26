@@ -1,0 +1,182 @@
+/* RESET */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  list-style: none;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+/* BODY */
+body {
+  background: #f8fafc; /* Lighter, cleaner gray */
+  color: #1e293b;
+}
+
+/* NAVBAR */
+.navbar {
+  width: 100%;
+  background: white;
+  padding: 10px 0;
+}
+
+.nav-inner {
+  max-width: 1200px;
+  margin: auto;
+  padding: 10px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo {
+  font-weight: 700;
+  font-size: 18px;
+}
+
+.logo span {
+  color: #3b82f6;
+}
+
+.nav-links {
+  display: flex;
+  gap: 25px;
+  align-items: center;
+}
+
+.nav-links a {
+  text-decoration: none;
+  color: #64748b;
+  font-size: 14px;
+  font-weight: 500;
+}
+/* MAIN CONTAINER */
+.main {
+  max-width: 1200px;
+  margin: 40px auto;
+  padding: 0 20px;
+}
+
+/* HERO SECTION */
+.hero {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr; /* Slightly larger left side */
+  gap: 30px;
+  align-items: stretch;
+}
+
+/* CARDS */
+.card {
+  background: white;
+  padding: 40px; /* Increased padding for that spacious look */
+  border-radius: 24px; /* Much rounder corners as per image */
+  border: 1px solid #e2e8f0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+/* LEFT SIDE CONTENT */
+.small-title {
+  color: #3b82f6;
+  font-size: 14px;
+  font-weight: 650;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.hero-left h1 {
+  margin: 15px 0;
+  font-size: 40px; /* Larger, bolder heading */
+  line-height: 1.1;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.desc {
+  color: #64748b;
+  font-size: 16px;
+  line-height: 1.6;
+  margin-bottom: 25px;
+}
+
+/* BUTTONS */
+.buttons {
+  margin-top: 15px;
+}
+
+.primary {
+  background: blue;
+  color: white;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 20px;
+}
+
+.secondary {
+  margin-left: 10px;
+  padding: 10px 15px;
+  border-radius: 20px;
+  border: none;
+  background: #ddd;
+}
+
+/* NEXT EVENT INNER BOX */
+.next-event-box {
+  margin-top: 20px;
+  background: #e0f2fe;
+  border: 2px solid #3b82f6;
+  padding: 15px;
+  border-radius: 10px;
+}
+
+.mini {
+  font-size: 12px;
+  color: #1e40af;
+}
+/* EVENTS */
+.events-section {
+  margin-top: 40px;
+}
+
+.events-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+  margin-top: 15px;
+}
+
+.event-card {
+  background: white;
+  padding: 15px;
+  border-radius: 10px;
+}
+/* Update the nav-links alignment to ensure the bubbles look centered */
+.nav-links {
+  display: flex;
+  gap: 10px; /* Reduced gap slightly to fit bubbles better */
+  align-items: center;
+}
+
+/* Base style for nav links */
+.nav-links a {
+  text-decoration: none;
+  color: #4b5563; /* Subtle dark gray */
+  font-weight: 600;
+  padding: 8px 20px; /* Space inside the bubble */
+  border-radius: 25px; /* Makes it a pill/bubble shape */
+  transition: all 0.3s ease;
+}
+
+/* 🔵 THE BLUE BUBBLE CLASS */
+.nav-links a.active {
+  background-color: #3b82f6; /* Modern blue */
+  color: white !important;   /* White text inside the bubble */
+  box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.2); /* Optional soft glow */
+}
+
+/* Hover effect for non-active links */
+.nav-links a:hover:not(.active) {
+  background-color: #f3f4f6;
+  color: #1d4ed8;
+}

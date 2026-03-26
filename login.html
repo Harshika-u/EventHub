@@ -54,17 +54,19 @@
         errorDiv.style.display = "none";
 
         // 2. DOMAIN VALIDATION
-        if (!email.endsWith(allowedDomain)) {
-            errorDiv.innerText = `Access Denied: You must use a ${allowedDomain} email address.`;
-            errorDiv.style.display = "block";
-            return;
-        }
 
         try {
             // 3. FIREBASE AUTHENTICATION
-            await signInWithEmailAndPassword(auth, email, pass);
+            // TEMPORARY LOGIN (for testing only)
+if (email === "student@test.com" && pass === "123456") {
+    alert("Login Successful! Redirecting...");
+    window.location.href = "dashboard.html";
+} else {
+    errorDiv.innerText = "Invalid email or password.";
+    errorDiv.style.display = "block";
+}
             alert("Login Successful! Redirecting...");
-            window.location.href = "student_dashboard.html"; // Change to your student page
+            window.location.href = "index.html"; // Change to your student page
         } catch (error) {
             errorDiv.innerText = "Invalid email or password.";
             errorDiv.style.display = "block";
