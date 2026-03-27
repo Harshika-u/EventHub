@@ -51,9 +51,9 @@
         <button class="export-btn excel" onclick="exportExcel()">Export Excel</button>
       </div>
       <div class="participants-stats" id="participantStats" style="display:none;">
-        <div class="stat-box">Interested: <strong id="statInterested">0</strong></div>
-        <div class="stat-box">Group regs: <strong id="statGroup">0</strong></div>
-        <div class="stat-box">Remaining slots: <strong id="statRemaining">â€”</strong></div>
+        <div class="stat-box">Interested: <strong id="statInterested"></strong></div>
+        <div class="stat-box">Group regs: <strong id="statGroup"></strong></div>
+        <div class="stat-box">Remaining slots: <strong id="statRemaining"></strong></div>
       </div>
       <table class="participants-table" id="participantsTable" style="display:none;">
         <thead>
@@ -131,10 +131,6 @@
           <option>Cultural</option>
           <option>Sports</option>
           <option>Academic</option>
-          <option>Literary</option>
-          <option>Commerce</option>
-          <option>Science</option>
-          <option>Humanities</option>
         </select>
       </div>
       <div style="display:flex; align-items:center; gap:8px; margin-top:28px;">
@@ -370,10 +366,10 @@ function renderEvents() {
       <div class="event-info">
         <h3>${e.name}</h3>
         <span>
-          ${e.category || ""} Â· ${e.seats || 0} slots Â· ${e.status || ""}<br>
-          ðŸ“… ${e.eventDate ? new Date(e.eventDate).toLocaleDateString('en-IN') : "â€”"} &nbsp;
-          â° Deadline: ${e.regDeadline ? new Date(e.regDeadline).toLocaleDateString('en-IN') : "â€”"}<br>
-          ðŸ‘¥ ${e.joined || 0}/${e.seats || 0} participants
+          ${e.category || ""} · ${e.seats || 0} slots· ${e.status || ""}<br>
+          ${e.eventDate ? new Date(e.eventDate).toLocaleDateString('en-IN') : "â€”"} &nbsp;
+          Deadline: ${e.regDeadline ? new Date(e.regDeadline).toLocaleDateString('en-IN') : "”"}<br>
+          Participants: ${e.joined || 0}/${e.seats || 0}
         </span>
       </div>
       <div class="event-actions">

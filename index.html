@@ -16,6 +16,7 @@
     <ul class="nav-links">
       <li><a href="index.html" class="active">Home</a></li>
       <li><a href="events.html">Events</a></li>
+      <li><a href="moments.html">Moments</a></li>
       <li><a href="admin/login.html">Admin</a></li>
     </ul>
   </div>
@@ -54,7 +55,7 @@
   <div class="events-section">
     <div class="section-header">
       <h2>Upcoming Events</h2>
-      <a href="events.html" class="see-all">See all â†’</a>
+      <a href="events.html" class="see-all">See all</a>
     </div>
     <div class="events-grid" id="homeEventsGrid">
       <p class="loading-text">Loading events...</p>
@@ -98,19 +99,35 @@
         return;
       }
 
-      // Countdown to nearest upcoming event
-      const withDates = display.filter(e => e.eventDate);
+      // --- START NEW LIVE COUNTDOWN ---
+      const withDates = allEvents
+        .filter(e => e.eventDate && new Date(e.eventDate) > new Date())
+        .sort((a, b) => new Date(a.eventDate) - new Date(b.eventDate));
+
       if (withDates.length > 0) {
-        withDates.sort((a, b) => new Date(a.eventDate) - new Date(b.eventDate));
         const nearest = withDates[0];
-        const diff = new Date(nearest.eventDate) - new Date();
-        if (diff > 0) {
-          const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-          document.getElementById("countdownText").innerText =
-            `${nearest.name} â€” in ${days} day${days !== 1 ? 's' : ''}`;
-        } else {
-          document.getElementById("countdownText").innerText = nearest.name + " â€” Today!";
-        }
+        const targetDate = new Date(nearest.eventDate).getTime();
+
+        // This function updates the text every 1 second
+        const timer = setInterval(() => {
+          const now = new Date().getTime();
+          const diff = targetDate - now;
+
+          if (diff <= 0) {
+            document.getElementById("countdownText").innerText = `${nearest.name} — Started!`;
+            clearInterval(timer);
+            return;
+          }
+
+          const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+          const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+          const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+          const s = Math.floor((diff % (1000 * 60)) / 1000);
+
+          document.getElementById("countdownText").innerText = 
+            `${nearest.name}: ${d}d ${h}h ${m}m ${s}s left`;
+        }, 1000);
+
       } else {
         document.getElementById("countdownText").innerText = "No upcoming events yet";
       }
@@ -119,7 +136,7 @@
         const regDeadline = e.regDeadline ? new Date(e.regDeadline).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : "â€”";
         const eventDate = e.eventDate ? new Date(e.eventDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : "â€”";
         const current = e.joined || 0;
-        const max = e.seats || "â€”";
+        const max = e.seats || "”";
         const statusClass = e.status === "Ongoing" ? "badge-ongoing" : "badge-upcoming";
 
         return `
@@ -131,10 +148,10 @@
           <div class="event-card-body">
             <h3>${e.name}</h3>
             <div class="event-meta">
-              <span>ðŸ“… ${eventDate}</span>
-              <span>â° Deadline: ${regDeadline}</span>
-              <span>ðŸ‘¥ ${current}/${max} participants</span>
-              ${e.venue ? `<span>ðŸ“ ${e.venue}</span>` : ""}
+              <span>Event Date: ${eventDate}</span>
+              <span>Deadline: ${regDeadline}</span>
+              <span>Participants: ${current}/${max}</span>
+              ${e.venue ? `<span>Venue: ${e.venue}</span>` : ""}
             </div>
             <button class="register-btn" onclick="alert('Registration coming soon!')">Register</button>
           </div>

@@ -16,6 +16,7 @@
     <ul class="nav-links">
       <li><a href="index.html">Home</a></li>
       <li><a href="events.html" class="active">Events</a></li>
+      <li><a href="moments.html">Moments</a></li>
       <li><a href="admin/login.html">Admin</a></li>
     </ul>
   </div>
@@ -41,10 +42,6 @@
       <option value="Sports">Sports</option>
       <option value="Cultural">Cultural</option>
       <option value="Academic">Academic</option>
-      <option value="Literary">Literary</option>
-      <option value="Commerce">Commerce</option>
-      <option value="Science">Science</option>
-      <option value="Humanities">Humanities</option>
     </select>
   </div>
 
@@ -109,7 +106,7 @@
       const regDeadline = e.regDeadline ? new Date(e.regDeadline).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : "â€”";
       const eventDate = e.eventDate ? new Date(e.eventDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : "â€”";
       const current = e.joined || 0;
-      const max = e.seats || "â€”";
+      const max = e.seats || "ae”";
       const isClosed = e.status === "Completed" || (e.regDeadline && new Date(e.regDeadline) < new Date());
       const statusClass = e.status === "Ongoing" ? "badge-ongoing" : e.status === "Completed" ? "badge-completed" : "badge-upcoming";
 
@@ -122,10 +119,10 @@
         <div class="event-card-body">
           <h3>${e.name}</h3>
           <div class="event-meta">
-            <span>ðŸ“… ${eventDate}</span>
-            <span>â° Deadline: ${regDeadline}</span>
-            <span>ðŸ‘¥ ${current}/${max} participants</span>
-            ${e.venue ? `<span>ðŸ“ ${e.venue}</span>` : ""}
+            <span>Event Date: ${eventDate}</span>
+            <span>Deadline: ${regDeadline}</span>
+            <span>Participants: ${current}/${max}</span>
+            ${e.venue ? `<span>Venue: ${e.venue}</span>` : ""}
           </div>
           <div class="event-card-actions">
             ${isClosed
