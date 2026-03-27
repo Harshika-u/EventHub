@@ -367,8 +367,8 @@ function renderEvents() {
         <h3>${e.name}</h3>
         <span>
           ${e.category || ""} · ${e.seats || 0} slots· ${e.status || ""}<br>
-          ${e.eventDate ? new Date(e.eventDate).toLocaleDateString('en-IN') : "â€”"} &nbsp;
-          Deadline: ${e.regDeadline ? new Date(e.regDeadline).toLocaleDateString('en-IN') : "”"}<br>
+          ${e.eventDate ? new Date(e.eventDate).toLocaleDateString('en-IN') : ""} &nbsp;
+          Deadline: ${e.regDeadline ? new Date(e.regDeadline).toLocaleDateString('en-IN') : ""}<br>
           Participants: ${e.joined || 0}/${e.seats || 0}
         </span>
       </div>
