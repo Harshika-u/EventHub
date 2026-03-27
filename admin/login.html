@@ -1,51 +1,49 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-
-
-<title>Admin Login</title>
-
-<link rel="stylesheet" href="css/style.css">
-<link rel="stylesheet" href="css/teacher.css">
-
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Teacher Login | EventHub</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/teacher.css">
 </head>
+<body class="admin-login-page">
 
-<body>
-
-<div class="login-container">
-
-<div class="login-card">
-
-<h2>Admin Login</h2>
-
-<p class="info">
-Use your school event coordinator credentials
-</p>
-
-<div class="demo-box">
-
-<p>Email: admin@schoolhub.local</p>
-<p>Password: EventHub@123</p>
-
+<div class="navbar">
+  <div class="nav-inner">
+    <div class="logo">School <span>EventHub</span></div>
+    <ul class="nav-links">
+      <li><a href="../index.html">Home</a></li>
+      <li><a href="../events.html">Events</a></li>
+      <li><a href="login.html" class="active">Admin</a></li>
+    </ul>
+  </div>
 </div>
 
-<form id="loginForm">
+<div class="admin-login-wrapper">
+  <div class="login-card">
+    <h2>Teacher/Admin Login</h2>
+    <p class="login-sub">Use your school event coordinator credentials to manage events and participants.</p>
 
-<label>Email</label>
-<input type="email" id="email" required>
+    <div class="demo-box">
+      <p class="demo-label">DEFAULT PLACEHOLDER CREDENTIALS</p>
+      <p>Email: admin@schoolhub.local</p>
+      <p>Password: EventHub@123</p>
+    </div>
 
-<label>Password</label>
-<input type="password" id="password" required>
+    <form id="loginForm">
+      <label>Email</label>
+      <input type="email" id="email" placeholder="admin@schoolhub.local" required>
 
-<button type="submit">Sign In</button>
+      <label>Password</label>
+      <input type="password" id="password" placeholder="••••••••••" required>
 
-</form>
-
+      <button type="submit" class="signin-btn">Sign In</button>
+    </form>
+  </div>
 </div>
 
-</div>
-
-<script src="js/teacher.js"></script>
+<script src="../js/teacher.js"></script>
 
 </body>
 </html>
