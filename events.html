@@ -16,7 +16,6 @@
     <ul class="nav-links">
       <li><a href="index.html">Home</a></li>
       <li><a href="events.html" class="active">Events</a></li>
-      <li><a href="moments.html">Moments</a></li>
       <li><a href="admin/login.html">Admin</a></li>
     </ul>
   </div>
@@ -28,9 +27,8 @@
     <p>Browse upcoming, ongoing, and completed events. Use filters to quickly find what matters.</p>
   </div>
 
-  <!-- FILTERS -->
   <div class="filters-row">
-    <input type="text" id="searchInput" placeholder="ðŸ” Search by event or organizer" class="search-input" oninput="filterEvents()">
+    <input type="text" id="searchInput" placeholder="Search by event or organizer" class="search-input" oninput="filterEvents()">
     <select id="statusFilter" onchange="filterEvents()" class="filter-select">
       <option value="">All Statuses</option>
       <option value="Upcoming">Upcoming</option>
@@ -42,6 +40,10 @@
       <option value="Sports">Sports</option>
       <option value="Cultural">Cultural</option>
       <option value="Academic">Academic</option>
+      <option value="Literary">Literary</option>
+      <option value="Commerce">Commerce</option>
+      <option value="Science">Science</option>
+      <option value="Humanities">Humanities</option>
     </select>
   </div>
 
@@ -50,9 +52,137 @@
   </div>
 </div>
 
+<!-- ═══ VIEW DETAILS MODAL ═══ -->
+<div class="modal" id="detailsModal">
+  <div class="modal-content details-modal-content">
+    <button class="details-close-btn" onclick="closeDetailsModal()">X</button>
+
+    <div class="details-img-wrap">
+      <img id="detailImg" src="" alt="">
+      <span class="badge" id="detailBadge"></span>
+    </div>
+
+    <div class="details-body">
+      <h2 id="detailName"></h2>
+      <p id="detailShortDesc" class="details-short-desc"></p>
+      <p id="detailDesc" class="details-long-desc"></p>
+
+      <div class="details-meta-grid">
+        <div class="details-meta-item">
+          <span class="meta-label">Event Date</span>
+          <span id="detailDate"></span>
+        </div>
+        <div class="details-meta-item">
+          <span class="meta-label">Time</span>
+          <span id="detailTime"></span>
+        </div>
+        <div class="details-meta-item">
+          <span class="meta-label">Venue</span>
+          <span id="detailVenue"></span>
+        </div>
+        <div class="details-meta-item">
+          <span class="meta-label">Organizer</span>
+          <span id="detailOrganizer"></span>
+        </div>
+        <div class="details-meta-item">
+          <span class="meta-label">Category</span>
+          <span id="detailCategory"></span>
+        </div>
+        <div class="details-meta-item">
+          <span class="meta-label">Participants</span>
+          <span id="detailLimit"></span>
+        </div>
+      </div>
+
+      <div class="details-reg-box">
+        <h3>Registration</h3>
+        <div class="reg-info-row">
+          <div class="reg-info-item">
+            <span class="meta-label">Reg. Opens</span>
+            <strong id="detailRegStart"></strong>
+          </div>
+          <div class="reg-info-item">
+            <span class="meta-label">Deadline</span>
+            <strong id="detailDeadline"></strong>
+          </div>
+          <div class="reg-info-item">
+            <span class="meta-label">Group Participation</span>
+            <strong id="detailGroup"></strong>
+          </div>
+        </div>
+        <button class="register-btn" id="detailRegBtn" onclick="openRegisterFromDetails()">Enroll</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ REGISTER MODAL ═══ -->
+<div class="modal" id="registerModal">
+  <div class="modal-content register-modal-content">
+    <div class="modal-header">
+      <h2>Enroll for <span id="regEventName"></span></h2>
+      <button class="modal-close" onclick="closeRegisterModal()">X</button>
+    </div>
+    <p class="modal-sub">Fill your details below. Roll number is required, email is optional.</p>
+
+    <div class="form-row">
+      <div>
+        <label>Student Name</label>
+        <input id="regName" type="text" placeholder="Full name">
+      </div>
+      <div>
+        <label>Class</label>
+        <input id="regClass" type="text" placeholder="e.g. 12">
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div>
+        <label>Section</label>
+        <input id="regSection" type="text" placeholder="e.g. A">
+      </div>
+      <div>
+        <label>Roll Number</label>
+        <input id="regRoll" type="text" placeholder="e.g. 24">
+      </div>
+    </div>
+
+    <label>Email (Optional)</label>
+    <input id="regEmail" type="email" placeholder="your@email.com">
+
+    <!-- GROUP SECTION -->
+    <div id="groupSection" style="display:none; margin-top:16px;">
+      <div class="group-toggle-row">
+        <input type="checkbox" id="isGroup" onchange="toggleGroupMembers()" style="width:auto;">
+        <label for="isGroup" style="margin:0; font-weight:600; margin-left:8px;">Group Participation</label>
+      </div>
+      <div id="groupMembersSection" style="display:none; margin-top:12px;">
+        <div class="form-row" style="margin-bottom:8px;">
+          <div>
+            <label>Group Name</label>
+            <input id="groupName" type="text" placeholder="e.g. Team Alpha">
+          </div>
+          <div>
+            <label>Number of Participants</label>
+            <input id="groupCount" type="number" min="2" value="2" onchange="updateGroupMembers()">
+          </div>
+        </div>
+        <div id="groupMembersList"></div>
+      </div>
+    </div>
+
+    <button class="save-btn" id="submitRegBtn" onclick="submitRegistration()" style="margin-top:20px;">Submit</button>
+    <p id="regError" style="color:#ef4444; font-size:13px; margin-top:8px; display:none;"></p>
+  </div>
+</div>
+
+<!-- FIREBASE -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-  import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+  import {
+    getFirestore, collection, getDocs, addDoc,
+    query, where, updateDoc, doc, increment
+  } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyDMkDxml0p9zUp6gZuo1SeVhmQ3BZamy9o",
@@ -65,14 +195,20 @@
 
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
-  window._allEvents = [];
 
+  // Make Firebase functions globally available
+  window._db = db;
+  window._fb = { collection, getDocs, addDoc, query, where, updateDoc, doc, increment };
+  window._allEvents = [];
+  window._currentEvent = null;
+
+  /* ── LOAD EVENTS ── */
   async function loadEvents() {
     const grid = document.getElementById("eventsGrid");
     try {
       const snapshot = await getDocs(collection(db, "events"));
       window._allEvents = [];
-      snapshot.forEach(doc => window._allEvents.push({ id: doc.id, ...doc.data() }));
+      snapshot.forEach(d => window._allEvents.push({ id: d.id, ...d.data() }));
       renderEvents(window._allEvents);
     } catch (err) {
       console.error(err);
@@ -80,61 +216,309 @@
     }
   }
 
-  window.filterEvents = () => {
-    const search = document.getElementById("searchInput").value.toLowerCase();
-    const status = document.getElementById("statusFilter").value;
-    const category = document.getElementById("categoryFilter").value;
+  /* ── REGISTRATION STATUS ── */
+  function getRegStatus(e) {
+    const now      = new Date();
+    const regStart = e.regStart    ? new Date(e.regStart)    : null;
+    const regEnd   = e.regDeadline ? new Date(e.regDeadline) : null;
+    const seats    = e.seats ? parseInt(e.seats) : 0;
+    const joined   = e.joined || 0;
+    if (e.status === "Completed")     return { open: false, reason: "Completed" };
+    if (seats > 0 && joined >= seats) return { open: false, reason: "Full" };
+    if (regStart && now < regStart)   return { open: false, reason: "Not open yet" };
+    if (regEnd   && now > regEnd)     return { open: false, reason: "Closed" };
+    return { open: true };
+  }
 
-    let filtered = window._allEvents.filter(e => {
-      const matchSearch = e.name?.toLowerCase().includes(search) || e.organizer?.toLowerCase().includes(search);
-      const matchStatus = !status || e.status === status;
-      const matchCategory = !category || e.category === category;
-      return matchSearch && matchStatus && matchCategory;
-    });
-
-    renderEvents(filtered);
-  };
-
+  /* ── RENDER EVENT CARDS ── */
   function renderEvents(list) {
     const grid = document.getElementById("eventsGrid");
     if (list.length === 0) {
       grid.innerHTML = '<p class="loading-text">No events found.</p>';
       return;
     }
-
     grid.innerHTML = list.map(e => {
-      const regDeadline = e.regDeadline ? new Date(e.regDeadline).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : "â€”";
-      const eventDate = e.eventDate ? new Date(e.eventDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : "â€”";
-      const current = e.joined || 0;
-      const max = e.seats || "ae”";
-      const isClosed = e.status === "Completed" || (e.regDeadline && new Date(e.regDeadline) < new Date());
-      const statusClass = e.status === "Ongoing" ? "badge-ongoing" : e.status === "Completed" ? "badge-completed" : "badge-upcoming";
+      const eventDate = e.eventDate
+        ? new Date(e.eventDate).toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' })
+        : "TBA";
+      const regEnd = e.regDeadline
+        ? new Date(e.regDeadline).toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' })
+        : "TBA";
+      const current     = e.joined || 0;
+      const max         = e.seats  || "Unlimited";
+      const statusClass = e.status === "Ongoing"   ? "badge-ongoing"
+                        : e.status === "Completed" ? "badge-completed"
+                        : "badge-upcoming";
+      const reg = getRegStatus(e);
 
       return `
       <div class="event-card">
         <div class="event-card-img">
           <img src="${e.image || 'https://via.placeholder.com/400x200'}" alt="${e.name}">
-          <span class="badge ${statusClass}">${(e.status || "").toLowerCase()}</span>
+          <span class="badge ${statusClass}">${(e.status || "upcoming").toLowerCase()}</span>
         </div>
         <div class="event-card-body">
           <h3>${e.name}</h3>
           <div class="event-meta">
-            <span>Event Date: ${eventDate}</span>
-            <span>Deadline: ${regDeadline}</span>
-            <span>Participants: ${current}/${max}</span>
+            <span>Date: ${eventDate}</span>
+            <span>Reg. deadline: ${regEnd}</span>
+            <span>Participants: ${current} / ${max}</span>
             ${e.venue ? `<span>Venue: ${e.venue}</span>` : ""}
           </div>
           <div class="event-card-actions">
-            ${isClosed
-              ? `<button class="register-btn closed" disabled>Registration Closed</button>`
-              : `<button class="register-btn" onclick="alert('Registration coming soon!')">Register</button>`
+            ${reg.open
+              ? `<button class="register-btn" onclick="openRegisterModal('${e.id}')">Register</button>`
+              : `<button class="register-btn closed" disabled>Registration ${reg.reason}</button>`
             }
-            <button class="details-btn" onclick="alert('Details coming soon!')">View Details</button>
+            <button class="details-btn" onclick="openDetailsModal('${e.id}')">View Details</button>
           </div>
         </div>
       </div>`;
     }).join("");
   }
+
+  /* ── DETAILS MODAL ── */
+  window.openDetailsModal = function(eventId) {
+    const e = window._allEvents.find(ev => ev.id === eventId);
+    if (!e) return;
+    window._currentEvent = e;
+
+    document.getElementById("detailImg").src = e.image || "https://via.placeholder.com/800x400";
+    document.getElementById("detailName").innerText = e.name || "";
+
+    const badge = document.getElementById("detailBadge");
+    badge.innerText = (e.status || "upcoming").toUpperCase();
+    badge.className = "badge " + (e.status === "Ongoing"   ? "badge-ongoing"
+                                : e.status === "Completed" ? "badge-completed"
+                                : "badge-upcoming");
+
+    document.getElementById("detailShortDesc").innerText = e.shortDesc || "";
+    document.getElementById("detailDesc").innerText      = e.desc      || "";
+
+    if (e.eventDate) {
+      const d = new Date(e.eventDate);
+      document.getElementById("detailDate").innerText = d.toLocaleDateString('en-IN', { day:'numeric', month:'long', year:'numeric' });
+      document.getElementById("detailTime").innerText = d.toLocaleTimeString('en-IN', { hour:'2-digit', minute:'2-digit' });
+    } else {
+      document.getElementById("detailDate").innerText = "TBA";
+      document.getElementById("detailTime").innerText = "TBA";
+    }
+
+    document.getElementById("detailVenue").innerText     = e.venue     || "TBA";
+    document.getElementById("detailOrganizer").innerText = e.organizer || "TBA";
+    document.getElementById("detailCategory").innerText  = e.category  || "General";
+    document.getElementById("detailLimit").innerText     = e.seats ? `${e.joined || 0} / ${e.seats}` : "Unlimited";
+    document.getElementById("detailRegStart").innerText  = e.regStart
+      ? new Date(e.regStart).toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' }) : "TBA";
+    document.getElementById("detailDeadline").innerText  = e.regDeadline
+      ? new Date(e.regDeadline).toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' }) : "TBA";
+    document.getElementById("detailGroup").innerText     = e.allowGroup ? "Allowed" : "Not allowed";
+
+    const reg = getRegStatus(e);
+    const btn = document.getElementById("detailRegBtn");
+    if (reg.open) {
+      btn.disabled = false;
+      btn.className = "register-btn";
+      btn.innerText = "Enroll";
+    } else {
+      btn.disabled = true;
+      btn.className = "register-btn closed";
+      btn.innerText = "Registration " + reg.reason;
+    }
+
+    document.getElementById("detailsModal").style.display = "flex";
+  };
+
+  window.closeDetailsModal = function() {
+    document.getElementById("detailsModal").style.display = "none";
+  };
+
+  window.openRegisterFromDetails = function() {
+    closeDetailsModal();
+    if (window._currentEvent) window.openRegisterModal(window._currentEvent.id);
+  };
+
+  /* ── REGISTER MODAL ── */
+  window.openRegisterModal = function(eventId) {
+    const e = window._allEvents.find(ev => ev.id === eventId);
+    if (!e) return;
+    window._currentEvent = e;
+
+    document.getElementById("regEventName").innerText  = e.name;
+    document.getElementById("regName").value           = "";
+    document.getElementById("regClass").value          = "";
+    document.getElementById("regSection").value        = "";
+    document.getElementById("regRoll").value           = "";
+    document.getElementById("regEmail").value          = "";
+    document.getElementById("isGroup").checked         = false;
+    document.getElementById("groupMembersSection").style.display = "none";
+    document.getElementById("groupMembersList").innerHTML = "";
+    document.getElementById("regError").style.display = "none";
+
+    // Show group checkbox only if event allows group
+    document.getElementById("groupSection").style.display = e.allowGroup ? "block" : "none";
+
+    document.getElementById("registerModal").style.display = "flex";
+  };
+
+  window.closeRegisterModal = function() {
+    document.getElementById("registerModal").style.display = "none";
+  };
+
+  window.toggleGroupMembers = function() {
+    const checked = document.getElementById("isGroup").checked;
+    document.getElementById("groupMembersSection").style.display = checked ? "block" : "none";
+    if (checked) updateGroupMembers();
+  };
+
+  window.updateGroupMembers = function() {
+    const count = parseInt(document.getElementById("groupCount").value) || 2;
+    const list = document.getElementById("groupMembersList");
+    list.innerHTML = "";
+    for (let i = 1; i <= count; i++) {
+      const row = document.createElement("div");
+      row.className = "group-member-row";
+      row.innerHTML = `
+        <div class="group-member-header">
+          <span style="font-weight:600; font-size:13px;">Participant ${i}</span>
+        </div>
+        <div class="form-row">
+          <div><input type="text" placeholder="Participant ${i} Name" class="member-name"></div>
+          <div><input type="text" placeholder="Class" class="member-class"></div>
+          <div><input type="text" placeholder="Section" class="member-section"></div>
+        </div>
+      `;
+      list.appendChild(row);
+    }
+  };
+
+  /* ── SUBMIT REGISTRATION ── */
+  window.submitRegistration = async function() {
+    const e             = window._currentEvent;
+    const name          = document.getElementById("regName").value.trim();
+    const regClass      = document.getElementById("regClass").value.trim();
+    const regSection    = document.getElementById("regSection").value.trim();
+    const rollNumber    = document.getElementById("regRoll").value.trim();
+    const email         = document.getElementById("regEmail").value.trim();
+    const errEl         = document.getElementById("regError");
+    errEl.style.display = "none";
+
+    if (!name || !regClass || !regSection || !rollNumber) {
+      errEl.innerText = "Please fill in all required fields (Name, Class, Section, Roll Number).";
+      errEl.style.display = "block";
+      return;
+    }
+
+    const isGroup = document.getElementById("isGroup").checked && e.allowGroup;
+    const groupName = isGroup ? document.getElementById("groupName").value.trim() : "";
+    let members = [];
+
+    if (isGroup) {
+      const rows = document.getElementById("groupMembersList").querySelectorAll(".group-member-row");
+      for (let row of rows) {
+        const mName    = row.querySelector(".member-name").value.trim();
+        const mClass   = row.querySelector(".member-class").value.trim();
+        const mSection = row.querySelector(".member-section").value.trim();
+        if (!mName || !mClass || !mSection) {
+          errEl.innerText = "Please fill in all participant details.";
+          errEl.style.display = "block";
+          return;
+        }
+        members.push({ name: mName, class: mClass, section: mSection });
+      }
+    }
+
+    try {
+      const btn = document.getElementById("submitRegBtn");
+      btn.disabled = true;
+      btn.innerText = "Submitting...";
+
+      const { collection, addDoc, updateDoc, doc, increment, query, where, getDocs } = window._fb;
+
+      // Check duplicate registration by roll number
+      const existSnap = await getDocs(query(
+        collection(window._db, "registrations"),
+        where("eventId", "==", e.id),
+        where("rollNumber", "==", rollNumber)
+      ));
+      if (!existSnap.empty) {
+        errEl.innerText = "You have already registered for this event with this roll number.";
+        errEl.style.display = "block";
+        btn.disabled = false;
+        btn.innerText = "Submit";
+        return;
+      }
+
+      // Check participant limit
+      if (e.seats && parseInt(e.seats) > 0) {
+        const allRegsSnap = await getDocs(query(
+          collection(window._db, "registrations"),
+          where("eventId", "==", e.id)
+        ));
+        if (allRegsSnap.size >= parseInt(e.seats)) {
+          errEl.innerText = "Sorry, this event is now full.";
+          errEl.style.display = "block";
+          btn.disabled = false;
+          btn.innerText = "Submit";
+          return;
+        }
+      }
+
+      // Save to Firebase
+      await addDoc(collection(window._db, "registrations"), {
+        eventId: e.id,
+        eventName: e.name,
+        name,
+        class: regClass,
+        section: regSection,
+        classSection: regClass + "-" + regSection,
+        rollNumber,
+        email: email || "",
+        type: isGroup ? "group" : "individual",
+        groupName: groupName,
+        members: isGroup ? members : [],
+        registeredAt: new Date().toISOString()
+      });
+
+      // Increment participant count
+      await updateDoc(doc(window._db, "events", e.id), { joined: increment(1) });
+
+      // Update local data
+      const ev = window._allEvents.find(ev => ev.id === e.id);
+      if (ev) ev.joined = (ev.joined || 0) + 1;
+
+      window.closeRegisterModal();
+      renderEvents(window._allEvents);
+      alert("Successfully registered for " + e.name + "!");
+
+    } catch (err) {
+      console.error(err);
+      errEl.innerText = "Registration failed. Please try again.";
+      errEl.style.display = "block";
+      document.getElementById("submitRegBtn").disabled = false;
+      document.getElementById("submitRegBtn").innerText = "Submit";
+    }
+  };
+
+  /* ── FILTER ── */
+  window.filterEvents = function() {
+    const search   = document.getElementById("searchInput").value.toLowerCase();
+    const status   = document.getElementById("statusFilter").value;
+    const category = document.getElementById("categoryFilter").value;
+    const filtered = window._allEvents.filter(e => {
+      const matchSearch   = e.name?.toLowerCase().includes(search) || e.organizer?.toLowerCase().includes(search);
+      const matchStatus   = !status   || e.status   === status;
+      const matchCategory = !category || e.category === category;
+      return matchSearch && matchStatus && matchCategory;
+    });
+    renderEvents(filtered);
+  };
+
+  // Close modals on outside click
+  window.addEventListener("click", ev => {
+    if (ev.target.id === "detailsModal")  window.closeDetailsModal();
+    if (ev.target.id === "registerModal") window.closeRegisterModal();
+  });
 
   loadEvents();
 </script>

@@ -51,9 +51,9 @@
         <button class="export-btn excel" onclick="exportExcel()">Export Excel</button>
       </div>
       <div class="participants-stats" id="participantStats" style="display:none;">
-        <div class="stat-box">Interested: <strong id="statInterested"></strong></div>
-        <div class="stat-box">Group regs: <strong id="statGroup"></strong></div>
-        <div class="stat-box">Remaining slots: <strong id="statRemaining"></strong></div>
+        <div class="stat-box">Registered: <strong id="statInterested">0</strong></div>
+        <div class="stat-box">Group regs: <strong id="statGroup">0</strong></div>
+        <div class="stat-box">Remaining slots: <strong id="statRemaining">-</strong></div>
       </div>
       <table class="participants-table" id="participantsTable" style="display:none;">
         <thead>
@@ -73,14 +73,14 @@
   </div>
 </div>
 
-<!-- MODAL -->
+<!-- ADD/EDIT EVENT MODAL -->
 <div class="modal" id="eventModal">
   <div class="modal-content">
     <div class="modal-header">
       <h2 id="modalTitle">Add New Event</h2>
-      <button class="modal-close" onclick="closeModal()">âœ•</button>
+      <button class="modal-close" onclick="closeModal()">X</button>
     </div>
-    <p class="modal-sub">Add details, set participant limits, and configure registration deadlines.</p>
+    <p class="modal-sub">Add details, set participant limits, and configure registration dates.</p>
 
     <label>Event Name</label>
     <input id="eventName" type="text" placeholder="e.g. Prismatic Science Fest">
@@ -93,23 +93,23 @@
 
     <div class="form-row">
       <div>
-        <label>Start Date &amp; Time</label>
+        <label>Event Date &amp; Time</label>
         <input id="eventDate" type="datetime-local">
       </div>
       <div>
-        <label>End Date &amp; Time</label>
-        <input id="eventEndDate" type="datetime-local">
+        <label>Participant Limit (blank = unlimited)</label>
+        <input id="eventSeats" type="number" min="1" placeholder="e.g. 20">
       </div>
     </div>
 
     <div class="form-row">
       <div>
-        <label>Registration Deadline</label>
-        <input id="eventRegDeadline" type="datetime-local">
+        <label>Registration Start Date &amp; Time</label>
+        <input id="eventRegStart" type="datetime-local">
       </div>
       <div>
-        <label>Participant Limit</label>
-        <input id="eventSeats" type="number" min="1" placeholder="20">
+        <label>Registration End Date &amp; Time</label>
+        <input id="eventRegDeadline" type="datetime-local">
       </div>
     </div>
 
@@ -131,6 +131,10 @@
           <option>Cultural</option>
           <option>Sports</option>
           <option>Academic</option>
+          <option>Literary</option>
+          <option>Commerce</option>
+          <option>Science</option>
+          <option>Humanities</option>
         </select>
       </div>
       <div style="display:flex; align-items:center; gap:8px; margin-top:28px;">
@@ -140,7 +144,7 @@
     </div>
 
     <label>Short Description</label>
-    <textarea id="eventShortDesc" placeholder="Brief summary..."></textarea>
+    <textarea id="eventShortDesc" placeholder="Brief one-line summary..."></textarea>
 
     <label>Description</label>
     <textarea id="eventDesc" placeholder="Full event details..."></textarea>
@@ -154,7 +158,7 @@
 <!-- FIREBASE -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-  import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+  import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, updateDoc, query, where } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyDMkDxml0p9zUp6gZuo1SeVhmQ3BZamy9o",
@@ -168,10 +172,9 @@
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
   window.db = db;
-  window.firebaseFns = { collection, addDoc, getDocs, deleteDoc, doc, updateDoc };
+  window.firebaseFns = { collection, addDoc, getDocs, deleteDoc, doc, updateDoc, query, where };
 
   window.onload = () => {
-    // Protect dashboard
     if (localStorage.getItem("admin") !== "true") {
       window.location.href = "login.html";
       return;
@@ -185,17 +188,16 @@ let events = [];
 let eventIds = [];
 let editIndex = -1;
 
-/* TAB SWITCHING */
+/* ── TAB SWITCHING ── */
 function showTab(tab) {
   document.getElementById("panel-events").style.display = tab === "events" ? "block" : "none";
   document.getElementById("panel-participants").style.display = tab === "participants" ? "block" : "none";
   document.getElementById("tab-events").className = tab === "events" ? "active" : "";
   document.getElementById("tab-participants").className = tab === "participants" ? "active" : "";
-
   if (tab === "participants") populateEventDropdown();
 }
 
-/* POPULATE DROPDOWN FOR PARTICIPANTS */
+/* ── POPULATE PARTICIPANT DROPDOWN ── */
 function populateEventDropdown() {
   const sel = document.getElementById("eventSelectDropdown");
   sel.innerHTML = '<option value="">Select an event...</option>';
@@ -204,8 +206,8 @@ function populateEventDropdown() {
   });
 }
 
-/* LOAD PARTICIPANTS (stub - ready for expansion) */
-function loadParticipants() {
+/* ── LOAD PARTICIPANTS ── */
+async function loadParticipants() {
   const idx = document.getElementById("eventSelectDropdown").value;
   const statsDiv = document.getElementById("participantStats");
   const table = document.getElementById("participantsTable");
@@ -219,22 +221,57 @@ function loadParticipants() {
   }
 
   const e = events[idx];
-  statsDiv.style.display = "flex";
-  document.getElementById("statInterested").innerText = e.joined || 0;
-  document.getElementById("statGroup").innerText = 0;
-  document.getElementById("statRemaining").innerText = (e.seats || 0) - (e.joined || 0);
+  const eventId = eventIds[idx];
 
-  // For now show empty table
-  document.getElementById("participantsBody").innerHTML = "";
-  table.style.display = "table";
-  msg.innerText = `Viewing participants for: ${e.name}`;
+  try {
+    const { collection, getDocs, query, where } = window.firebaseFns;
+    const snap = await getDocs(query(
+      collection(window.db, "registrations"),
+      where("eventId", "==", eventId)
+    ));
+
+    let regs = [];
+    snap.forEach(d => regs.push(d.data()));
+
+    const groupRegs = regs.filter(r => r.type === "group").length;
+    statsDiv.style.display = "flex";
+    document.getElementById("statInterested").innerText = regs.length;
+    document.getElementById("statGroup").innerText = groupRegs;
+    document.getElementById("statRemaining").innerText = e.seats
+      ? Math.max(0, parseInt(e.seats) - regs.length)
+      : "Unlimited";
+
+    const tbody = document.getElementById("participantsBody");
+    if (regs.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:#94a3b8; padding:20px;">No registrations yet.</td></tr>`;
+    } else {
+      tbody.innerHTML = regs.map(r => `
+        <tr>
+          <td>${r.name || ""}</td>
+          <td>${r.classSection || ""}</td>
+          <td>${r.rollNumber || ""}</td>
+          <td>${r.type || "individual"}</td>
+          <td>${r.type === "group" && r.members && r.members.length > 0
+            ? r.members.map(m => `${m.name} (${m.classSection}, ${m.rollNumber})`).join("<br>")
+            : "-"
+          }</td>
+        </tr>`).join("");
+    }
+
+    table.style.display = "table";
+    msg.innerText = `Viewing participants for: ${e.name}`;
+
+  } catch (err) {
+    console.error(err);
+    msg.innerText = "Failed to load participants.";
+  }
 }
 
-/* EXPORT STUBS */
+/* ── EXPORT STUBS ── */
 function exportCSV() { alert("CSV export coming soon!"); }
 function exportExcel() { alert("Excel export coming soon!"); }
 
-/* OPEN ADD */
+/* ── OPEN ADD EVENT ── */
 function openAddEvent() {
   document.getElementById("eventModal").style.display = "flex";
   document.getElementById("modalTitle").innerText = "Add New Event";
@@ -243,7 +280,7 @@ function openAddEvent() {
   editIndex = -1;
 }
 
-/* OPEN EDIT */
+/* ── OPEN EDIT EVENT ── */
 function openEditEvent(index) {
   const e = events[index];
   document.getElementById("eventModal").style.display = "flex";
@@ -258,7 +295,7 @@ function openEditEvent(index) {
   document.getElementById("eventVenue").value = e.venue || "";
   document.getElementById("eventOrganizer").value = e.organizer || "";
   document.getElementById("eventDate").value = e.eventDate || "";
-  document.getElementById("eventEndDate").value = e.eventEndDate || "";
+  document.getElementById("eventRegStart").value = e.regStart || "";
   document.getElementById("eventRegDeadline").value = e.regDeadline || "";
   document.getElementById("eventImageURL").value = e.image || "";
   document.getElementById("allowGroup").checked = e.allowGroup || false;
@@ -266,19 +303,20 @@ function openEditEvent(index) {
   editIndex = index;
 }
 
-/* CLOSE MODAL */
+/* ── CLOSE MODAL ── */
 function closeModal() {
   document.getElementById("eventModal").style.display = "none";
 }
 
-window.onclick = function(e) {
-  if (e.target.id === "eventModal") closeModal();
+window.onclick = function(ev) {
+  if (ev.target.id === "eventModal") closeModal();
 }
 
-/* CLEAR */
+/* ── CLEAR FORM ── */
 function clearForm() {
-  ["eventName","eventDesc","eventShortDesc","eventSeats","eventVenue",
-   "eventOrganizer","eventDate","eventEndDate","eventRegDeadline","eventImageURL"].forEach(id => {
+  ["eventName", "eventDesc", "eventShortDesc", "eventSeats", "eventVenue",
+   "eventOrganizer", "eventDate", "eventRegStart", "eventRegDeadline", "eventImageURL"
+  ].forEach(id => {
     document.getElementById(id).value = "";
   });
   document.getElementById("eventCategory").value = "Cultural";
@@ -286,40 +324,45 @@ function clearForm() {
   document.getElementById("eventImageFile").value = "";
 }
 
-/* SAVE */
+/* ── SAVE EVENT ── */
 async function saveEvent() {
   const name = document.getElementById("eventName").value.trim();
-  if (!name) { alert("Event name is required!"); return; }
+  if (!name) {
+    alert("Event name is required!");
+    return;
+  }
 
   try {
     const { collection, addDoc, updateDoc, doc } = window.firebaseFns;
-    const imageURL = document.getElementById("eventImageURL").value;
+
+    const imageURL = document.getElementById("eventImageURL").value.trim();
     const imageFile = document.getElementById("eventImageFile").files[0];
     let finalImage = imageURL || (imageFile ? URL.createObjectURL(imageFile) : "");
 
-    // Determine status from dates
     const now = new Date();
-    const startDate = document.getElementById("eventDate").value;
-    const endDate = document.getElementById("eventEndDate").value;
+    const eventDate = document.getElementById("eventDate").value;
+    const regStart = document.getElementById("eventRegStart").value;
+    const regDeadline = document.getElementById("eventRegDeadline").value;
+
+    // Auto determine status
     let status = "Upcoming";
-    if (startDate && endDate) {
-      if (now >= new Date(startDate) && now <= new Date(endDate)) status = "Ongoing";
-      else if (now > new Date(endDate)) status = "Completed";
-    } else if (startDate && now >= new Date(startDate)) {
+    if (eventDate && now > new Date(eventDate)) {
+      status = "Completed";
+    } else if (regStart && now >= new Date(regStart)) {
       status = "Ongoing";
     }
 
-    const event = {
+    const eventData = {
       name,
       desc: document.getElementById("eventDesc").value,
       shortDesc: document.getElementById("eventShortDesc").value,
       category: document.getElementById("eventCategory").value,
-      seats: document.getElementById("eventSeats").value,
+      seats: document.getElementById("eventSeats").value || "",
       venue: document.getElementById("eventVenue").value,
       organizer: document.getElementById("eventOrganizer").value,
-      eventDate: document.getElementById("eventDate").value,
-      eventEndDate: document.getElementById("eventEndDate").value,
-      regDeadline: document.getElementById("eventRegDeadline").value,
+      eventDate,
+      regStart,
+      regDeadline,
       image: finalImage,
       allowGroup: document.getElementById("allowGroup").checked,
       status,
@@ -327,20 +370,21 @@ async function saveEvent() {
     };
 
     if (editIndex === -1) {
-      await addDoc(collection(window.db, "events"), event);
+      await addDoc(collection(window.db, "events"), eventData);
     } else {
-      await updateDoc(doc(window.db, "events", eventIds[editIndex]), event);
+      await updateDoc(doc(window.db, "events", eventIds[editIndex]), eventData);
     }
 
     closeModal();
     loadEvents();
+
   } catch (error) {
     console.error(error);
-    alert("Error saving event âŒ");
+    alert("Error saving event. Please try again.");
   }
 }
 
-/* DELETE */
+/* ── DELETE EVENT ── */
 async function deleteEvent(index) {
   if (!confirm("Are you sure you want to delete this event?")) return;
   try {
@@ -353,47 +397,65 @@ async function deleteEvent(index) {
   }
 }
 
-/* RENDER */
+/* ── RENDER EVENT CARDS ── */
 function renderEvents() {
   const container = document.getElementById("eventsContainer");
   if (events.length === 0) {
     container.innerHTML = '<p class="loading-text">No events yet. Click "Add Event" to create one.</p>';
     return;
   }
-  container.innerHTML = events.map((e, i) => `
+
+  container.innerHTML = events.map((e, i) => {
+    const eventDate = e.eventDate
+      ? new Date(e.eventDate).toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' })
+      : "Not set";
+    const regStart = e.regStart
+      ? new Date(e.regStart).toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' })
+      : "Not set";
+    const regEnd = e.regDeadline
+      ? new Date(e.regDeadline).toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' })
+      : "Not set";
+
+    return `
     <div class="admin-event-card">
       <img src="${e.image || 'https://via.placeholder.com/180x100'}" alt="${e.name}">
       <div class="event-info">
         <h3>${e.name}</h3>
         <span>
-          ${e.category || ""} · ${e.seats || 0} slots· ${e.status || ""}<br>
-          ${e.eventDate ? new Date(e.eventDate).toLocaleDateString('en-IN') : ""} &nbsp;
-          Deadline: ${e.regDeadline ? new Date(e.regDeadline).toLocaleDateString('en-IN') : ""}<br>
-          Participants: ${e.joined || 0}/${e.seats || 0}
+          ${e.category || ""} &middot; ${e.seats ? e.seats + " slots" : "Unlimited"} &middot; ${e.status || "Upcoming"}<br>
+          Event: ${eventDate}<br>
+          Reg: ${regStart} to ${regEnd}<br>
+          Participants: ${e.joined || 0} / ${e.seats || "Unlimited"}
         </span>
       </div>
       <div class="event-actions">
         <button class="edit" onclick="openEditEvent(${i})">Edit</button>
         <button class="delete" onclick="deleteEvent(${i})">Delete</button>
       </div>
-    </div>
-  `).join("");
+    </div>`;
+  }).join("");
 }
 
-/* LOAD */
+/* ── LOAD EVENTS FROM FIREBASE ── */
 async function loadEvents() {
   try {
     const { collection, getDocs } = window.firebaseFns;
     const snapshot = await getDocs(collection(window.db, "events"));
+
     events = [];
     eventIds = [];
+
     snapshot.forEach(docSnap => {
       events.push(docSnap.data());
       eventIds.push(docSnap.id);
     });
+
     renderEvents();
+
   } catch (error) {
     console.error(error);
+    document.getElementById("eventsContainer").innerHTML =
+      '<p class="loading-text">Failed to load events. Check your connection.</p>';
   }
 }
 </script>
