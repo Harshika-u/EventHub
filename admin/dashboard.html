@@ -19,6 +19,7 @@
       <ul class="sidebar-menu">
         <li id="tab-events" class="active" onclick="showTab('events')">Events</li>
         <li id="tab-participants" onclick="showTab('participants')">Participants</li>
+       <li id="tab-participants" onclick="showTab('spot')">Spotlight</li>
       </ul>
     </div>
     <button class="logout-btn" onclick="logout()">Logout</button>
@@ -62,6 +63,7 @@
             <th>CLASS/SECTION</th>
             <th>ROLL NUMBER</th>
             <th>TYPE</th>
+                <th>EMAIL</th>
             <th>GROUP DETAILS</th>
           </tr>
         </thead>
@@ -159,6 +161,7 @@
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
   import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, updateDoc, query, where } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+  import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyDMkDxml0p9zUp6gZuo1SeVhmQ3BZamy9o",
@@ -171,8 +174,12 @@
 
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
+  const storage = getStorage(app);
+
   window.db = db;
+  window.storage = storage;
   window.firebaseFns = { collection, addDoc, getDocs, deleteDoc, doc, updateDoc, query, where };
+  window.storageFns = { ref, uploadBytes, getDownloadURL };
 
   window.onload = () => {
     if (localStorage.getItem("admin") !== "true") {
@@ -194,14 +201,22 @@ function showTab(tab) {
   document.getElementById("panel-participants").style.display = tab === "participants" ? "block" : "none";
   document.getElementById("tab-events").className = tab === "events" ? "active" : "";
   document.getElementById("tab-participants").className = tab === "participants" ? "active" : "";
-  if (tab === "participants") populateEventDropdown();
+  if (tab === "participants") {
+    populateEventDropdown();
+    loadParticipants(); // ← ADD THIS — triggers empty state on load
+  }
 }
 
 /* ── POPULATE PARTICIPANT DROPDOWN ── */
 function populateEventDropdown() {
   const sel = document.getElementById("eventSelectDropdown");
   sel.innerHTML = '<option value="">Select an event...</option>';
-  events.forEach((e, i) => {
+
+  // Sort alphabetically but keep original index for Firebase lookup
+  const sorted = events.map((e, i) => ({ e, i }))
+    .sort((a, b) => a.e.name.localeCompare(b.e.name));
+
+  sorted.forEach(({ e, i }) => {
     sel.innerHTML += `<option value="${i}">${e.name}</option>`;
   });
 }
@@ -212,13 +227,139 @@ async function loadParticipants() {
   const statsDiv = document.getElementById("participantStats");
   const table = document.getElementById("participantsTable");
   const msg = document.getElementById("participantsMsg");
+if (idx === "") {
+  statsDiv.style.display = "none";
+  table.style.display = "none";
+ msg.innerHTML = `
+<style>
+@keyframes orbit1{from{transform:rotate(0deg) translateX(90px) rotate(0deg)}to{transform:rotate(360deg) translateX(90px) rotate(-360deg)}}
+@keyframes orbit2{from{transform:rotate(120deg) translateX(60px) rotate(-120deg)}to{transform:rotate(480deg) translateX(60px) rotate(-480deg)}}
+@keyframes orbit3{from{transform:rotate(240deg) translateX(75px) rotate(-240deg)}to{transform:rotate(600deg) translateX(75px) rotate(-600deg)}}
+@keyframes breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes twinkle{0%,100%{opacity:0.2;transform:scale(1)}50%{opacity:1;transform:scale(1.4)}}
+@keyframes wave{0%{transform:translateY(0)}25%{transform:translateY(-6px)}75%{transform:translateY(6px)}100%{transform:translateY(0)}}
+@keyframes ringPulse{0%{transform:scale(1);opacity:0.4}100%{transform:scale(1.8);opacity:0}}
+.eh-o1{animation:orbit1 6s linear infinite}
+.eh-o2{animation:orbit2 9s linear infinite}
+.eh-o3{animation:orbit3 12s linear infinite}
+.eh-breathe{animation:breathe 3s ease-in-out infinite}
+.eh-f1{animation:fadeUp 0.6s ease forwards}
+.eh-f2{animation:fadeUp 0.6s 0.15s ease both}
+.eh-f3{animation:fadeUp 0.6s 0.3s ease both}
+.eh-f4{animation:fadeUp 0.6s 0.45s ease both}
+.eh-tw1{animation:twinkle 2s 0.0s ease-in-out infinite}
+.eh-tw2{animation:twinkle 2.5s 0.4s ease-in-out infinite}
+.eh-tw3{animation:twinkle 1.8s 0.8s ease-in-out infinite}
+.eh-tw4{animation:twinkle 2.2s 1.2s ease-in-out infinite}
+.eh-w1{animation:wave 2s 0s ease-in-out infinite}
+.eh-w2{animation:wave 2s 0.15s ease-in-out infinite}
+.eh-w3{animation:wave 2s 0.3s ease-in-out infinite}
+.eh-w4{animation:wave 2s 0.45s ease-in-out infinite}
+.eh-ring{animation:ringPulse 2s ease-out infinite}
+.eh-ring2{animation:ringPulse 2s 0.7s ease-out infinite}
+.eh-sc{transition:transform 0.2s,box-shadow 0.2s;cursor:default}
+.eh-sc:hover{transform:translateY(-4px) scale(1.03);box-shadow:0 12px 32px rgba(0,0,0,0.1)}
+</style>
+<div style="display:flex;flex-direction:column;align-items:center;padding:40px 20px 48px;background:linear-gradient(160deg,#faf5ff 0%,#f0f9ff 50%,#f0fdf4 100%);position:relative;overflow:hidden;min-height:100vh;margin:-20px;">
+  <div style="position:absolute;top:16px;left:24px;width:6px;height:6px;border-radius:50%;background:#a78bfa;" class="eh-tw1"></div>
+  <div style="position:absolute;top:40px;left:80px;width:4px;height:4px;border-radius:50%;background:#34d399;" class="eh-tw2"></div>
+  <div style="position:absolute;top:24px;right:60px;width:5px;height:5px;border-radius:50%;background:#60a5fa;" class="eh-tw3"></div>
+  <div style="position:absolute;top:60px;right:20px;width:3px;height:3px;border-radius:50%;background:#f472b6;" class="eh-tw4"></div>
+  <div style="position:absolute;bottom:60px;left:30px;width:4px;height:4px;border-radius:50%;background:#fbbf24;" class="eh-tw2"></div>
+  <div style="position:absolute;bottom:40px;right:40px;width:5px;height:5px;border-radius:50%;background:#a78bfa;" class="eh-tw1"></div>
 
-  if (idx === "") {
-    statsDiv.style.display = "none";
-    table.style.display = "none";
-    msg.innerText = "";
-    return;
+  <div style="position:relative;width:200px;height:200px;display:flex;align-items:center;justify-content:center;margin-bottom:32px;">
+    <div style="position:absolute;width:190px;height:190px;border-radius:50%;border:1px dashed rgba(139,92,246,0.2);"></div>
+    <div style="position:absolute;width:130px;height:130px;border-radius:50%;border:1px dashed rgba(99,102,241,0.3);"></div>
+    <div style="position:absolute;width:190px;height:190px;border-radius:50%;border:2px solid rgba(139,92,246,0.15);" class="eh-ring"></div>
+    <div style="position:absolute;width:190px;height:190px;border-radius:50%;border:2px solid rgba(139,92,246,0.15);" class="eh-ring2"></div>
+    <div style="position:absolute;width:190px;height:190px;display:flex;align-items:center;justify-content:center;">
+      <div class="eh-o1" style="position:absolute;width:28px;height:28px;border-radius:10px;background:linear-gradient(135deg,#6366f1,#8b5cf6);display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(99,102,241,0.4);">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" stroke="white" stroke-width="2.5" stroke-linecap="round"/><circle cx="9" cy="7" r="4" stroke="white" stroke-width="2.5"/></svg>
+      </div>
+    </div>
+    <div style="position:absolute;width:130px;height:130px;display:flex;align-items:center;justify-content:center;">
+      <div class="eh-o2" style="position:absolute;width:24px;height:24px;border-radius:8px;background:linear-gradient(135deg,#10b981,#059669);display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(16,185,129,0.4);">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M9 11l3 3L22 4" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+    </div>
+    <div style="position:absolute;width:160px;height:160px;display:flex;align-items:center;justify-content:center;">
+      <div class="eh-o3" style="position:absolute;width:22px;height:22px;border-radius:7px;background:linear-gradient(135deg,#f59e0b,#d97706);display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(245,158,11,0.4);">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+    </div>
+    <div class="eh-breathe" style="width:72px;height:72px;border-radius:20px;background:linear-gradient(135deg,#7c3aed,#6366f1);display:flex;align-items:center;justify-content:center;box-shadow:0 8px 24px rgba(124,58,237,0.4);position:relative;z-index:2;">
+      <svg width="32" height="32" viewBox="0 0 24 24" fill="none">
+        <path d="M3 3h7v7H3z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M14 3h7v7h-7z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M14 14h7v7h-7z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M3 14h7v7H3z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+  </div>
+
+  <div class="eh-f1" style="text-align:center;margin-bottom:6px;">
+    <h2 style="font-size:24px;font-weight:800;background:linear-gradient(135deg,#7c3aed,#6366f1,#0ea5e9);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin:0;">Ready to explore?</h2>
+  </div>
+  <div class="eh-f2" style="text-align:center;margin-bottom:36px;">
+    <p style="color:#94a3b8;font-size:14px;margin:0;line-height:1.7;max-width:320px;">Pick an event from the dropdown above </p>
+  </div>
+
+  <div class="eh-f3" style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-bottom:32px;">
+    <div class="eh-sc" style="background:white;border:1.5px solid #e9d5ff;border-radius:16px;padding:16px 24px;text-align:center;min-width:90px;">
+      <div style="font-size:26px;font-weight:800;color:#7c3aed;" id="eh-total">0</div>
+      <div style="font-size:11px;color:#a78bfa;margin-top:3px;font-weight:600;letter-spacing:0.06em;">EVENTS</div>
+    </div>
+    <div class="eh-sc" style="background:white;border:1.5px solid #a7f3d0;border-radius:16px;padding:16px 24px;text-align:center;min-width:90px;">
+      <div style="font-size:26px;font-weight:800;color:#059669;" id="eh-ongoing">0</div>
+      <div style="font-size:11px;color:#34d399;margin-top:3px;font-weight:600;letter-spacing:0.06em;">ONGOING</div>
+    </div>
+    <div class="eh-sc" style="background:white;border:1.5px solid #fde68a;border-radius:16px;padding:16px 24px;text-align:center;min-width:90px;">
+      <div style="font-size:26px;font-weight:800;color:#d97706;" id="eh-upcoming">0</div>
+      <div style="font-size:11px;color:#fbbf24;margin-top:3px;font-weight:600;letter-spacing:0.06em;">UPCOMING</div>
+    </div>
+    <div class="eh-sc" style="background:white;border:1.5px solid #fbcfe8;border-radius:16px;padding:16px 24px;text-align:center;min-width:90px;">
+      <div style="font-size:26px;font-weight:800;color:#db2777;" id="eh-done">0</div>
+      <div style="font-size:11px;color:#f472b6;margin-top:3px;font-weight:600;letter-spacing:0.06em;">COMPLETED</div>
+    </div>
+  </div>
+
+  <div class="eh-f4" style="display:flex;align-items:center;gap:8px;">
+    <div class="eh-w1" style="width:4px;height:16px;border-radius:4px;background:#a78bfa;"></div>
+    <div class="eh-w2" style="width:4px;height:22px;border-radius:4px;background:#818cf8;"></div>
+    <div class="eh-w3" style="width:4px;height:12px;border-radius:4px;background:#a78bfa;"></div>
+    <div class="eh-w4" style="width:4px;height:20px;border-radius:4px;background:#818cf8;"></div>
+    <span style="font-size:13px;color:#94a3b8;margin:0 10px;">Select an event to load data</span>
+    <div class="eh-w4" style="width:4px;height:20px;border-radius:4px;background:#818cf8;"></div>
+    <div class="eh-w3" style="width:4px;height:12px;border-radius:4px;background:#a78bfa;"></div>
+    <div class="eh-w2" style="width:4px;height:22px;border-radius:4px;background:#818cf8;"></div>
+    <div class="eh-w1" style="width:4px;height:16px;border-radius:4px;background:#a78bfa;"></div>
+  </div>
+</div>
+
+`;
+
+// Run count animation after HTML is inserted
+(function(){
+  function animCount(id, target){
+    let n = 0;
+    const el = document.getElementById(id);
+    if(!el || target === 0) return;
+    const s = Math.ceil(target / 20);
+    const t = setInterval(() => {
+      n = Math.min(n + s, target);
+      el.textContent = n;
+      if(n >= target) clearInterval(t);
+    }, 40);
   }
+  animCount('eh-total',    events.length);
+  animCount('eh-ongoing',  events.filter(e => getAdminEventStatus(e) === 'Ongoing').length);
+animCount('eh-upcoming', events.filter(e => getAdminEventStatus(e) === 'Upcoming').length);
+animCount('eh-done',     events.filter(e => getAdminEventStatus(e) === 'Completed').length);
+})();
+return;
+}
 
   const e = events[idx];
   const eventId = eventIds[idx];
@@ -230,9 +371,21 @@ async function loadParticipants() {
       where("eventId", "==", eventId)
     ));
 
-    let regs = [];
-    snap.forEach(d => regs.push(d.data()));
+   let regs = [];
+    snap.forEach(d => regs.push(d.data()));   // ← FILL regs FIRST
 
+    regs.sort((a, b) => {                     // ← THEN sort
+      const getSection = (r) => {
+        if (r.section) return r.section.toLowerCase();
+        if (r.classSection) return r.classSection.split("-")[1]?.toLowerCase() || "";
+        return "";
+      };
+      const secA = getSection(a);
+      const secB = getSection(b);
+      if (secA < secB) return -1;
+      if (secA > secB) return 1;
+      return (a.name || "").toLowerCase().localeCompare((b.name || "").toLowerCase());
+    });
     const groupRegs = regs.filter(r => r.type === "group").length;
     statsDiv.style.display = "flex";
     document.getElementById("statInterested").innerText = regs.length;
@@ -245,17 +398,31 @@ async function loadParticipants() {
     if (regs.length === 0) {
       tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:#94a3b8; padding:20px;">No registrations yet.</td></tr>`;
     } else {
-      tbody.innerHTML = regs.map(r => `
-        <tr>
-          <td>${r.name || ""}</td>
-          <td>${r.classSection || ""}</td>
-          <td>${r.rollNumber || ""}</td>
-          <td>${r.type || "individual"}</td>
-          <td>${r.type === "group" && r.members && r.members.length > 0
-            ? r.members.map(m => `${m.name} (${m.classSection}, ${m.rollNumber})`).join("<br>")
-            : "-"
-          }</td>
-        </tr>`).join("");
+      tbody.innerHTML = regs.map(r => {
+        const isGroup = r.type === "group";
+        const displayName = isGroup ? (r.groupName || r.name || "Group") : (r.name || "");
+        const displayClass = isGroup ? "--" : (r.classSection || "");
+        const displayRoll = isGroup ? "--" : (r.rollNumber || "");
+
+        let groupDetails = "-";
+        if (isGroup && r.members && r.members.length > 0) {
+          groupDetails = r.members.map(m => {
+            const cls = m.classSection || (m.class && m.section ? m.class + '-' + m.section : (m.class || m.section || "N/A"));
+            const roll = m.rollNumber || "N/A";
+            return `${m.name || "?"} (${cls}, Roll: ${roll})`;
+          }).join("<br>");
+        }
+
+        return `
+<tr>
+  <td>${displayName}</td>
+  <td>${displayClass}</td>
+  <td>${displayRoll}</td>
+  <td>${r.type || "individual"}</td>
+  <td>${r.email || "-"}</td>
+  <td>${groupDetails}</td>
+</tr>`;
+      }).join("");
     }
 
     table.style.display = "table";
@@ -268,9 +435,125 @@ async function loadParticipants() {
 }
 
 /* ── EXPORT STUBS ── */
-function exportCSV() { alert("CSV export coming soon!"); }
-function exportExcel() { alert("Excel export coming soon!"); }
+/* ── HELPER: GET CURRENT REGISTRATIONS ── */
+function getCurrentRegs() {
+  const idx = document.getElementById("eventSelectDropdown").value;
+  if (idx === "") {
+    const warn = document.createElement("div");
+    warn.style.cssText = "position:fixed;inset:0;background:rgba(15,10,30,0.5);backdrop-filter:blur(4px);z-index:9999;display:flex;align-items:center;justify-content:center;animation:fadeIn 0.2s ease";
+    warn.innerHTML = `
+      <style>
+        @keyframes popIn{from{opacity:0;transform:scale(0.85) translateY(20px)}to{opacity:1;transform:scale(1) translateY(0)}}
+        @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+      </style>
+      <div style="background:white;border-radius:24px;padding:36px 40px;max-width:360px;width:90%;text-align:center;box-shadow:0 32px 80px rgba(0,0,0,0.2);animation:popIn 0.3s cubic-bezier(0.175,0.885,0.32,1.275);">
+        <div style="width:64px;height:64px;border-radius:20px;background:linear-gradient(135deg,#fefce8,#fef08a);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none">
+            <path d="M12 9v4M12 17h.01" stroke="#ca8a04" stroke-width="2.5" stroke-linecap="round"/>
+            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" stroke="#ca8a04" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <h2 style="font-size:20px;font-weight:800;color:#0f172a;margin:0 0 8px;">No event selected</h2>
+        <p style="font-size:14px;color:#94a3b8;margin:0 0 24px;line-height:1.6;">Please select an event from the dropdown before exporting.</p>
+        <button onclick="document.body.removeChild(this.closest('[style*=fixed]'))" style="width:100%;padding:13px;border-radius:12px;border:none;background:linear-gradient(135deg,#f59e0b,#d97706);font-size:14px;font-weight:700;color:white;cursor:pointer;box-shadow:0 4px 12px rgba(245,158,11,0.35);">
+          Got it!
+        </button>
+      </div>
+    `;
+    document.body.appendChild(warn);
+    warn.addEventListener("click", (e) => { if (e.target === warn) document.body.removeChild(warn); });
+    return null;
+  }
+  const eventName = events[idx].name;
+  const rows = [];
 
+  document.querySelectorAll("#participantsBody tr").forEach(tr => {
+    const tds = tr.querySelectorAll("td");
+    if (tds.length < 5) return;
+    rows.push({
+      name:         tds[0].innerText,
+      classSection: tds[1].innerText,
+      rollNumber:   tds[2].innerText,
+      type:         tds[3].innerText,
+      groupDetails: tds[4].innerText
+    });
+  });
+
+  return { eventName, rows };
+}
+
+/* ── EXPORT CSV ── */
+function exportCSV() {
+  const data = getCurrentRegs();
+  if (!data) return;
+
+  const header = ["Name", "Class/Section", "Roll Number", "Type", "Group Details"];
+  const csvRows = [header.join(",")];
+
+  data.rows.forEach(r => {
+    const row = [
+      `"${r.name}"`,
+      `"${r.classSection}"`,
+      `"${r.rollNumber}"`,
+      `"${r.type}"`,
+      `"${r.groupDetails.replace(/\n/g, " | ")}"`
+    ];
+    csvRows.push(row.join(","));
+  });
+
+  const blob = new Blob([csvRows.join("\n")], { type: "text/csv" });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement("a");
+  a.href     = url;
+  a.download = `${data.eventName}_participants.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+/* ── EXPORT EXCEL ── */
+async function exportExcel() {
+  const data = getCurrentRegs();
+  if (!data) return;
+
+  // Load SheetJS if not already loaded
+  if (!window.XLSX) {
+    await new Promise((resolve, reject) => {
+      const script = document.createElement("script");
+      script.src = "https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js";
+      script.onload = resolve;
+      script.onerror = reject;
+      document.head.appendChild(script);
+    });
+  }
+
+  const header = ["Name", "Class/Section", "Roll Number", "Type", "Group Details"];
+  const sheetData = [header];
+
+  data.rows.forEach(r => {
+    sheetData.push([
+      r.name,
+      r.classSection,
+      r.rollNumber,
+      r.type,
+      r.groupDetails.replace(/\n/g, " | ")
+    ]);
+  });
+
+  const wb = XLSX.utils.book_new();
+  const ws = XLSX.utils.aoa_to_sheet(sheetData);
+
+  // Set column widths
+  ws["!cols"] = [
+    { wch: 20 },
+    { wch: 15 },
+    { wch: 12 },
+    { wch: 12 },
+    { wch: 50 }
+  ];
+
+  XLSX.utils.book_append_sheet(wb, ws, "Participants");
+  XLSX.writeFile(wb, `${data.eventName}_participants.xlsx`);
+}
 /* ── OPEN ADD EVENT ── */
 function openAddEvent() {
   document.getElementById("eventModal").style.display = "flex";
@@ -332,41 +615,59 @@ async function saveEvent() {
     return;
   }
 
+  const saveBtn = document.getElementById("saveBtn");
+  saveBtn.disabled = true;
+  saveBtn.innerText = "Saving...";
+
   try {
     const { collection, addDoc, updateDoc, doc } = window.firebaseFns;
+    const { ref, uploadBytes, getDownloadURL } = window.storageFns;
 
-    const imageURL = document.getElementById("eventImageURL").value.trim();
+    const imageURL  = document.getElementById("eventImageURL").value.trim();
     const imageFile = document.getElementById("eventImageFile").files[0];
-    let finalImage = imageURL || (imageFile ? URL.createObjectURL(imageFile) : "");
+    let finalImage  = imageURL; // default to pasted URL
 
-    const now = new Date();
-    const eventDate = document.getElementById("eventDate").value;
-    const regStart = document.getElementById("eventRegStart").value;
+    // If a file was chosen, upload it to Firebase Storage
+    if (imageFile) {
+  const cloudName = "danjlladp";       // ← from Cloudinary dashboard
+  const uploadPreset = "EventHub";   // ← the unsigned preset you created
+
+  const formData = new FormData();
+  formData.append("file", imageFile);
+  formData.append("upload_preset", uploadPreset);
+
+  const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
+    method: "POST",
+    body: formData
+  });
+  const data = await res.json();
+  finalImage = data.secure_url;  // normal https URL, works everywhere
+}
+    const now         = new Date();
+    const eventDate   = document.getElementById("eventDate").value;
+    const regStart    = document.getElementById("eventRegStart").value;
     const regDeadline = document.getElementById("eventRegDeadline").value;
 
-    // Auto determine status
     let status = "Upcoming";
-    if (eventDate && now > new Date(eventDate)) {
-      status = "Completed";
-    } else if (regStart && now >= new Date(regStart)) {
-      status = "Ongoing";
-    }
+    if (eventDate && now > new Date(eventDate))       status = "Completed";
+    else if (regStart && now >= new Date(regStart))   status = "Ongoing";
 
     const eventData = {
       name,
-      desc: document.getElementById("eventDesc").value,
-      shortDesc: document.getElementById("eventShortDesc").value,
-      category: document.getElementById("eventCategory").value,
-      seats: document.getElementById("eventSeats").value || "",
-      venue: document.getElementById("eventVenue").value,
-      organizer: document.getElementById("eventOrganizer").value,
+      desc:       document.getElementById("eventDesc").value,
+      shortDesc:  document.getElementById("eventShortDesc").value,
+      category:   document.getElementById("eventCategory").value,
+      seats:      document.getElementById("eventSeats").value || "",
+      venue:      document.getElementById("eventVenue").value,
+      organizer:  document.getElementById("eventOrganizer").value,
       eventDate,
       regStart,
       regDeadline,
-      image: finalImage,
+      image:      finalImage,
       allowGroup: document.getElementById("allowGroup").checked,
       status,
-      joined: editIndex === -1 ? 0 : (events[editIndex].joined || 0)
+      createdAt:  Date.now(),
+      joined:     editIndex === -1 ? 0 : (events[editIndex].joined || 0)
     };
 
     if (editIndex === -1) {
@@ -380,23 +681,75 @@ async function saveEvent() {
 
   } catch (error) {
     console.error(error);
-    alert("Error saving event. Please try again.");
+    alert("Error saving event: " + error.message);
+  } finally {
+    saveBtn.disabled = false;
+    saveBtn.innerText = editIndex === -1 ? "Create Event" : "Save Changes";
   }
 }
 
 /* ── DELETE EVENT ── */
-async function deleteEvent(index) {
-  if (!confirm("Are you sure you want to delete this event?")) return;
-  try {
-    const { deleteDoc, doc } = window.firebaseFns;
-    await deleteDoc(doc(window.db, "events", eventIds[index]));
-    loadEvents();
-  } catch (error) {
-    console.error(error);
-    alert("Error deleting event.");
-  }
+function deleteEvent(index) {
+  const overlay = document.createElement("div");
+  overlay.style.cssText = "position:fixed;inset:0;background:rgba(15,10,30,0.6);backdrop-filter:blur(4px);z-index:9999;display:flex;align-items:center;justify-content:center;animation:fadeIn 0.2s ease";
+
+  overlay.innerHTML = `
+    <style>
+      @keyframes popIn{from{opacity:0;transform:scale(0.85) translateY(20px)}to{opacity:1;transform:scale(1) translateY(0)}}
+      @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+    </style>
+    <div style="background:white;border-radius:24px;padding:36px 40px;max-width:380px;width:90%;text-align:center;box-shadow:0 32px 80px rgba(0,0,0,0.2);animation:popIn 0.3s cubic-bezier(0.175,0.885,0.32,1.275);">
+      <div style="width:64px;height:64px;border-radius:20px;background:linear-gradient(135deg,#fef2f2,#fee2e2);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none">
+          <polyline points="3,6 5,6 21,6" stroke="#ef4444" stroke-width="2" stroke-linecap="round"/>
+          <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" stroke="#ef4444" stroke-width="2" stroke-linecap="round"/>
+          <path d="M10 11v6M14 11v6" stroke="#ef4444" stroke-width="2" stroke-linecap="round"/>
+          <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" stroke="#ef4444" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <h2 style="font-size:20px;font-weight:800;color:#0f172a;margin:0 0 8px;">Delete Event?</h2>
+      <p style="font-size:14px;color:#94a3b8;margin:0 0 28px;line-height:1.6;">This action is permanent and cannot be undone. All participant data for this event will also be lost.</p>
+      <div style="display:flex;gap:12px;">
+        <button id="cancelDeleteBtn" style="flex:1;padding:12px;border-radius:12px;border:1.5px solid #e2e8f0;background:white;font-size:14px;font-weight:600;color:#64748b;cursor:pointer;"
+          onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background='white'">Cancel</button>
+        <button id="confirmDeleteBtn" style="flex:1;padding:12px;border-radius:12px;border:none;background:linear-gradient(135deg,#ef4444,#dc2626);font-size:14px;font-weight:700;color:white;cursor:pointer;box-shadow:0 4px 12px rgba(239,68,68,0.35);"
+          onmouseover="this.style.transform='translateY(-1px)'" onmouseout="this.style.transform='translateY(0)'">Yes, Delete</button>
+      </div>
+    </div>
+  `;
+
+  document.body.appendChild(overlay);
+
+  document.getElementById("cancelDeleteBtn").onclick = () => document.body.removeChild(overlay);
+
+  document.getElementById("confirmDeleteBtn").onclick = async () => {
+    document.body.removeChild(overlay);
+    try {
+      const { deleteDoc, doc } = window.firebaseFns;
+      await deleteDoc(doc(window.db, "events", eventIds[index]));
+      loadEvents();
+    } catch (error) {
+      console.error(error);
+      alert("Error deleting event.");
+    }
+  };
+
+  overlay.addEventListener("click", (e) => {
+    if (e.target === overlay) document.body.removeChild(overlay);
+  });
 }
 
+/* ── GET EVENT STATUS ── */
+function getAdminEventStatus(e) {
+  const now = new Date();
+  const regStart = e.regStart    ? new Date(e.regStart)    : null;
+  const regEnd   = e.regDeadline ? new Date(e.regDeadline) : null;
+
+  if (regEnd && now > regEnd)                                         return "Completed";
+  if (regStart && now < regStart)                                     return "Upcoming";
+  if ((!regStart || now >= regStart) && (!regEnd || now <= regEnd))   return "Ongoing";
+  return "Upcoming";
+}
 /* ── RENDER EVENT CARDS ── */
 function renderEvents() {
   const container = document.getElementById("eventsContainer");
@@ -422,7 +775,7 @@ function renderEvents() {
       <div class="event-info">
         <h3>${e.name}</h3>
         <span>
-          ${e.category || ""} &middot; ${e.seats ? e.seats + " slots" : "Unlimited"} &middot; ${e.status || "Upcoming"}<br>
+       ${e.category || ""} &middot; ${e.seats ? e.seats + " slots" : "Unlimited"} &middot; ${getAdminEventStatus(e)}<br>
           Event: ${eventDate}<br>
           Reg: ${regStart} to ${regEnd}<br>
           Participants: ${e.joined || 0} / ${e.seats || "Unlimited"}

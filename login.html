@@ -6,32 +6,108 @@
   <title>Student Login | EventHub</title>
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/student.css">
+  <link rel="stylesheet" href="css/logins.css">
+  <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
 </head>
-<body class="login-page">
+<body>
+ 
 
-<div class="login-wrapper">
-  <div class="login-card">
-    <div class="login-logo">School <span>EventHub</span></div>
-    <h2>Student Login</h2>
-    <p class="login-sub">Use your school email to sign in</p>
-
-    <div id="errorMessage" class="error-msg"></div>
-
-    <label>Email</label>
-    <input type="email" id="loginEmail" placeholder="name@jgsicse.org" required>
-
-    <label>Password</label>
-    <input type="password" id="loginPassword" placeholder="Enter password" required>
-
-    <button class="login-btn" onclick="handleLogin()">Login</button>
-
-    <p class="admin-link">Are you a teacher? <a href="admin/login.html">Admin Login</a></p>
-  </div>
+  <div class="container" id="mainContainer">
+ 
+    <!-- STUDENT LOGIN FORM -->
+    <div class="form-box login">
+      <form onsubmit="return false;">
+        <h1>Login</h1>
+ 
+        <div id="errorMessage" class="error-msg"></div>
+ 
+        <div class="input-box">
+          <input type="email" id="loginEmail" placeholder="name@jgsicse.org"  autocomplete="off" required>
+          <i class='bx bxs-envelope'></i>
+        </div>
+       <div class="input-box">
+  <input type="password" id="loginPassword" placeholder="Enter password"  autocomplete="new-password" required>
+  <i class="lock-icon" id="lockToggle" onclick="togglePassword()">
+    <svg id="lockSvg" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <!-- Shackle -->
+      <path id="lockShackle" d="M8 11V7a4 4 0 0 1 8 0v4" 
+        stroke="#aaa" stroke-width="2" stroke-linecap="round"
+        fill="none"/>
+      <!-- Body -->
+      <rect x="5" y="11" width="14" height="10" rx="2" 
+        fill="none" stroke="#aaa" stroke-width="2"/>
+      <!-- Keyhole -->
+      <circle cx="12" cy="16" r="1.5" fill="#aaa"/>
+      <line x1="12" y1="17.5" x2="12" y2="20" 
+        stroke="#aaa" stroke-width="2" stroke-linecap="round"/>
+    </svg>
+  </i>
 </div>
+       
+ 
+        <button type="button" class="btn" onclick="handleLogin()">Login</button>
+ 
+        
+        
+      </form>
+    </div>
+ 
+   <!-- ADMIN LOGIN FORM -->
+<div class="form-box register"> <!-- keep class "register" so existing CSS transitions still work -->
+  <form onsubmit="return false;">
+    <h1>Admin Login</h1>
+
+    <div id="adminErrorMessage" class="error-msg"></div>
+
+    <div class="input-box">
+      <input type="email" id="adminEmail" placeholder="Email"  autocomplete="off" required>
+      <i class='bx bxs-envelope'></i>
+    </div>
+
+    <div class="input-box">
+      <input type="password" id="adminPassword" placeholder="Enter password"  autocomplete="new-password" required>
+      <i class="lock-icon" id="lockToggle2" onclick="togglePassword2()">
+        <svg id="lockSvg2" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path id="lockShackle2" d="M8 11V7a4 4 0 0 1 8 0v4"
+            stroke="#aaa" stroke-width="2" stroke-linecap="round" fill="none"/>
+          <rect x="5" y="11" width="14" height="10" rx="2"
+            fill="none" stroke="#aaa" stroke-width="2"/>
+          <circle cx="12" cy="16" r="1.5" fill="#aaa"/>
+          <line x1="12" y1="17.5" x2="12" y2="20"
+            stroke="#aaa" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </i>
+    </div>
+
+    
+
+    <button type="button" class="btn" onclick="handleAdminLogin()">Sign In</button>
+  </form>
+</div>
+ 
+    <!-- TOGGLE PANELS -->
+    <div class="toggle-box">
+      <div class="toggle-panel toggle-left">
+        <h1>Hello, Welcome!</h1>
+        <p>Are you an Admin?</p>
+        <button class="btn register-btn">Admin Login</button>
+      </div>
+      <div class="toggle-panel toggle-right">
+        <h1>Welcome Back!</h1>
+        <p>Are you a Student?</p>
+        <button class="btn login-btn">Student Login</button>
+      </div>
+    </div>
+ 
+  </div>
+ 
+  <!-- Toggle + Firebase -->
+  <script src="js/script.js"></script>
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
   import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
 
   const firebaseConfig = {
     apiKey: "AIzaSyDMkDxml0p9zUp6gZuo1SeVhmQ3BZamy9o",
@@ -42,16 +118,32 @@
     appId: "1:450946542344:web:e54c332ca5bf2358d01abd"
   };
 
+
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
   window._auth = auth;
   window._signIn = signInWithEmailAndPassword;
 
+window.handleAdminLogin = () => {
+  const email = document.getElementById("adminEmail").value.trim();
+  const pass = document.getElementById("adminPassword").value;
+  const errorDiv = document.getElementById("adminErrorMessage");
+  errorDiv.style.display = "none";
+
+  if (email === "admin@schoolhub.local" && pass === "EventHub@123") {
+    localStorage.setItem("admin", "true");
+    window.location.href = "admin/dashboard.html";
+  } else {
+    errorDiv.innerText = "Invalid email or password.";
+    errorDiv.style.display = "block";
+  }
+};
   window.handleLogin = async () => {
     const email = document.getElementById("loginEmail").value.trim();
     const pass = document.getElementById("loginPassword").value;
     const errorDiv = document.getElementById("errorMessage");
     errorDiv.style.display = "none";
+
 
     if (!email || !pass) {
       errorDiv.innerText = "Please fill in all fields.";
@@ -59,22 +151,34 @@
       return;
     }
 
+
     // Temporary test login
     if (email === "student@test.com" && pass === "123456") {
       localStorage.setItem("student", "true");
+       localStorage.setItem("studentEmail", email); // ← ADD
       window.location.href = "index.html";
       return;
     }
 
+
     try {
       await window._signIn(window._auth, email, pass);
       localStorage.setItem("student", "true");
+      localStorage.setItem("studentEmail", email); // ← ADD
       window.location.href = "index.html";
     } catch (error) {
       errorDiv.innerText = "Invalid email or password.";
       errorDiv.style.display = "block";
     }
   };
+</script>
+<script>
+  window.addEventListener("load", () => {
+    document.getElementById("loginEmail").value = "";
+    document.getElementById("loginPassword").value = "";
+    document.getElementById("adminEmail").value = "";
+    document.getElementById("adminPassword").value = "";
+  });
 </script>
 
 </body>

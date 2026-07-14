@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Johnson Grammar School</title>
+<link rel="stylesheet" href="css/public.css">
+</head>
+<body class="jgs-public">
+
+<!-- NAVBAR (solid, sits above the hero — not overlaid on it) -->
+<nav class="jgs-nav">
+  <div class="jgs-nav-inner">
+    <a href="home.html" class="jgs-brand"><span class="crest">JGS</span> Johnson Grammar School</a>
+    <ul class="jgs-links">
+      <li><a href="home.html">Home</a></li>
+      <li><a href="clubs/clubs.html">School Clubs</a></li>
+      <li><a href="alumni.html">Alumni</a></li>
+      <li><a href="../login.html">Admin</a></li>
+      <li><a href="../indexlogin.html" class="cta">EventHub →</a></li>
+    </ul>
+  </div>
+</nav>
+
+<!-- HERO SLIDER -->
+<section class="hero-full">
+  <img class="hero-slide active" src="https://placehold.co/1920x1080/1b2a4a/e4c95f?text=Campus" alt="JGS campus">
+  <img class="hero-slide" src="https://placehold.co/1920x1080/7a1f2b/f8f6f0?text=Classrooms" alt="JGS classrooms">
+  <img class="hero-slide" src="https://placehold.co/1920x1080/2e3f66/e4c95f?text=Student+Life" alt="JGS student life">
+  <div class="hero-scrim"></div>
+  <div class="hero-full-content">
+    <div class="eyebrow light">JOHNSON GRAMMAR SCHOOL</div>
+    <h1 class="hero-full-title">Excellence in<br>every classroom</h1>
+    <p class="hero-full-sub">A digital home for JGS — events, clubs, achievements, and campus life, all in one place.</p>
+    <a href="../indexlogin.html" class="btn btn-outline-light">Enter EventHub</a>
+  </div>
+  <div class="hero-full-dots">
+    <span class="active"></span><span></span><span></span>
+  </div>
+</section>
+
+<!-- FLAME-STYLE STRIP: SPOTLIGHT | EVENTS | MEDIA -->
+<section class="strip-section reveal">
+  <div class="strip-grid">
+
+    <div class="strip-col">
+      <div class="strip-label">Spotlight</div>
+      <div class="spotlight-item">
+        <img id="spotlightImg" src="https://placehold.co/220x220/c9a227/1b2a4a?text=Photo" alt="">
+        <h4 id="spotlightTitle">JGS ranked 2nd in Telangana — ISC 2026 results</h4>
+      </div>
+      <div class="spotlight-arrows">
+        <button id="spotlightPrev">‹</button>
+        <button id="spotlightNext">›</button>
+      </div>
+    </div>
+
+    <div class="strip-col">
+      <div class="strip-label">Events</div>
+      <!-- Dummy data for now — wire to Firestore "events" collection later, same as index.html's countdown -->
+      <div class="event-row">
+        <div class="event-date-box">
+          <span class="d">05</span>
+          <span class="m">Aug</span>
+          <span class="t">3:30 PM</span>
+        </div>
+        <div>
+          <h4>Inter-House Debate Competition</h4>
+          <span>Registrations open · Auditorium</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="strip-col">
+      <div class="strip-label">Media</div>
+      <div class="media-item">
+        <a href="#">JGS Newsletter — July Edition is out now</a>
+        <span>Newsletter Club | 10 July, 2026</span>
+      </div>
+      <div class="media-item">
+        <a href="#">JNN wins Best Campus Media at District Meet</a>
+        <span>JNN News | 2 July, 2026</span>
+      </div>
+    </div>
+
+    <div class="strip-links">
+      <a href="#">All Spotlight</a>
+      <a href="../events.html">Event Calendar</a>
+      <a href="clubs/clubs.html">All Media</a>
+    </div>
+
+  </div>
+</section>
+
+<!-- LEDGER STATS -->
+<section class="ledger reveal">
+  <div class="ledger-title">School at a glance</div>
+  <div class="ledger-table">
+    <div class="ledger-row">
+      <div class="ledger-num" id="statStudents">—</div>
+      <div class="ledger-label">Students enrolled</div>
+    </div>
+    <div class="ledger-row">
+      <div class="ledger-num" id="statTeachers">—</div>
+      <div class="ledger-label">Teaching staff</div>
+    </div>
+    <div class="ledger-row">
+      <div class="ledger-num" id="statAlumni">—</div>
+      <div class="ledger-label">Alumni network</div>
+    </div>
+  </div>
+  <div class="ledger-note">Figures updated by school administration.</div>
+</section>
+
+<!-- ABOUT JGS -->
+<section class="about-jgs">
+  <div class="about-jgs-inner">
+    <h2 class="about-jgs-heading reveal">JOHNSON<br>GRAMMAR<br><span class="underline-gold">SCHOOL</span></h2>
+    <div class="about-jgs-text reveal">
+      <p>Johnson Grammar School was recently ranked 2nd in Telangana for ISC 2026 results — a reflection of a campus where academics and student-led activity have always grown side by side. Founded in [Year] by [Founder Name], and guided since by [Chairman Name] as Chairman, JGS has built its reputation on rigorous ICSE/ISC academics paired with a campus life students actually run themselves — from the newsletter desk to JNN to the four major ISC events organized entirely by ISC students each year.</p>
+      <p class="placeholder-note">[Editable placeholder — replace founding year, founder, and chairman details]</p>
+    </div>
+  </div>
+</section>
+
+<!-- ADVANTAGES -->
+<section class="advantages">
+  <div class="advantages-inner">
+    <div class="advantage-grid">
+
+      <div class="advantage-box reveal">
+        <div>
+          <h4>Practical, Industry-Ready Learning</h4>
+          <p>ISC students at JGS get hands-on, practical exposure most intermediate colleges don't offer — labs, projects, and real application, not just theory.</p>
+        </div>
+        <span class="advantage-tag">Academics</span>
+      </div>
+
+      <div class="advantage-box reveal">
+        <div>
+          <h4>Student-Led ISC Events</h4>
+          <p>Four major ISC events run every year — organized, managed, and executed entirely by JGS ISC students from start to finish.</p>
+        </div>
+        <span class="advantage-tag">Student Life</span>
+      </div>
+
+      <div class="advantage-box reveal">
+        <div>
+          <h4>One Digital Campus</h4>
+          <p>Events, registrations, and announcements live in one place — EventHub — instead of being announced class by class.</p>
+        </div>
+        <span class="advantage-tag">EventHub</span>
+      </div>
+
+      <div class="advantage-box reveal">
+        <div>
+          <h4>Small Classes, Real Mentoring</h4>
+          <p>Every student is known by name — academics come paired with individual attention, not just curriculum coverage.</p>
+        </div>
+        <span class="advantage-tag">Faculty</span>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- VISION & MISSION -->
+<section class="section">
+  <div class="section-head reveal">
+    <div class="eyebrow">What we stand for</div>
+  </div>
+  <div class="vm-cards reveal">
+    <div class="vm-card">
+      <h4>Vision</h4>
+      <p id="visionText">To be a school where academic excellence and student-led activity grow side by side.</p>
+    </div>
+    <div class="vm-card">
+      <h4>Mission</h4>
+      <p id="missionText">To give every student the tools, platform, and recognition to pursue what they're genuinely good at — inside and outside the classroom.</p>
+    </div>
+  </div>
+</section>
+
+<!-- SPORTS STRIP -->
+<section class="sports-strip">
+  <div class="sports-inner">
+    <div class="eyebrow">On the field</div>
+    <h2>Sport at JGS</h2>
+    <div class="sports-list">
+      <div class="sport-item"><div class="yr">ANNUAL</div><p>Inter-house athletics meet</p></div>
+      <div class="sport-item"><div class="yr">ANNUAL</div><p>Basketball & football leagues</p></div>
+      <div class="sport-item"><div class="yr">ONGOING</div><p>Weekly badminton & table tennis</p></div>
+      <div class="sport-item"><div class="yr">ANNUAL</div><p>Inter-school sports meet</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ALUMNI TEASER -->
+<section class="alumni-teaser reveal">
+  <div class="alumni-head">
+    <div>
+      <div class="eyebrow">Where they are now</div>
+      <h2>Alumni</h2>
+    </div>
+    <a href="alumni.html">View all alumni →</a>
+  </div>
+  <div class="alumni-row">
+    <div class="alumni-card">
+      <div class="alumni-photo"><img src="https://placehold.co/300x300/1b2a4a/e4c95f?text=Photo" alt=""></div>
+      <div class="alumni-info"><h4>Alumni name</h4><span>BATCH OF 20XX</span></div>
+    </div>
+    <div class="alumni-card">
+      <div class="alumni-photo"><img src="https://placehold.co/300x300/7a1f2b/f8f6f0?text=Photo" alt=""></div>
+      <div class="alumni-info"><h4>Alumni name</h4><span>BATCH OF 20XX</span></div>
+    </div>
+    <div class="alumni-card">
+      <div class="alumni-photo"><img src="https://placehold.co/300x300/2e3f66/e4c95f?text=Photo" alt=""></div>
+      <div class="alumni-info"><h4>Alumni name</h4><span>BATCH OF 20XX</span></div>
+    </div>
+    <div class="alumni-card">
+      <div class="alumni-photo"><img src="https://placehold.co/300x300/c9a227/1b2a4a?text=Photo" alt=""></div>
+      <div class="alumni-info"><h4>Alumni name</h4><span>BATCH OF 20XX</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="jgs-footer">
+  <div class="footer-inner">
+    <div class="footer-grid">
+      <div>
+        <h5>Johnson Grammar School</h5>
+        <p style="font-size:14px;color:var(--slate);line-height:1.6;max-width:32ch;">The school's digital campus — news, clubs, achievements, and EventHub, all in one place.</p>
+      </div>
+      <div>
+        <h5>Explore</h5>
+        <ul>
+          <li><a href="home.html">Home</a></li>
+          <li><a href="clubs/clubs.html">School Clubs</a></li>
+          <li><a href="alumni.html">Alumni</a></li>
+        </ul>
+      </div>
+      <div>
+        <h5>Portal</h5>
+        <ul>
+          <li><a href="../indexlogin.html">Student Login</a></li>
+          <li><a href="../login.html">Admin Login</a></li>
+        </ul>
+      </div>
+      <div>
+        <h5>Contact</h5>
+        <ul>
+          <li><a href="#">info@jgsicse.org</a></li>
+          <li><a href="#">Instagram</a></li>
+          <li><a href="#">YouTube — JNN</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© Johnson Grammar School</span>
+      <span>Built by students, for students.</span>
+    </div>
+  </div>
+</footer>
+
+<script src="js/public.js"></script>
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+  import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyDMkDxml0p9zUp6gZuo1SeVhmQ3BZamy9o",
+    authDomain: "eventhub-8a8dc.firebaseapp.com",
+    projectId: "eventhub-8a8dc",
+    storageBucket: "eventhub-8a8dc.firebasestorage.app",
+    messagingSenderId: "450946542344",
+    appId: "1:450946542344:web:e54c332ca5bf2358d01abd"
+  };
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  // Placeholder fallbacks — shown until an admin edit panel writes real values
+  // to the "siteContent" collection in Firestore.
+  const FALLBACK = { students: "330+", teachers: "40+", alumni: "1,200+" };
+
+  async function loadStats() {
+    try {
+      const snap = await getDoc(doc(db, "siteContent", "stats"));
+      const data = snap.exists() ? snap.data() : {};
+      document.getElementById("statStudents").textContent = data.students || FALLBACK.students;
+      document.getElementById("statTeachers").textContent = data.teachers || FALLBACK.teachers;
+      document.getElementById("statAlumni").textContent   = data.alumni   || FALLBACK.alumni;
+    } catch (err) {
+      console.error("Failed to load stats, using placeholders:", err);
+      document.getElementById("statStudents").textContent = FALLBACK.students;
+      document.getElementById("statTeachers").textContent = FALLBACK.teachers;
+      document.getElementById("statAlumni").textContent   = FALLBACK.alumni;
+    }
+  }
+
+  // Spotlight rotation items (placeholder — swap in real achievements/images)
+  window.__jgsSpotlightItems = [
+    { img: "https://placehold.co/220x220/c9a227/1b2a4a?text=Photo", title: "JGS ranked 2nd in Telangana — ISC 2026 results" },
+    { img: "https://placehold.co/220x220/7a1f2b/f8f6f0?text=Photo", title: "Prismatic 2026 — Science Fest highlights" },
+    { img: "https://placehold.co/220x220/2e3f66/e4c95f?text=Photo", title: "JNN wins Best Campus Media — District Meet" }
+  ];
+
+  loadStats();
+</script>
+
+</body>
+</html>

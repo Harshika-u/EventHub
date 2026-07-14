@@ -1,23 +1,18 @@
+/*logic for jgs animation*/
 @import url("https://fonts.googleapis.com/css2?family=Michroma&display=swap");
+
 * {
   padding: 0;
   margin: 0;
   box-sizing: border-box;
 }
+
 body {
   font-family: "Michroma", sans-serif;
   height: 100vh;
+  background-color: rgb(255, 255, 255);
 }
-.container {
-  background-color: black;
-  color: #fff;
-  height: 100%;
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-}
+
 .loading-page {
   position: absolute;
   top: 0;
@@ -30,61 +25,56 @@ body {
   gap: 1.5rem;
   align-items: center;
   justify-content: center;
-  color: #191654;
+  z-index: 999;
 }
+
 #svg {
-  height: 150px;
-  width: 300px;
+  height: 250px;
+  width: 100%; /* Responsive width */
+  max-width: 800px;
+  stroke: white;
+  fill: transparent;
+  stroke-width: 2px;
+  stroke-dasharray: 2000;
+  stroke-dashoffset: 2000;
+  animation: draw 8s ease-out forwards;
 }
-@keyframes draw {
-  0% {
-    stroke-dashoffset: 1200;
-  }
-  100% {
-    stroke-dashoffset: 0;
-  }
+
+.jgs-text {
+     font-family: "Michroma", sans-serif;
+  font-size: 150px;
+  font-weight: bold;
+  letter-spacing: 10px;
 }
-.name-container {
-  height: 50px;
-  overflow: hidden;
-}
+
 .logo-name {
   color: #fff;
   font-size: 20px;
   letter-spacing: 12px;
   text-transform: uppercase;
-  margin-left: 20px;
   font-weight: bolder;
-}
-/* Update the existing #svg rule to handle the text size better */
-#svg {
-    height: 190x;
-    width: 800px; /* Widened to fit three letters */
-    stroke: white;
-    fill: transparent; /* Ensures only the outline shows initially */
-    stroke-width: 3px;
-    stroke-dasharray: 1000;
-    stroke-dashoffset: 1000;
-    animation: draw 5s ease forwards;
-}
-
-.jgs-text {  
-    font-family: "Michroma", sans-serif;
-    font-size: 200px;
-    font-weight: bold;
-    letter-spacing: 10px;
+  opacity: 0; /* Handled by GSAP */
 }
 
 @keyframes draw {
-    0% {
-        stroke-dashoffset: 1000;
-        fill: rgba(255, 255, 255, 0);
-    }
-    70% {
-        fill: rgba(255, 255, 255, 0);
-    }
-    100% {
-        stroke-dashoffset: 0;
-        fill: rgba(255, 255, 255, 1); /* Fills the letters in at the end */
-    }
+  0% {
+    stroke-dashoffset: 2000;
+    fill: rgba(255, 255, 255, 0);
+  }
+  70% {
+    fill: rgba(255, 255, 255, 0);
+  }
+  100% {
+    stroke-dashoffset: 0;
+    fill: rgba(255, 255, 255, 1);
+  }
+}
+.loading-page {
+  /* ... existing styles ... */
+  gap: 0.3rem; /* reduced from 1.5rem */
+}
+
+/* Add this — white fill during fade out */
+.loading-page.fading {
+  background: white;
 }

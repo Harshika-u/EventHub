@@ -1,0 +1,1 @@
+setTimeout(()=>{window.location.href='../spotlight.html';},6500);
