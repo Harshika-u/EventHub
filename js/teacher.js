@@ -1,4 +1,3 @@
-
 /* LOGOUT */
 function logout() {
   localStorage.removeItem("admin");

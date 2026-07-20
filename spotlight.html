@@ -1,0 +1,943 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Spotlight — The Vantage Events Archive</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --void:#0a0910;
+    --curtain:#151220;
+    --curtain-2:#1b1826;
+    --surface:#1e1a29;
+    --surface-2:#262130;
+    --spotlight:#ffdb8a;
+    --spotlight-soft:#ffdb8a33;
+    --gold:#d4af37;
+    --gold-bright:#f4d580;
+    --ivory:#f3efe6;
+    --muted:#9c93a8;
+    --muted-dim:#6b6379;
+    --velvet:#5c1a2c;
+    --line:#332c42;
+    --radius:14px;
+    --ease:cubic-bezier(.22,1,.36,1);
+  }
+
+  *{margin:0;padding:0;box-sizing:border-box;}
+
+  html{scroll-behavior:smooth;}
+
+  body{
+    background:var(--void);
+    color:var(--ivory);
+    font-family:'Inter',sans-serif;
+    overflow-x:hidden;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  a{color:inherit;text-decoration:none;}
+  button{font-family:inherit;cursor:pointer;background:none;border:none;color:inherit;}
+
+  ::selection{background:var(--gold);color:var(--void);}
+
+  :focus-visible{
+    outline:2px solid var(--spotlight);
+    outline-offset:3px;
+    border-radius:4px;
+  }
+
+  .eyebrow{
+    font-size:12px;
+    letter-spacing:.22em;
+    text-transform:uppercase;
+    color:var(--gold);
+    font-weight:600;
+  }
+
+  .display{
+    font-family:'Bebas Neue',sans-serif;
+    letter-spacing:.03em;
+    line-height:.92;
+  }
+
+  .serif{
+    font-family:'Fraunces',serif;
+  }
+
+  /* ---------- background texture ---------- */
+  body::before{
+    content:'';
+    position:fixed;
+    inset:0;
+    z-index:-2;
+    background:
+      radial-gradient(ellipse 60% 40% at 50% -10%, #241f3a55, transparent 60%),
+      repeating-linear-gradient(90deg, #ffffff05 0px, #ffffff05 1px, transparent 1px, transparent 90px);
+    pointer-events:none;
+  }
+
+  /* ---------- header ---------- */
+  header{
+    position:fixed;
+    top:0;left:0;right:0;
+    z-index:100;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:22px clamp(20px,5vw,64px);
+    transition:background .4s var(--ease), padding .4s var(--ease), border-color .4s var(--ease);
+    border-bottom:1px solid transparent;
+  }
+  header.scrolled{
+    background:#0a0910d9;
+    backdrop-filter:blur(10px);
+    padding:14px clamp(20px,5vw,64px);
+    border-color:var(--line);
+  }
+
+  .logo{
+    font-family:'Bebas Neue',sans-serif;
+    font-size:22px;
+    letter-spacing:.14em;
+    display:flex;
+    align-items:center;
+    gap:9px;
+  }
+  .logo .dot{
+    width:8px;height:8px;border-radius:50%;
+    background:var(--spotlight);
+    box-shadow:0 0 10px 2px var(--spotlight);
+    animation:pulseDot 2.4s ease-in-out infinite;
+  }
+  @keyframes pulseDot{
+    0%,100%{opacity:1;transform:scale(1);}
+    50%{opacity:.45;transform:scale(.7);}
+  }
+
+  nav{display:flex;gap:clamp(18px,3vw,40px);align-items:center;}
+  nav a{
+    font-size:13px;
+    letter-spacing:.06em;
+    color:var(--muted);
+    font-weight:500;
+    position:relative;
+    padding-bottom:4px;
+    transition:color .3s;
+  }
+  nav a:hover{color:var(--ivory);}
+  nav a::after{
+    content:'';
+    position:absolute;left:0;bottom:0;
+    width:0;height:1px;
+    background:var(--gold);
+    transition:width .35s var(--ease);
+  }
+  nav a:hover::after{width:100%;}
+
+  /* ---------- hero ---------- */
+  .hero{
+    position:relative;
+    min-height:100svh;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    padding:120px 20px 80px;
+    overflow:hidden;
+    background:
+      radial-gradient(1100px 600px at 50% 15%, #2a2338 0%, transparent 65%),
+      linear-gradient(180deg, var(--void), var(--curtain) 120%);
+  }
+
+  /* velvet curtain folds */
+  .hero::before{
+    content:'';
+    position:absolute; inset:0;
+    background:repeating-linear-gradient(90deg,
+      #0000 0 40px,
+      #ffffff04 40px 42px,
+      #0000 42px 90px);
+    mix-blend-mode:screen;
+    opacity:.5;
+    pointer-events:none;
+  }
+
+  /* cursor spotlight beam — signature element */
+  .beam{
+    position:absolute; inset:0;
+    background:radial-gradient(320px 320px at var(--mx,50%) var(--my,30%),
+      #ffdb8a22 0%, #ffdb8a0d 35%, transparent 68%);
+    pointer-events:none;
+    transition:background .12s linear;
+    z-index:1;
+  }
+
+  .marquee-frame{
+    position:relative;
+    z-index:2;
+    padding:34px clamp(18px,6vw,70px);
+    border:1px solid var(--line);
+    border-radius:6px;
+  }
+  .bulb-row{
+    position:absolute;
+    display:flex;
+    justify-content:space-between;
+  }
+  .bulb-row.top,.bulb-row.bottom{left:14px;right:14px;}
+  .bulb-row.top{top:-6px;}
+  .bulb-row.bottom{bottom:-6px;}
+  .bulb-row.left,.bulb-row.right{top:14px;bottom:14px;flex-direction:column;}
+  .bulb-row.left{left:-6px;}
+  .bulb-row.right{right:-6px;}
+  .bulb{
+    width:6px;height:6px;border-radius:50%;
+    background:var(--gold);
+    box-shadow:0 0 6px 1px var(--gold-bright);
+    animation:bulbBlink 3.2s ease-in-out infinite;
+  }
+
+  @keyframes bulbBlink{
+    0%,100%{opacity:.25;box-shadow:0 0 3px 0px var(--gold-bright);}
+    50%{opacity:1;box-shadow:0 0 8px 2px var(--gold-bright);}
+  }
+
+  .hero h1{
+    font-size:clamp(72px,14vw,168px);
+    color:var(--ivory);
+    text-shadow:0 0 60px #ffdb8a30;
+    opacity:0;
+    transform:translateY(24px);
+    animation:rise .9s var(--ease) .15s forwards;
+  }
+  .hero p.tag{
+    margin-top:18px;
+    font-size:clamp(15px,2vw,19px);
+    color:var(--muted);
+    max-width:560px;
+    margin-left:auto;margin-right:auto;
+    font-weight:400;
+    opacity:0;
+    transform:translateY(18px);
+    animation:rise .9s var(--ease) .35s forwards;
+  }
+  .hero p.tag em{color:var(--gold-bright);font-style:italic;font-family:'Fraunces',serif;}
+
+  @keyframes rise{to{opacity:1;transform:translateY(0);}}
+
+  .hero-cta{
+    margin-top:38px;
+    display:inline-flex;
+    align-items:center;
+    gap:10px;
+    padding:14px 30px;
+    border:1px solid var(--gold);
+    border-radius:100px;
+    font-size:13px;
+    letter-spacing:.1em;
+    text-transform:uppercase;
+    font-weight:600;
+    color:var(--gold-bright);
+    opacity:0;
+    transform:translateY(16px);
+    animation:rise .9s var(--ease) .55s forwards;
+    transition:background .3s, color .3s, box-shadow .3s;
+    position:relative;
+    z-index:2;
+  }
+  .hero-cta:hover{
+    background:var(--gold);
+    color:var(--void);
+    box-shadow:0 0 30px #d4af3766;
+  }
+  .hero-cta svg{transition:transform .3s var(--ease);}
+  .hero-cta:hover svg{transform:translateY(3px);}
+
+  /* stats strip */
+  .stats{
+    position:relative;z-index:2;
+    display:flex;
+    flex-wrap:wrap;
+    gap:0;
+    justify-content:center;
+    margin-top:64px;
+    border-top:1px solid var(--line);
+    border-bottom:1px solid var(--line);
+  }
+  .stats span{
+    padding:16px 28px;
+    font-size:12.5px;
+    letter-spacing:.08em;
+    color:var(--muted);
+    border-right:1px solid var(--line);
+  }
+  .stats span:last-child{border-right:none;}
+  .stats b{color:var(--ivory);font-weight:700;}
+
+  /* ---------- section shell ---------- */
+  section.block{
+    max-width:1240px;
+    margin:0 auto;
+    padding:110px 24px;
+  }
+  .block-head{
+    display:flex;
+    align-items:flex-end;
+    justify-content:space-between;
+    gap:20px;
+    margin-bottom:46px;
+    flex-wrap:wrap;
+  }
+  .block-head h2{
+    font-size:clamp(38px,6vw,58px);
+    margin-top:6px;
+  }
+  .block-head p{color:var(--muted);max-width:420px;font-size:14.5px;line-height:1.5;}
+
+  /* ---------- film reel year nav ---------- */
+  .reel{
+    display:flex;
+    gap:6px;
+    position:relative;
+    background:var(--curtain-2);
+    border:1px solid var(--line);
+    border-radius:100px;
+    padding:6px;
+    width:max-content;
+  }
+  .reel button{
+    position:relative;
+    z-index:2;
+    padding:10px 24px;
+    font-size:14px;
+    font-weight:600;
+    letter-spacing:.03em;
+    color:var(--muted);
+    border-radius:100px;
+    transition:color .35s;
+  }
+  .reel button.active{color:var(--void);}
+  .reel .thumb{
+    position:absolute;
+    top:6px;bottom:6px;
+    background:var(--spotlight);
+    border-radius:100px;
+    box-shadow:0 0 24px #ffdb8a55;
+    transition:left .45s var(--ease), width .45s var(--ease);
+    z-index:1;
+  }
+
+  /* ---------- event grid ---------- */
+  .grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(300px,1fr));
+    gap:26px;
+  }
+
+  .card{
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    overflow:hidden;
+    opacity:0;
+    transform:translateY(26px);
+    transition:opacity .7s var(--ease), transform .7s var(--ease), border-color .3s, box-shadow .4s;
+    cursor:pointer;
+  }
+  .card.in-view{opacity:1;transform:translateY(0);}
+  .card:hover{
+    border-color:var(--gold);
+    box-shadow:0 18px 48px -14px #000c, 0 0 0 1px #d4af3733;
+    transform:translateY(-6px);
+  }
+
+  .thumb-area{
+    position:relative;
+    height:190px;
+    background:linear-gradient(160deg, var(--surface-2), var(--curtain));
+    overflow:hidden;
+  }
+  .thumb-area::before{
+    content:'';
+    position:absolute;
+    inset:-40%;
+    background:linear-gradient(115deg, transparent 40%, var(--beam-color,#ffdb8a) 48%, transparent 56%);
+    opacity:.16;
+    transform:rotate(0deg);
+    transition:opacity .4s;
+  }
+  .card:hover .thumb-area::before{opacity:.3;}
+
+  .cat-icon{
+    position:absolute;
+    right:14px;bottom:10px;
+    opacity:.14;
+    width:74px;height:74px;
+  }
+
+  .ribbon{
+    position:absolute;
+    top:12px;left:12px;
+    display:flex;align-items:center;gap:6px;
+    background:#0a0910cc;
+    border:1px solid var(--gold);
+    color:var(--gold-bright);
+    font-size:10.5px;
+    letter-spacing:.09em;
+    text-transform:uppercase;
+    font-weight:700;
+    padding:6px 10px 6px 8px;
+    border-radius:100px;
+    backdrop-filter:blur(4px);
+  }
+  .ribbon svg{width:12px;height:12px;flex-shrink:0;}
+
+  .play-badge{
+    position:absolute;
+    left:14px;bottom:12px;
+    display:flex;align-items:center;gap:6px;
+    font-size:11px;color:var(--ivory);
+    background:#00000066;
+    padding:5px 10px;
+    border-radius:100px;
+    letter-spacing:.04em;
+  }
+  .play-badge svg{width:9px;height:9px;}
+
+  .card-body{padding:18px 20px 20px;}
+  .card-body .eyebrow{font-size:10.5px;}
+  .card-body h3{
+    font-size:20px;
+    margin-top:6px;
+    font-weight:700;
+    letter-spacing:-.01em;
+  }
+  .card-meta{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-top:14px;
+    padding-top:14px;
+    border-top:1px solid var(--line);
+    font-size:12.5px;
+    color:var(--muted);
+  }
+  .card-meta .winner-name{color:var(--gold-bright);font-family:'Fraunces',serif;font-style:italic;}
+
+  /* ---------- winners showcase ---------- */
+  .winners-wrap{
+    background:var(--curtain);
+    border-top:1px solid var(--line);
+    border-bottom:1px solid var(--line);
+  }
+  .winner-scroll{
+    display:flex;
+    gap:22px;
+    overflow-x:auto;
+    padding:6px 24px 30px;
+    scroll-snap-type:x proximity;
+    scrollbar-width:thin;
+    scrollbar-color:var(--gold) transparent;
+  }
+  .winner-scroll::-webkit-scrollbar{height:6px;}
+  .winner-scroll::-webkit-scrollbar-thumb{background:var(--gold);border-radius:10px;}
+
+  .wcard{
+    scroll-snap-align:start;
+    flex:0 0 300px;
+    background:linear-gradient(160deg, var(--surface), var(--curtain-2));
+    border:1px solid var(--gold);
+    border-radius:var(--radius);
+    padding:26px 24px 24px;
+    position:relative;
+    overflow:hidden;
+    opacity:0;
+    transform:translateY(26px);
+    transition:opacity .7s var(--ease), transform .7s var(--ease);
+  }
+  .wcard.in-view{opacity:1;transform:translateY(0);}
+
+  .wcard::before{
+    content:'';
+    position:absolute;
+    top:0;left:-150%;
+    width:120%;height:100%;
+    background:linear-gradient(100deg, transparent, #f4d58033, transparent);
+    transition:left .8s var(--ease);
+  }
+  .wcard:hover::before{left:150%;}
+
+  .wcard .trophy{
+    width:34px;height:34px;
+    color:var(--gold);
+    margin-bottom:14px;
+    transition:transform .4s var(--ease);
+  }
+  .wcard:hover .trophy{transform:translateY(-3px) rotate(-6deg);}
+
+  .wcard .wname{
+    font-family:'Fraunces',serif;
+    font-style:italic;
+    font-size:26px;
+    color:var(--ivory);
+    line-height:1.15;
+  }
+  .wcard .wtitle{
+    margin-top:8px;
+    color:var(--gold-bright);
+    font-size:13px;
+    letter-spacing:.03em;
+    font-weight:600;
+  }
+  .wcard .wmeta{
+    margin-top:16px;
+    padding-top:14px;
+    border-top:1px solid var(--line);
+    font-size:12px;
+    color:var(--muted);
+    display:flex;
+    justify-content:space-between;
+  }
+
+  /* ---------- footer ---------- */
+  footer{
+    padding:60px 24px 40px;
+    text-align:center;
+  }
+  footer .footer-bulbs{
+    display:flex;
+    justify-content:center;
+    gap:14px;
+    margin-bottom:24px;
+  }
+  footer .footer-bulbs span{
+    width:5px;height:5px;border-radius:50%;
+    background:var(--gold);
+    animation:bulbBlink 3.2s ease-in-out infinite;
+  }
+  footer p{color:var(--muted-dim);font-size:12.5px;letter-spacing:.04em;}
+
+  /* ---------- modal / lightbox ---------- */
+  .modal-backdrop{
+    position:fixed;inset:0;
+    background:#05050add;
+    backdrop-filter:blur(6px);
+    z-index:200;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:30px;
+    opacity:0;
+    pointer-events:none;
+    transition:opacity .35s var(--ease);
+  }
+  .modal-backdrop.open{opacity:1;pointer-events:auto;}
+
+  .modal{
+    background:var(--curtain-2);
+    border:1px solid var(--line);
+    border-radius:18px;
+    width:min(920px,100%);
+    max-height:85vh;
+    overflow:auto;
+    padding:32px clamp(20px,4vw,40px) 40px;
+    transform:scale(.94) translateY(14px);
+    transition:transform .4s var(--ease);
+  }
+  .modal-backdrop.open .modal{transform:scale(1) translateY(0);}
+
+  .modal-top{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    margin-bottom:22px;
+    gap:16px;
+  }
+  .modal-top h3{font-size:30px;}
+  .modal-top p{color:var(--muted);font-size:13px;margin-top:6px;}
+  .modal-close{
+    width:36px;height:36px;
+    border:1px solid var(--line);
+    border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    flex-shrink:0;
+    transition:border-color .3s, transform .3s;
+  }
+  .modal-close:hover{border-color:var(--gold);transform:rotate(90deg);}
+  .modal-close svg{width:14px;height:14px;}
+
+  .modal-winner{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    background:#00000033;
+    border:1px solid var(--gold);
+    border-radius:10px;
+    padding:14px 16px;
+    margin-bottom:22px;
+  }
+  .modal-winner svg{width:26px;height:26px;color:var(--gold);flex-shrink:0;}
+  .modal-winner .wname{font-family:'Fraunces',serif;font-style:italic;font-size:18px;}
+  .modal-winner .wtitle{font-size:12px;color:var(--gold-bright);margin-top:2px;}
+
+  .media-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(110px,1fr));
+    gap:10px;
+  }
+  .tile{
+    aspect-ratio:1/1;
+    border-radius:8px;
+    background:linear-gradient(150deg,var(--surface-2),var(--surface));
+    position:relative;
+    overflow:hidden;
+    border:1px solid var(--line);
+    display:flex;align-items:center;justify-content:center;
+    opacity:0;
+    animation:tileIn .5s var(--ease) forwards;
+  }
+  @keyframes tileIn{to{opacity:1;}}
+  .tile::before{
+    content:'';
+    position:absolute;inset:-50%;
+    background:linear-gradient(120deg, transparent 42%, #ffdb8a20 50%, transparent 58%);
+  }
+  .tile svg{width:16px;height:16px;color:var(--muted-dim);position:relative;z-index:1;}
+  .tile.video svg{color:var(--gold-bright);}
+  .tile.gold{border-color:var(--gold);}
+  .tile.gold svg{color:var(--gold);}
+
+  /* ---------- responsive ---------- */
+  @media (max-width:640px){
+    .stats{flex-direction:column;width:100%;}
+    .stats span{border-right:none;border-bottom:1px solid var(--line);text-align:center;}
+    nav{display:none;}
+    .block{padding:80px 18px;}
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:.001ms !important; animation-iteration-count:1 !important; transition-duration:.001ms !important; scroll-behavior:auto !important;}
+    .beam{display:none;}
+  }
+</style>
+</head>
+<body>
+
+<header id="header">
+  <a href="#top" class="logo"><span class="dot"></span>SPOTLIGHT</a>
+  <nav>
+    <a href="#gallery">Gallery</a>
+    <a href="#winners">Winners</a>
+    <a href="#about">About</a>
+  </nav>
+</header>
+
+<section class="hero" id="top">
+  <div class="beam" id="beam"></div>
+  <div class="marquee-frame">
+    <div class="bulb-row top" id="bulbsTop"></div>
+    <div class="bulb-row bottom" id="bulbsBottom"></div>
+    <div class="bulb-row left" id="bulbsLeft"></div>
+    <div class="bulb-row right" id="bulbsRight"></div>
+    <p class="eyebrow">The Vantage Events Archive</p>
+    <h1 class="display">SPOTLIGHT</h1>
+    <p class="tag">Every photo, every clip, every event Vantage has run — sorted by year and <em>held up to the light</em> when a winner takes the stage.</p>
+  </div>
+  <a href="#gallery" class="hero-cta">
+    Enter the Gallery
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 4v16M5 13l7 7 7-7"/></svg>
+  </a>
+  <div class="stats">
+    <span><b>18</b>&nbsp; events archived</span>
+    <span><b>9,340</b>&nbsp; photos</span>
+    <span><b>612</b>&nbsp; videos</span>
+    <span><b>3</b>&nbsp; years running</span>
+  </div>
+</section>
+
+<section class="block" id="gallery">
+  <div class="block-head">
+    <div>
+      <p class="eyebrow">Browse by year</p>
+      <h2 class="display">THE ARCHIVE</h2>
+    </div>
+    <p>Pick a year to roll the reel. Gold-trimmed cards carry a Winner's Spotlight — open one to see who took the stage.</p>
+  </div>
+
+  <div class="reel" id="reel">
+    <div class="thumb" id="reelThumb"></div>
+    <!-- year buttons injected by JS -->
+  </div>
+
+  <div class="grid" id="eventGrid" style="margin-top:40px;"></div>
+</section>
+
+<div class="winners-wrap" id="winners">
+  <section class="block" style="padding-top:100px;padding-bottom:90px;">
+    <div class="block-head">
+      <div>
+        <p class="eyebrow">Hall of Fame</p>
+        <h2 class="display">WINNER'S SPOTLIGHT</h2>
+      </div>
+      <p>The names Vantage keeps coming back to — one standout per event, chosen the night the lights came up.</p>
+    </div>
+    <div class="winner-scroll" id="winnerScroll"></div>
+  </section>
+</div>
+
+<footer id="about">
+  <div class="footer-bulbs">
+    <span></span><span></span><span></span><span></span><span></span>
+  </div>
+  <p class="eyebrow" style="margin-bottom:10px;">About this archive</p>
+  <p style="max-width:480px;margin:0 auto;color:var(--muted);line-height:1.6;">Spotlight is Vantage's living record of every event — built by the community team so no photo, clip, or winning moment gets lost between years.</p>
+  <p style="margin-top:26px;">© 2026 Vantage Community · Spotlight Archive</p>
+</footer>
+
+<div class="modal-backdrop" id="modalBackdrop">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal-top">
+      <div>
+        <p class="eyebrow" id="modalYear"></p>
+        <h3 id="modalTitle"></h3>
+        <p id="modalDesc"></p>
+      </div>
+      <button class="modal-close" id="modalClose" aria-label="Close gallery">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+    </div>
+    <div id="modalWinnerBox"></div>
+    <div class="media-grid" id="modalGrid"></div>
+  </div>
+</div>
+
+<script>
+/* ---------------- icons ---------------- */
+const ICONS = {
+  camera:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 8h3l1.5-2h7L17 8h3a1 1 0 011 1v10a1 1 0 01-1 1H4a1 1 0 01-1-1V9a1 1 0 011-1z"/><circle cx="12" cy="14" r="3.6"/></svg>`,
+  play:`<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>`,
+  trophy:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 4h8v4a4 4 0 01-8 0V4z"/><path d="M8 5H4v2a4 4 0 004 4M16 5h4v2a4 4 0 01-4 4"/><path d="M12 12v4M9 20h6M10 16h4v4h-4z"/></svg>`,
+  ribbon:`<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.4 5.2L20 8l-4 4 .9 5.8L12 15l-4.9 2.8L8 12 4 8l5.6-.8z"/></svg>`,
+};
+
+/* ---------------- data ---------------- */
+const DATA = [
+  { year:2026, events:[
+    {title:"Founders' Day", desc:"The annual homecoming — speeches, throwback reels, and a lot of confetti.", photos:812, videos:44, winner:{name:"Aanya Kapoor", title:"Best Founders' Day Moment — Speech of the Night"}},
+    {title:"Ignite Hackathon", desc:"36 hours, 40 teams, one very stressful demo stage.", photos:530, videos:61, winner:{name:"Team Nightshift", title:"Grand Prize — Best Overall Build"}},
+    {title:"Cultural Carnival · Rangotsav", desc:"Dance, dress, and a colour-run finale that stains every camera lens.", photos:1140, videos:98, winner:{name:"Meher Iyer", title:"Best Solo Performance"}},
+    {title:"Sports Premier League", desc:"Six-week league across five sports, ending in the season final.", photos:670, videos:52, winner:{name:"Kabir Malhotra", title:"Most Valuable Player"}},
+  ]},
+  { year:2025, events:[
+    {title:"Frame & Focus · Photo Walk", desc:"A dawn-to-dusk walk across campus, entries judged at golden hour.", photos:940, videos:12, winner:{name:"Devika Nair", title:"Best Frame — 'Empty Corridor'"}},
+    {title:"Encore · Talent Night", desc:"Open mic turned finale — singers, sketch comedy, one magician.", photos:410, videos:70, winner:{name:"Rohan Sequeira", title:"Crowd's Choice Award"}},
+    {title:"Ignite Hackathon", desc:"The second run — bigger sponsors, tighter deadline, louder demos.", photos:388, videos:39, winner:{name:"Team Parallax", title:"Grand Prize — Best Overall Build"}},
+    {title:"Sports Premier League", desc:"A rain-delayed season that came down to the final over.", photos:520, videos:31, winner:null},
+  ]},
+  { year:2024, events:[
+    {title:"Founders' Day", desc:"The very first archive entry — where Spotlight itself started.", photos:390, videos:18, winner:{name:"Simran Bhatt", title:"Best Founders' Day Moment — Speech of the Night"}},
+    {title:"Cultural Carnival · Rangotsav", desc:"The inaugural Rangotsav — smaller crowd, same amount of colour.", photos:610, videos:40, winner:{name:"Aditi Rao", title:"Best Solo Performance"}},
+    {title:"Frame & Focus · Photo Walk", desc:"A rooftop-to-riverside route, first-ever Spotlight photo brief.", photos:275, videos:6, winner:null},
+  ]},
+];
+
+/* winners for showcase = flatten all winners */
+const WINNERS = DATA.flatMap(y => y.events.filter(e=>e.winner).map(e=>({...e.winner, event:e.title, year:y.year})));
+
+/* ---------------- header scroll state ---------------- */
+const header = document.getElementById('header');
+window.addEventListener('scroll', ()=>{
+  header.classList.toggle('scrolled', window.scrollY > 40);
+}, {passive:true});
+
+/* ---------------- cursor spotlight beam ---------------- */
+const beam = document.getElementById('beam');
+const heroEl = document.querySelector('.hero');
+const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+if(!reduceMotion){
+  heroEl.addEventListener('mousemove', (e)=>{
+    const r = heroEl.getBoundingClientRect();
+    const x = ((e.clientX - r.left) / r.width) * 100;
+    const y = ((e.clientY - r.top) / r.height) * 100;
+    beam.style.setProperty('--mx', x + '%');
+    beam.style.setProperty('--my', y + '%');
+  });
+  // gentle idle sweep for touch devices
+  let t = 0;
+  setInterval(()=>{
+    if(document.activeElement === beam) return;
+    t += 0.006;
+    const x = 50 + Math.sin(t) * 30;
+    const y = 28 + Math.cos(t*0.7) * 10;
+    beam.style.setProperty('--mx', x + '%');
+    beam.style.setProperty('--my', y + '%');
+  }, 60);
+}
+
+/* ---------------- marquee bulbs ---------------- */
+function fillBulbs(id, count){
+  const row = document.getElementById(id);
+  for(let i=0;i<count;i++){
+    const b = document.createElement('span');
+    b.className = 'bulb';
+    b.style.animationDelay = (i * 0.12) + 's';
+    row.appendChild(b);
+  }
+}
+fillBulbs('bulbsTop', 14);
+fillBulbs('bulbsBottom', 14);
+fillBulbs('bulbsLeft', 5);
+fillBulbs('bulbsRight', 5);
+
+/* ---------------- year reel nav ---------------- */
+const reel = document.getElementById('reel');
+const reelThumb = document.getElementById('reelThumb');
+let activeYear = DATA[0].year;
+
+DATA.forEach((y, i)=>{
+  const btn = document.createElement('button');
+  btn.textContent = y.year;
+  btn.dataset.year = y.year;
+  if(i===0) btn.classList.add('active');
+  btn.addEventListener('click', ()=> setYear(y.year));
+  reel.appendChild(btn);
+});
+
+function positionThumb(){
+  const activeBtn = reel.querySelector('button.active');
+  if(!activeBtn) return;
+  reelThumb.style.left = activeBtn.offsetLeft + 'px';
+  reelThumb.style.width = activeBtn.offsetWidth + 'px';
+}
+
+function setYear(year){
+  activeYear = year;
+  [...reel.querySelectorAll('button')].forEach(b=>{
+    b.classList.toggle('active', Number(b.dataset.year) === year);
+  });
+  positionThumb();
+  renderEvents(year);
+}
+
+/* ---------------- render event cards ---------------- */
+const grid = document.getElementById('eventGrid');
+const observer = new IntersectionObserver((entries)=>{
+  entries.forEach(en=>{
+    if(en.isIntersecting){
+      en.target.classList.add('in-view');
+      observer.unobserve(en.target);
+    }
+  });
+}, {threshold:0.15});
+
+function renderEvents(year){
+  grid.innerHTML = '';
+  const yearData = DATA.find(y => y.year === year);
+  yearData.events.forEach((ev, i)=>{
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.style.transitionDelay = (i * 0.06) + 's';
+    card.innerHTML = `
+      <div class="thumb-area">
+        <span class="cat-icon">${ICONS.camera}</span>
+        ${ev.winner ? `<span class="ribbon">${ICONS.ribbon} Winner Inside</span>` : ''}
+        <span class="play-badge">${ICONS.play} ${ev.videos} clips</span>
+      </div>
+      <div class="card-body">
+        <p class="eyebrow">${year} · Event Reel</p>
+        <h3>${ev.title}</h3>
+        <p style="color:var(--muted);font-size:13.5px;margin-top:8px;line-height:1.5;">${ev.desc}</p>
+        <div class="card-meta">
+          <span>${ev.photos.toLocaleString()} photos · ${ev.videos} videos</span>
+          ${ev.winner ? `<span class="winner-name">${ev.winner.name}</span>` : `<span>—</span>`}
+        </div>
+      </div>
+    `;
+    card.addEventListener('click', ()=> openModal(year, ev));
+    grid.appendChild(card);
+    observer.observe(card);
+  });
+}
+
+/* ---------------- winners showcase ---------------- */
+const winnerScroll = document.getElementById('winnerScroll');
+WINNERS.forEach((w, i)=>{
+  const card = document.createElement('div');
+  card.className = 'wcard';
+  card.style.transitionDelay = (i * 0.05) + 's';
+  card.innerHTML = `
+    <span class="trophy">${ICONS.trophy}</span>
+    <div class="wname">${w.name}</div>
+    <div class="wtitle">${w.title}</div>
+    <div class="wmeta"><span>${w.event}</span><span>${w.year}</span></div>
+  `;
+  winnerScroll.appendChild(card);
+  observer.observe(card);
+});
+
+/* ---------------- modal / lightbox ---------------- */
+const modalBackdrop = document.getElementById('modalBackdrop');
+const modalGrid = document.getElementById('modalGrid');
+const modalTitle = document.getElementById('modalTitle');
+const modalDesc = document.getElementById('modalDesc');
+const modalYear = document.getElementById('modalYear');
+const modalWinnerBox = document.getElementById('modalWinnerBox');
+const modalClose = document.getElementById('modalClose');
+let lastFocused = null;
+
+function openModal(year, ev){
+  lastFocused = document.activeElement;
+  modalYear.textContent = year + ' · Event Reel';
+  modalTitle.textContent = ev.title;
+  modalDesc.textContent = ev.desc;
+
+  modalWinnerBox.innerHTML = ev.winner ? `
+    <div class="modal-winner">
+      ${ICONS.trophy}
+      <div>
+        <div class="wname">${ev.winner.name}</div>
+        <div class="wtitle">${ev.winner.title}</div>
+      </div>
+    </div>` : '';
+
+  modalGrid.innerHTML = '';
+  const total = Math.min(ev.photos + ev.videos, 36); // capped preview grid
+  const videoRatio = ev.videos / (ev.photos + ev.videos);
+  for(let i=0;i<total;i++){
+    const tile = document.createElement('div');
+    const isVideo = Math.random() < videoRatio;
+    const isGold = ev.winner && i === 0;
+    tile.className = 'tile' + (isVideo ? ' video' : '') + (isGold ? ' gold' : '');
+    tile.style.animationDelay = (i * 0.018) + 's';
+    tile.innerHTML = isGold ? ICONS.trophy : (isVideo ? ICONS.play : ICONS.camera);
+    modalGrid.appendChild(tile);
+  }
+
+  modalBackdrop.classList.add('open');
+  modalClose.focus();
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal(){
+  modalBackdrop.classList.remove('open');
+  document.body.style.overflow = '';
+  if(lastFocused) lastFocused.focus();
+}
+
+modalClose.addEventListener('click', closeModal);
+modalBackdrop.addEventListener('click', (e)=>{ if(e.target === modalBackdrop) closeModal(); });
+document.addEventListener('keydown', (e)=>{ if(e.key === 'Escape' && modalBackdrop.classList.contains('open')) closeModal(); });
+
+/* ---------------- init ---------------- */
+renderEvents(activeYear);
+window.addEventListener('resize', positionThumb);
+requestAnimationFrame(positionThumb);
+</script>
+</body>
+</html>

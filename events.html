@@ -24,7 +24,11 @@ emailjs.init("YOUR_PUBLIC_KEY");
       <li><a href="events.html" class="active">Events</a></li>
       <li><a href="spotlight.html">Spotlight</a></li>
       
-    </ul>
+    <li>
+    <a href="#" onclick="logout()">
+        Logout
+    </a>
+</li></ul> 
   </div>
 </div>
 
@@ -612,7 +616,12 @@ renderEvents(window._allEvents);
     if (ev.target.id === "detailsModal")  window.closeDetailsModal();
     if (ev.target.id === "registerModal") window.closeRegisterModal();
   });
-
+window.logout = function () {
+    localStorage.removeItem("student");
+    localStorage.removeItem("studentEmail");
+    sessionStorage.clear();
+    window.location.replace("login.html");
+};
   loadEvents();
 </script>
 

@@ -40,6 +40,13 @@ function initSpotlightArrows() {
   nextBtn && nextBtn.addEventListener('click', () => { i = (i + 1) % items.length; render(); });
 }
 
+/* ── ALUMNI CARD EXPAND ON CLICK ── */
+function initAlumniCards() {
+  document.querySelectorAll('.alumni-card').forEach(card => {
+    card.addEventListener('click', () => card.classList.toggle('expanded'));
+  });
+}
+
 /* ── SCROLL REVEAL ── */
 function initReveal() {
   const els = document.querySelectorAll('.reveal');
@@ -57,5 +64,6 @@ function initReveal() {
 document.addEventListener('DOMContentLoaded', () => {
   initHeroSlider();
   initSpotlightArrows();
+  initAlumniCards();
   initReveal();
 });

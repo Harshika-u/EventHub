@@ -86,7 +86,7 @@ a { text-decoration: none; color: inherit; }
 .hero-full-dots span.active { background: var(--gold-soft); border-color: var(--gold-soft); }
 
 /* ── FLAME-STYLE 3-COLUMN STRIP: Spotlight | Events | Media ── */
-.strip-section { max-width: 1180px; margin: 0 auto; background: var(--ivory); border-top: 4px solid var(--gold); box-shadow: var(--shadow); position: relative; z-index: 2; }
+.strip-section { max-width: 1180px; margin: 22px auto 0; background: var(--ivory); border-top: 4px solid var(--gold); box-shadow: var(--shadow); position: relative; z-index: 2; }
 .strip-grid { display: grid; grid-template-columns: 1.1fr 1fr 1fr; }
 .strip-col { padding: 38px 32px; border-right: 1px solid var(--paper-line); }
 .strip-col:last-child { border-right: none; }
@@ -130,8 +130,11 @@ a { text-decoration: none; color: inherit; }
 /* ── ABOUT JGS (big stacked heading + paragraph, dark) ── */
 .about-jgs { background: var(--ink); color: var(--ivory); padding: 90px 28px 60px; }
 .about-jgs-inner { max-width: 1180px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: end; }
-.about-jgs-heading { font-family: var(--font-display); font-weight: 700; font-size: clamp(32px, 4.4vw, 52px); line-height: 1.05; text-transform: uppercase; margin: 0; }
-.about-jgs-heading .underline-gold { display: inline-block; border-bottom: 6px solid var(--gold); padding-bottom: 4px; }
+.about-frame { position: relative; padding: 18px 0; }
+.frame-line { position: absolute; height: 4px; background: var(--gold); width: 100vw; left: 50%; transform: translateX(-50%); z-index: 0; }
+.frame-line-top { top: 0; }
+.frame-line-bottom { bottom: 0; }
+.about-jgs-heading { position: relative; z-index: 1; font-family: var(--font-display); font-weight: 700; font-size: clamp(32px, 4.4vw, 52px); line-height: 1.05; text-transform: uppercase; margin: 0; }
 .about-jgs-text p { font-size: 15.5px; line-height: 1.8; color: rgba(248,246,240,.85); }
 .about-jgs-text .placeholder-note { font-family: var(--font-label); font-size: 11px; color: var(--gold-soft); margin-top: 14px; }
 
@@ -151,27 +154,33 @@ a { text-decoration: none; color: inherit; }
 .vm-card h4 { font-family: var(--font-display); font-size: 18px; margin: 0 0 8px; color: var(--ink); }
 .vm-card p { font-size: 14px; line-height: 1.65; color: var(--slate); margin: 0; }
 
-/* ── SPORTS STRIP ── */
-.sports-strip { background: var(--maroon); color: var(--ivory); padding: 60px 28px; }
-.sports-inner { max-width: 1180px; margin: 0 auto; }
-.sports-inner .eyebrow { color: var(--gold-soft); }
-.sports-inner .eyebrow::before { background: var(--gold-soft); }
-.sports-inner h2 { font-family: var(--font-display); font-size: 30px; margin: 12px 0 30px; }
-.sports-list { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
-.sport-item { border-top: 1px solid rgba(248,246,240,0.25); padding-top: 14px; }
-.sport-item .yr { font-family: var(--font-label); font-size: 11px; color: var(--gold-soft); }
-.sport-item p { margin: 8px 0 0; font-size: 14.5px; line-height: 1.5; }
-
 /* ── ALUMNI TEASER ── */
 .alumni-teaser { max-width: 1180px; margin: 0 auto; padding: 70px 28px; }
 .alumni-head { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 30px; flex-wrap: wrap; gap: 16px; }
 .alumni-head h2 { font-family: var(--font-display); font-size: 30px; margin: 12px 0 0; }
 .alumni-head a { font-family: var(--font-label); font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--maroon); border-bottom: 1px solid var(--maroon); }
 .alumni-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
-.alumni-card { background: var(--ivory); border: 1px solid var(--paper-line); }
-.alumni-photo { aspect-ratio: 1; background: var(--paper-line); overflow: hidden; }
+.alumni-card {
+  background: var(--ivory); border: 1px solid var(--paper-line);
+  cursor: pointer; transition: transform .25s ease, box-shadow .25s ease;
+  display: flex; flex-direction: column; overflow: hidden; height: 300px;
+}
+.alumni-card:hover { transform: translateY(-4px); box-shadow: var(--shadow); }
+.alumni-card-top { display: flex; flex: 1; overflow: hidden; }
+.alumni-photo { flex: 1 1 100%; transition: flex-basis .4s ease; overflow: hidden; position: relative; }
 .alumni-photo img { width: 100%; height: 100%; object-fit: cover; }
-.alumni-info { padding: 16px 18px; }
+.alumni-review {
+  flex: 0 0 0%; width: 0; opacity: 0; overflow: hidden;
+  transition: flex-basis .4s ease, opacity .3s ease .05s; padding: 0;
+  display: flex; flex-direction: column; justify-content: center;
+}
+.alumni-review h4 { font-size: 14.5px; margin: 0 0 3px; color: var(--ink); }
+.alumni-review .batch { font-family: var(--font-label); font-size: 10.5px; color: var(--slate-light); display: block; margin-bottom: 10px; }
+.alumni-review p { font-size: 12.5px; line-height: 1.55; color: var(--slate); margin: 0; font-style: italic; }
+.alumni-card.expanded .alumni-photo { flex: 0 0 42%; }
+.alumni-card.expanded .alumni-review { flex: 0 0 58%; opacity: 1; padding: 16px 16px; }
+.alumni-card.expanded .alumni-info { opacity: 0; }
+.alumni-info { padding: 16px 18px; transition: opacity .2s ease; }
 .alumni-info h4 { font-size: 14.5px; margin: 0 0 3px; color: var(--ink); }
 .alumni-info span { font-family: var(--font-label); font-size: 10.5px; color: var(--slate-light); }
 
@@ -193,7 +202,6 @@ a { text-decoration: none; color: inherit; }
   .about-jgs-inner { grid-template-columns: 1fr; }
   .advantage-grid { grid-template-columns: repeat(2, 1fr); }
   .vm-cards { grid-template-columns: 1fr; }
-  .sports-list { grid-template-columns: repeat(2, 1fr); }
   .alumni-row { grid-template-columns: repeat(2, 1fr); }
   .ledger-table { grid-template-columns: 1fr; }
   .ledger-row { border-right: none; border-bottom: 1px solid var(--paper-line); }

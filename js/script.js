@@ -20,11 +20,11 @@ if (container && registerBtn && loginBtn) {
 }
 
 // ── OTHER PAGES: Auth guard — redirect to login if not logged in ──
-// Only runs on pages that are NOT student.html
-const isLoginPage = window.location.pathname.includes("student.html");
+// Only runs on pages that are NOT login.html
+const isLoginPage = window.location.pathname.includes("login.html");
 
 if (!isLoginPage && !localStorage.getItem("student")) {
-window.location.replace("index.html");
+window.location.replace("login.html");
 }
 
 // ── Show logged-in student email in navbar (if element exists) ──
@@ -37,7 +37,8 @@ if (navEmail) {
 function logout() {
   localStorage.removeItem("student");
   localStorage.removeItem("studentEmail");
- window.location.replace("index.html");
+  sessionStorage.clear();
+ window.location.replace("login.html");
 }
 // In js/script.js
 function togglePassword() {

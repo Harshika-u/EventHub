@@ -17,7 +17,14 @@
     <ul class="nav-links">
       <li><a href="index.html" class="active">Home</a></li>
       <li><a href="events.html">Events</a></li>
-      <li><a href="admin/spot.html">Spotlight</a></li>
+      <li><a href="spotlight.html">Spotlight</a></li>
+       
+      <li>
+    <a href="#" onclick="logout()">
+        Logout
+    </a>
+</li>
+     
     
     </ul>
   </div>
@@ -766,8 +773,12 @@ loadHomeEvents();
     if (ev.target.id === "detailsModal")  window.closeDetailsModal();
     if (ev.target.id === "registerModal") window.closeRegisterModal();
   });
-
-
+window.logout = function () {
+    localStorage.removeItem("student");
+    localStorage.removeItem("studentEmail");
+    sessionStorage.clear();
+    window.location.replace("login.html");
+};
   loadHomeEvents();
 </script>
 
