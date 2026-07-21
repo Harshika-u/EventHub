@@ -9,7 +9,7 @@
 
 
 body {
-  background: #f8fafc;
+  background: #f9a48892;
   color: #1e293b;
 }
 
@@ -17,7 +17,8 @@ body {
 /* NAVBAR */
 .navbar {
   width: 100%;
-  background: white;
+  height: 60px;
+  background: #300251;
   border-bottom: 1px solid #e2e8f0;
   position: sticky;
   top: 0;
@@ -28,7 +29,7 @@ body {
 .nav-inner {
   max-width: 1200px;
   margin: auto;
-  padding: 12px 24px;
+  padding: 18px 24px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -38,12 +39,12 @@ body {
 .logo {
   font-weight: 700;
   font-size: 18px;
-  color: #1e293b;
+  color: #dce2eb;
 }
 
 
 .logo span {
-  color: #3b82f6;
+  color: #3c6fc6cd;
 }
 
 
@@ -56,7 +57,7 @@ body {
 
 .nav-links a {
   text-decoration: none;
-  color: #64748b;
+  color: #889dba;
   font-size: 14px;
   font-weight: 500;
   padding: 8px 18px;
@@ -66,15 +67,15 @@ body {
 
 
 .nav-links a.active {
-  background-color: #3b82f6;
+  background-color: #3c6fc6cd;
   color: white;
   box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
 }
 
 
 .nav-links a:hover:not(.active) {
-  background-color: #f1f5f9;
-  color: #1d4ed8;
+  background-color: #053e77;
+  color: #89a2e6;
 }
 
 
@@ -96,12 +97,36 @@ body {
 
 
 .card {
-  background: white;
+  background: #ffffff;
   padding: 40px;
   border-radius: 20px;
   border: 1px solid #e2e8f0;
+} 
+
+.hero-right {
+  width: 100%;
+  max-width: 480px;
+  aspect-ratio: 1 / 1;
+  margin: 0 auto;
+  align-self: center;
+  padding: 0;
+  border-radius: 50%;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
+.hero-right img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 50%;
+}
+
+.hero-left {
+  background: #092b62;
+}
 
 .hero-right img {
   width: 100%;
@@ -112,7 +137,7 @@ body {
 
 
 .small-title {
-  color: #3b82f6;
+  color: #e6edf9;
   font-size: 12px;
   font-weight: 700;
   letter-spacing: 1.5px;
@@ -125,12 +150,12 @@ body {
   font-size: 36px;
   line-height: 1.15;
   font-weight: 800;
-  color: #0f172a;
+  color: #fbfbfc;
 }
 
 
 .desc {
-  color: #64748b;
+  color: #20406d;
   font-size: 15px;
   line-height: 1.6;
   margin-bottom: 24px;
@@ -146,7 +171,7 @@ body {
 
 .primary {
   background: #3b82f6;
-  color: white;
+  color: #fefbfb;
   padding: 11px 22px;
   border: none;
   border-radius: 22px;
