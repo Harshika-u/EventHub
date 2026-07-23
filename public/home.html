@@ -8,8 +8,8 @@
 </head>
 <body class="jgs-public">
 
-<!-- NAVBAR (solid, sits above the hero — not overlaid on it) -->
-<nav class="jgs-nav">
+<!-- NAVBAR (transparent overlay on the hero) -->
+<nav class="jgs-nav nav-overlay">
   <div class="jgs-nav-inner">
     <a href="home.html" class="jgs-brand"><span class="crest">JGS</span> Johnson Grammar School</a>
     <ul class="jgs-links">
@@ -41,6 +41,7 @@
 
 <!-- FLAME-STYLE STRIP: SPOTLIGHT | EVENTS | MEDIA -->
 <section class="strip-section reveal">
+  <div class="strip-inner">
   <div class="strip-grid">
 
     <div class="strip-col">
@@ -90,40 +91,20 @@
     </div>
 
   </div>
-</section>
-
-<!-- LEDGER STATS -->
-<section class="ledger reveal">
-  <div class="ledger-title">School at a glance</div>
-  <div class="ledger-table">
-    <div class="ledger-row">
-      <div class="ledger-num" id="statStudents">—</div>
-      <div class="ledger-label">Students enrolled</div>
-    </div>
-    <div class="ledger-row">
-      <div class="ledger-num" id="statTeachers">—</div>
-      <div class="ledger-label">Teaching staff</div>
-    </div>
-    <div class="ledger-row">
-      <div class="ledger-num" id="statAlumni">—</div>
-      <div class="ledger-label">Alumni network</div>
-    </div>
   </div>
-  <div class="ledger-note">Figures updated by school administration.</div>
 </section>
 
 <!-- ABOUT JGS -->
 <section class="about-jgs">
-  <div class="about-jgs-inner">
-    <div class="about-frame reveal">
-      <span class="frame-line frame-line-top"></span>
+  <div class="about-jgs-frame reveal">
+    <div class="about-jgs-inner">
       <h2 class="about-jgs-heading">JOHNSON<br>GRAMMAR<br>SCHOOL</h2>
-      <span class="frame-line frame-line-bottom"></span>
+      <div class="about-jgs-text">
+        <p>Johnson Grammar School was recently ranked 2nd in Telangana for ISC 2026 results — a reflection of a campus where academics and student-led activity have always grown side by side. Founded in [Year] by [Founder Name], and guided since by [Chairman Name] as Chairman, JGS has built its reputation on rigorous ICSE/ISC academics paired with a campus life students actually run themselves — from the newsletter desk to JNN to the four major ISC events organized entirely by ISC students each year.</p>
+        <p class="placeholder-note">[Editable placeholder — replace founding year, founder, and chairman details]</p>
+      </div>
     </div>
-    <div class="about-jgs-text reveal">
-      <p>Johnson Grammar School was recently ranked 2nd in Telangana for ISC 2026 results — a reflection of a campus where academics and student-led activity have always grown side by side. Founded in [Year] by [Founder Name], and guided since by [Chairman Name] as Chairman, JGS has built its reputation on rigorous ICSE/ISC academics paired with a campus life students actually run themselves — from the newsletter desk to JNN to the four major ISC events organized entirely by ISC students each year.</p>
-      <p class="placeholder-note">[Editable placeholder — replace founding year, founder, and chairman details]</p>
-    </div>
+    <span class="frame-line-bottom"></span>
   </div>
 </section>
 
@@ -262,7 +243,7 @@
         <h5>Portal</h5>
         <ul>
           <li><a href="../indexlogin.html">Student Login</a></li>
-          <li><a href="../indexlogin.html">Admin Login</a></li>
+          <li><a href="../login.html">Admin Login</a></li>
         </ul>
       </div>
       <div>
@@ -283,47 +264,12 @@
 
 <script src="js/public.js"></script>
 <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-  import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
-  const firebaseConfig = {
-    apiKey: "AIzaSyDMkDxml0p9zUp6gZuo1SeVhmQ3BZamy9o",
-    authDomain: "eventhub-8a8dc.firebaseapp.com",
-    projectId: "eventhub-8a8dc",
-    storageBucket: "eventhub-8a8dc.firebasestorage.app",
-    messagingSenderId: "450946542344",
-    appId: "1:450946542344:web:e54c332ca5bf2358d01abd"
-  };
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
-
-  // Placeholder fallbacks — shown until an admin edit panel writes real values
-  // to the "siteContent" collection in Firestore.
-  const FALLBACK = { students: "330+", teachers: "40+", alumni: "1,200+" };
-
-  async function loadStats() {
-    try {
-      const snap = await getDoc(doc(db, "siteContent", "stats"));
-      const data = snap.exists() ? snap.data() : {};
-      document.getElementById("statStudents").textContent = data.students || FALLBACK.students;
-      document.getElementById("statTeachers").textContent = data.teachers || FALLBACK.teachers;
-      document.getElementById("statAlumni").textContent   = data.alumni   || FALLBACK.alumni;
-    } catch (err) {
-      console.error("Failed to load stats, using placeholders:", err);
-      document.getElementById("statStudents").textContent = FALLBACK.students;
-      document.getElementById("statTeachers").textContent = FALLBACK.teachers;
-      document.getElementById("statAlumni").textContent   = FALLBACK.alumni;
-    }
-  }
-
   // Spotlight rotation items (placeholder — swap in real achievements/images)
   window.__jgsSpotlightItems = [
     { img: "https://placehold.co/220x220/c9a227/1b2a4a?text=Photo", title: "JGS ranked 2nd in Telangana — ISC 2026 results" },
     { img: "https://placehold.co/220x220/7a1f2b/f8f6f0?text=Photo", title: "Prismatic 2026 — Science Fest highlights" },
     { img: "https://placehold.co/220x220/2e3f66/e4c95f?text=Photo", title: "JNN wins Best Campus Media — District Meet" }
   ];
-
-  loadStats();
 </script>
 
 </body>

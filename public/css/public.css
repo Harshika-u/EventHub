@@ -45,7 +45,7 @@ a { text-decoration: none; color: inherit; }
 .eyebrow.light { color: var(--gold-soft); }
 .eyebrow.light::before { background: var(--gold-soft); }
 
-/* ── NAVBAR (solid, always above the content — never overlaid on the hero) ── */
+/* ── NAVBAR ── */
 .jgs-nav {
   position: sticky; top: 0; z-index: 50;
   background: rgba(239, 234, 224, 0.97);
@@ -65,8 +65,21 @@ a { text-decoration: none; color: inherit; }
 .jgs-links .cta { background: var(--ink); color: var(--ivory) !important; padding: 9px 18px; border-radius: var(--radius); border: 1px solid var(--ink); }
 .jgs-links .cta:hover { background: var(--maroon); border-color: var(--maroon); color: var(--white) !important; }
 
-/* ── HERO (full-bleed slider, sits BELOW the nav in normal flow) ── */
-.hero-full { position: relative; height: 78vh; min-height: 480px; max-height: 640px; overflow: hidden; }
+/* Transparent overlay variant — used only on home.html, floats over the hero */
+.jgs-nav.nav-overlay {
+  position: fixed; top: 0; left: 0; right: 0;
+  background: linear-gradient(180deg, rgba(15,23,42,0.55), rgba(15,23,42,0));
+  border-bottom: none; backdrop-filter: none;
+}
+.jgs-nav.nav-overlay .jgs-brand,
+.jgs-nav.nav-overlay .jgs-links a:not(.cta) { color: var(--ivory); text-shadow: 0 1px 4px rgba(0,0,0,.4); }
+.jgs-nav.nav-overlay .jgs-brand .crest { border-color: var(--gold-soft); }
+.jgs-nav.nav-overlay .jgs-links a:hover:not(.cta) { color: var(--gold-soft); border-color: var(--gold-soft); }
+.jgs-nav.nav-overlay .jgs-links .cta { background: var(--gold-soft); color: var(--ink) !important; border-color: var(--gold-soft); }
+.jgs-nav.nav-overlay .jgs-links .cta:hover { background: var(--gold); border-color: var(--gold); }
+
+/* ── HERO (full-bleed slider; true 100vh since overlay nav is fixed/out of flow) ── */
+.hero-full { position: relative; height: 110vh; min-height: 480px; overflow: hidden; }
 .hero-slide { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity 1.2s ease; }
 .hero-slide.active { opacity: 1; }
 .hero-scrim { position: absolute; inset: 0; background: linear-gradient(0deg, rgba(27,42,74,.88) 0%, rgba(27,42,74,.35) 48%, rgba(27,42,74,.08) 72%); }
@@ -86,7 +99,8 @@ a { text-decoration: none; color: inherit; }
 .hero-full-dots span.active { background: var(--gold-soft); border-color: var(--gold-soft); }
 
 /* ── FLAME-STYLE 3-COLUMN STRIP: Spotlight | Events | Media ── */
-.strip-section { max-width: 1180px; margin: 22px auto 0; background: var(--ivory); border-top: 4px solid var(--gold); box-shadow: var(--shadow); position: relative; z-index: 2; }
+.strip-section { width: 100%; margin: 0; background: var(--ivory); border-top: 4px solid var(--gold); box-shadow: var(--shadow); position: relative; z-index: 2; }
+.strip-inner { max-width: 1180px; margin: 0 auto; }
 .strip-grid { display: grid; grid-template-columns: 1.1fr 1fr 1fr; }
 .strip-col { padding: 38px 32px; border-right: 1px solid var(--paper-line); }
 .strip-col:last-child { border-right: none; }
@@ -115,30 +129,18 @@ a { text-decoration: none; color: inherit; }
 .strip-links { grid-column: 1 / -1; border-top: 1px solid var(--paper-line); padding: 18px 32px; display: flex; gap: 28px; flex-wrap: wrap; }
 .strip-links a { font-family: var(--font-label); font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--maroon); border-bottom: 1px solid var(--maroon); }
 
-/* ── LEDGER STAT STRIP ── */
-.ledger { max-width: 1180px; margin: 0 auto; padding: 70px 28px; }
-.ledger-title { font-family: var(--font-label); font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--slate-light); margin-bottom: 10px; }
-.ledger-table { border-top: 2px solid var(--ink); border-bottom: 2px solid var(--ink); display: grid; grid-template-columns: repeat(3, 1fr); }
-.ledger-row { padding: 26px 22px; border-right: 1px solid var(--paper-line); }
-.ledger-row:last-child { border-right: none; }
-.ledger-num { font-family: var(--font-display); font-size: 42px; font-weight: 600; color: var(--ink); line-height: 1; }
-.ledger-label { font-family: var(--font-label); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--slate); margin-top: 10px; }
-.ledger-note { font-family: var(--font-label); font-size: 10px; color: var(--slate-light); margin-top: 16px; }
-
 .section { max-width: 1180px; margin: 0 auto; padding: 60px 28px; }
 
-/* ── ABOUT JGS (big stacked heading + paragraph, dark) ── */
-.about-jgs { background: var(--ink); color: var(--ivory); padding: 90px 28px 60px; }
-.about-jgs-inner { max-width: 1180px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: end; }
-.about-frame { position: relative; padding: 18px 0; }
-.frame-line { position: absolute; height: 4px; background: var(--gold); width: 100vw; left: 50%; transform: translateX(-50%); z-index: 0; }
-.frame-line-top { top: 0; }
-.frame-line-bottom { bottom: 0; }
-.about-jgs-heading { position: relative; z-index: 1; font-family: var(--font-display); font-weight: 700; font-size: clamp(32px, 4.4vw, 52px); line-height: 1.05; text-transform: uppercase; margin: 0; }
+/* ── ABOUT JGS ── */
+.about-jgs { background: var(--ink); color: var(--ivory); padding: 90px 28px 0; }
+.about-jgs-frame { position: relative; max-width: 1180px; margin: 0 auto; padding-bottom: 50px; }
+.frame-line-bottom { position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 100vw; height: 4px; background: var(--gold); }
+.about-jgs-inner { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: end; }
+.about-jgs-heading { font-family: var(--font-display); font-weight: 700; font-size: clamp(32px, 4.4vw, 52px); line-height: 1.05; text-transform: uppercase; margin: 0; }
 .about-jgs-text p { font-size: 15.5px; line-height: 1.8; color: rgba(248,246,240,.85); }
 .about-jgs-text .placeholder-note { font-family: var(--font-label); font-size: 11px; color: var(--gold-soft); margin-top: 14px; }
 
-/* ── ADVANTAGE BOXES (four, dark, corner-fold accent) ── */
+/* ── ADVANTAGE BOXES ── */
 .advantages { background: var(--ink); color: var(--ivory); padding: 40px 28px 90px; }
 .advantages-inner { max-width: 1180px; margin: 0 auto; }
 .advantage-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; margin-top: 10px; }
@@ -203,7 +205,5 @@ a { text-decoration: none; color: inherit; }
   .advantage-grid { grid-template-columns: repeat(2, 1fr); }
   .vm-cards { grid-template-columns: 1fr; }
   .alumni-row { grid-template-columns: repeat(2, 1fr); }
-  .ledger-table { grid-template-columns: 1fr; }
-  .ledger-row { border-right: none; border-bottom: 1px solid var(--paper-line); }
   .footer-grid { grid-template-columns: 1fr 1fr; }
 }
