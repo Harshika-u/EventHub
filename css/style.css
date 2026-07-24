@@ -9,7 +9,7 @@
 
 
 body {
-  background: #f9a48892;
+  background: #f5f5dc;
   color: #1e293b;
 }
 
@@ -18,7 +18,7 @@ body {
 .navbar {
   width: 100%;
   height: 60px;
-  background: #300251;
+  background: #002f49e0;
   border-bottom: 1px solid #e2e8f0;
   position: sticky;
   top: 0;
@@ -44,7 +44,7 @@ body {
 
 
 .logo span {
-  color: #3c6fc6cd;
+  color: #3c6fc6b1;
 }
 
 
@@ -67,7 +67,7 @@ body {
 
 
 .nav-links a.active {
-  background-color: #3c6fc6cd;
+  background-color: #3661abcd;
   color: white;
   box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
 }
@@ -75,7 +75,7 @@ body {
 
 .nav-links a:hover:not(.active) {
   background-color: #053e77;
-  color: #89a2e6;
+  color: #89a2e6eb;
 }
 
 
@@ -106,11 +106,12 @@ body {
 .hero-right {
   width: 100%;
   max-width: 480px;
-  aspect-ratio: 1 / 1;
   margin: 0 auto;
   align-self: center;
-  padding: 0;
-  border-radius: 50%;
+  padding: 40px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 20px;
   overflow: hidden;
   display: flex;
   align-items: center;
@@ -120,24 +121,16 @@ body {
 .hero-right img {
   width: 100%;
   height: 100%;
-  object-fit: contain;
-  border-radius: 50%;
-}
-
-.hero-left {
-  background: #092b62;
-}
-
-.hero-right img {
-  width: 100%;
-  height: 100%;
   object-fit: cover;
   border-radius: 12px;
 }
 
+.hero-left {
+  background: #fbfaf7;
+}
 
 .small-title {
-  color: #e6edf9;
+  color: #c1121f;
   font-size: 12px;
   font-weight: 700;
   letter-spacing: 1.5px;
@@ -150,7 +143,7 @@ body {
   font-size: 36px;
   line-height: 1.15;
   font-weight: 800;
-  color: #fbfbfc;
+  color: #003049;
 }
 
 
@@ -241,7 +234,7 @@ body {
 
 
 .see-all {
-  color: #3b82f6;
+  color: #669bbc;
   text-decoration: none;
   font-size: 14px;
   font-weight: 500;
@@ -260,7 +253,7 @@ body {
 
 
 .event-card {
-  background: white;
+  background: #fdfdfd;
   border-radius: 16px;
   border: 1px solid #e2e8f0;
   overflow: hidden;

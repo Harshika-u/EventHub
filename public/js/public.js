@@ -47,6 +47,48 @@ function initAlumniCards() {
   });
 }
 
+/* ── NAV: switch from transparent-over-hero to solid once scrolled past it ── */
+function initNavOverlay() {
+  const nav = document.querySelector('.jgs-nav.nav-overlay');
+  const hero = document.querySelector('.hero-full');
+  if (!nav || !hero) return;
+  function toggle() {
+    const heroBottom = hero.getBoundingClientRect().bottom;
+    const navHeight = nav.offsetHeight;
+    if (heroBottom <= navHeight) nav.classList.add('solid');
+    else nav.classList.remove('solid');
+  }
+  toggle();
+  window.addEventListener('scroll', toggle, { passive: true });
+}
+
+/* ── ALUMNI CAROUSEL (fast sliding, peek-style) ── */
+function initAlumniCarousel() {
+  const viewport = document.getElementById('alumniViewport');
+  const track = document.getElementById('alumniTrack');
+  const prevBtn = document.getElementById('alumniPrev');
+  const nextBtn = document.getElementById('alumniNext');
+  if (!viewport || !track) return;
+  const slides = Array.from(track.children);
+  const slideWidth = 260;
+  const gap = 24;
+  let active = 0;
+
+  function render() {
+    slides.forEach((s, i) => s.classList.toggle('active', i === active));
+    const vpWidth = viewport.clientWidth;
+    const offset = vpWidth / 2 - (active * (slideWidth + gap) + slideWidth / 2);
+    track.style.transform = `translateX(${offset}px)`;
+  }
+  prevBtn && prevBtn.addEventListener('click', () => { active = (active - 1 + slides.length) % slides.length; render(); });
+  nextBtn && nextBtn.addEventListener('click', () => { active = (active + 1) % slides.length; render(); });
+  window.addEventListener('resize', render);
+  render();
+
+  // auto-advance, fast
+  setInterval(() => { active = (active + 1) % slides.length; render(); }, 2600);
+}
+
 /* ── SCROLL REVEAL ── */
 function initReveal() {
   const els = document.querySelectorAll('.reveal');
@@ -65,5 +107,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initHeroSlider();
   initSpotlightArrows();
   initAlumniCards();
+  initAlumniCarousel();
+  initNavOverlay();
   initReveal();
 });

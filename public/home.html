@@ -8,15 +8,14 @@
 </head>
 <body class="jgs-public">
 
-<!-- NAVBAR (transparent overlay on the hero) -->
+<!-- NAVBAR (transparent overlay on hero, goes solid on scroll) -->
 <nav class="jgs-nav nav-overlay">
   <div class="jgs-nav-inner">
-    <a href="home.html" class="jgs-brand"><span class="crest">JGS</span> Johnson Grammar School</a>
+    <a href="home.html" class="jgs-brand"><span class="crest">ISC</span> Johnson Grammar School - ISC</a>
     <ul class="jgs-links">
-      <li><a href="home.html">Home</a></li>
-      <li><a href="clubs/clubs.html">School Clubs</a></li>
+      <li><a href="#about">About</a></li>
       <li><a href="alumni.html">Alumni</a></li>
-      <li><a href="../login.html">Admin</a></li>
+      <li><a href="clubs/clubs.html">Clubs</a></li>
       <li><a href="../indexlogin.html" class="cta">EventHub →</a></li>
     </ul>
   </div>
@@ -24,15 +23,14 @@
 
 <!-- HERO SLIDER -->
 <section class="hero-full">
-  <img class="hero-slide active" src="https://placehold.co/1920x1080/1b2a4a/e4c95f?text=Campus" alt="JGS campus">
-  <img class="hero-slide" src="https://placehold.co/1920x1080/7a1f2b/f8f6f0?text=Classrooms" alt="JGS classrooms">
-  <img class="hero-slide" src="https://placehold.co/1920x1080/2e3f66/e4c95f?text=Student+Life" alt="JGS student life">
+  <img class="hero-slide active" src="https://mallapur.jgsicse.org/wp-content/uploads/2023/11/main.jpg" alt="JGS campus">
+  <img class="hero-slide" src="https://mallapur.jgsicse.org/wp-content/uploads/2025/12/Home-page-picture-1.jpg-Replace-with-right-side-top-image.jpg" alt="JGS classrooms">
+  <img class="hero-slide" src="https://mallapur.jgsicse.org/wp-content/uploads/2026/01/DSC07881-scaled.jpg" alt="JGS student life">
   <div class="hero-scrim"></div>
   <div class="hero-full-content">
-    <div class="eyebrow light">JOHNSON GRAMMAR SCHOOL</div>
+    <div class="eyebrow light">JOHNSON GRAMMAR SCHOOL - ISC</div>
     <h1 class="hero-full-title">Excellence in<br>every classroom</h1>
-    <p class="hero-full-sub">A digital home for JGS — events, clubs, achievements, and campus life, all in one place.</p>
-    <a href="../indexlogin.html" class="btn btn-outline-light">Enter EventHub</a>
+    <p class="hero-full-sub">Johnson Grammar School - ISC - Analytical and critical education.</p>
   </div>
   <div class="hero-full-dots">
     <span class="active"></span><span></span><span></span>
@@ -47,7 +45,7 @@
     <div class="strip-col">
       <div class="strip-label">Spotlight</div>
       <div class="spotlight-item">
-        <img id="spotlightImg" src="https://placehold.co/220x220/c9a227/1b2a4a?text=Photo" alt="">
+        <div class="zoom-hover"><img id="spotlightImg" src="https://placehold.co/220x220/c9a227/1b2a4a?text=Photo" alt=""></div>
         <h4 id="spotlightTitle">JGS ranked 2nd in Telangana — ISC 2026 results</h4>
       </div>
       <div class="spotlight-arrows">
@@ -84,27 +82,30 @@
       </div>
     </div>
 
-    <div class="strip-links">
-      <a href="#">All Spotlight</a>
-      <a href="../events.html">Event Calendar</a>
-      <a href="clubs/clubs.html">All Media</a>
-    </div>
-
   </div>
   </div>
 </section>
 
 <!-- ABOUT JGS -->
-<section class="about-jgs">
-  <div class="about-jgs-frame reveal">
-    <div class="about-jgs-inner">
-      <h2 class="about-jgs-heading">JOHNSON<br>GRAMMAR<br>SCHOOL</h2>
+<section class="about-jgs" id="about">
+  <div class="about-jgs-inner">
+    <div class="reveal">
+      <div class="eyebrow">About JGS - ISC</div>
+      <h2 class="about-jgs-heading">An education measured in more than results.</h2>
       <div class="about-jgs-text">
-        <p>Johnson Grammar School was recently ranked 2nd in Telangana for ISC 2026 results — a reflection of a campus where academics and student-led activity have always grown side by side. Founded in [Year] by [Founder Name], and guided since by [Chairman Name] as Chairman, JGS has built its reputation on rigorous ICSE/ISC academics paired with a campus life students actually run themselves — from the newsletter desk to JNN to the four major ISC events organized entirely by ISC students each year.</p>
-        <p class="placeholder-note">[Editable placeholder — replace founding year, founder, and chairman details]</p>
+        <p>Johnson Grammar School was recently ranked 2nd in Telangana for ISC 2026 results — a reflection of a campus where academics and student-led activity have always grown side by side. The ISC curriculum is designed to improve oral and writing skills, along with in-depth learning of various concepts, which focuses on the overall development of students. A critical two-year “stream-based”, subject-specific, competency-based teaching and learning and assessment programme which is offered by the Council for the Indian School Certificate Examination. The ISC curriculum places a lot of importance on English literature & language along with elective subjects. It is very systematic; disciplined & the difficulty level of the subjects is equally distributed in exams. At JGS, the ISC curriculum is offered to students of classes XI & XII with English as the medium of instruction in the following streams,
+<br>SCIENCE- M.P.C, Bi.P.C, M.Bi.P.C<br>
+COMMERCE- M.A.E, A.E.C
+<br>HUMANITIES</p>
       </div>
     </div>
-    <span class="frame-line-bottom"></span>
+    <div class="about-jgs-photo zoom-hover reveal">
+      <img src="https://mallapur.jgsicse.org/wp-content/uploads/2025/12/ISC-Image.jpg" alt="JGS campus">
+      <div class="about-jgs-badge">
+        <span class="yr">Since [Year]</span>
+        <span class="tag">A legacy of learning</span>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -149,24 +150,7 @@
   </div>
 </section>
 
-<!-- VISION & MISSION -->
-<section class="section">
-  <div class="section-head reveal">
-    <div class="eyebrow">What we stand for</div>
-  </div>
-  <div class="vm-cards reveal">
-    <div class="vm-card">
-      <h4>Vision</h4>
-      <p id="visionText">To be a school where academic excellence and student-led activity grow side by side.</p>
-    </div>
-    <div class="vm-card">
-      <h4>Mission</h4>
-      <p id="missionText">To give every student the tools, platform, and recognition to pursue what they're genuinely good at — inside and outside the classroom.</p>
-    </div>
-  </div>
-</section>
-
-<!-- ALUMNI TEASER -->
+<!-- ALUMNI TEASER — fast sliding carousel, 6 placeholder alumni -->
 <section class="alumni-teaser reveal">
   <div class="alumni-head">
     <div>
@@ -175,90 +159,100 @@
     </div>
     <a href="alumni.html">View all alumni →</a>
   </div>
-  <div class="alumni-row">
-    <div class="alumni-card">
-      <div class="alumni-card-top">
-        <div class="alumni-photo"><img src="https://placehold.co/300x300/1b2a4a/e4c95f?text=Photo" alt=""></div>
-        <div class="alumni-review">
-          <h4>Alumni name</h4>
-          <span class="batch">Batch of 20XX</span>
-          <p>"Placeholder review — swap in what this alumnus actually said about their time at JGS."</p>
+
+  <div class="alumni-carousel">
+    <button class="alumni-arrow prev" id="alumniPrev">‹</button>
+    <div class="alumni-viewport" id="alumniViewport">
+      <div class="alumni-track" id="alumniTrack">
+
+        <div class="alumni-slide">
+          <div class="alumni-slide-photo"><img src="https://placehold.co/300x300/1b2a4a/e4c95f?text=Photo" alt=""></div>
+          <div class="alumni-slide-name">Alumni name</div>
+          <div class="alumni-slide-role">Role · Company</div>
+          <span class="alumni-slide-batch">Class of 20XX</span>
         </div>
-      </div>
-      <div class="alumni-info"><h4>Alumni name</h4><span>BATCH OF 20XX</span></div>
-    </div>
-    <div class="alumni-card">
-      <div class="alumni-card-top">
-        <div class="alumni-photo"><img src="https://placehold.co/300x300/7a1f2b/f8f6f0?text=Photo" alt=""></div>
-        <div class="alumni-review">
-          <h4>Alumni name</h4>
-          <span class="batch">Batch of 20XX</span>
-          <p>"Placeholder review — swap in what this alumnus actually said about their time at JGS."</p>
+
+        <div class="alumni-slide">
+          <div class="alumni-slide-photo"><img src="https://placehold.co/300x300/7a1f2b/f8f6f0?text=Photo" alt=""></div>
+          <div class="alumni-slide-name">Alumni name</div>
+          <div class="alumni-slide-role">Role · Company</div>
+          <span class="alumni-slide-batch">Class of 20XX</span>
         </div>
-      </div>
-      <div class="alumni-info"><h4>Alumni name</h4><span>BATCH OF 20XX</span></div>
-    </div>
-    <div class="alumni-card">
-      <div class="alumni-card-top">
-        <div class="alumni-photo"><img src="https://placehold.co/300x300/2e3f66/e4c95f?text=Photo" alt=""></div>
-        <div class="alumni-review">
-          <h4>Alumni name</h4>
-          <span class="batch">Batch of 20XX</span>
-          <p>"Placeholder review — swap in what this alumnus actually said about their time at JGS."</p>
+
+        <div class="alumni-slide">
+          <div class="alumni-slide-photo"><img src="https://placehold.co/300x300/2e3f66/e4c95f?text=Photo" alt=""></div>
+          <div class="alumni-slide-name">Alumni name</div>
+          <div class="alumni-slide-role">Role · Company</div>
+          <span class="alumni-slide-batch">Class of 20XX</span>
         </div>
-      </div>
-      <div class="alumni-info"><h4>Alumni name</h4><span>BATCH OF 20XX</span></div>
-    </div>
-    <div class="alumni-card">
-      <div class="alumni-card-top">
-        <div class="alumni-photo"><img src="https://placehold.co/300x300/c9a227/1b2a4a?text=Photo" alt=""></div>
-        <div class="alumni-review">
-          <h4>Alumni name</h4>
-          <span class="batch">Batch of 20XX</span>
-          <p>"Placeholder review — swap in what this alumnus actually said about their time at JGS."</p>
+
+        <div class="alumni-slide">
+          <div class="alumni-slide-photo"><img src="https://placehold.co/300x300/c9a227/1b2a4a?text=Photo" alt=""></div>
+          <div class="alumni-slide-name">Alumni name</div>
+          <div class="alumni-slide-role">Role · Company</div>
+          <span class="alumni-slide-batch">Class of 20XX</span>
         </div>
+
+        <div class="alumni-slide">
+          <div class="alumni-slide-photo"><img src="https://placehold.co/300x300/4a1a20/f8f6f0?text=Photo" alt=""></div>
+          <div class="alumni-slide-name">Alumni name</div>
+          <div class="alumni-slide-role">Role · Company</div>
+          <span class="alumni-slide-batch">Class of 20XX</span>
+        </div>
+
+        <div class="alumni-slide">
+          <div class="alumni-slide-photo"><img src="https://placehold.co/300x300/6b5b1f/f8f6f0?text=Photo" alt=""></div>
+          <div class="alumni-slide-name">Alumni name</div>
+          <div class="alumni-slide-role">Role · Company</div>
+          <span class="alumni-slide-batch">Class of 20XX</span>
+        </div>
+
       </div>
-      <div class="alumni-info"><h4>Alumni name</h4><span>BATCH OF 20XX</span></div>
     </div>
+    <button class="alumni-arrow next" id="alumniNext">›</button>
   </div>
 </section>
 
 <!-- FOOTER -->
 <footer class="jgs-footer">
-  <div class="footer-inner">
-    <div class="footer-grid">
-      <div>
-        <h5>Johnson Grammar School</h5>
-        <p style="font-size:14px;color:var(--slate);line-height:1.6;max-width:32ch;">The school's digital campus — news, clubs, achievements, and EventHub, all in one place.</p>
+  <div class="footer-cta reveal">
+    <div class="eyebrow light">Get involved</div>
+    <h2 class="footer-cta-heading">Ready to see what's happening on campus?</h2>
+    <a href="../indexlogin.html" class="btn-cta">Enter EventHub</a>
+  </div>
+
+  <div class="footer-divider"></div>
+
+  <div class="footer-info">
+    <div>
+      <h5>Johnson Grammar School - ISC</h5>
+      <p class="tagline">It is very systematic; disciplined & the difficulty level of the subjects is equally distributed in exams.</p>
+    </div>
+    <div class="footer-contact">
+      <div class="footer-contact-item">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 6-9 13-9 13s-9-7-9-13a9 9 0 0 1 18 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+        <span>Plot No-A, 16, Nacharam - Mallapur Rd, Baba Nagar, Nacharam, Hyderabad, Secunderabad, Telangana 500076</span>
       </div>
-      <div>
-        <h5>Explore</h5>
-        <ul>
-          <li><a href="home.html">Home</a></li>
-          <li><a href="clubs/clubs.html">School Clubs</a></li>
-          <li><a href="alumni.html">Alumni</a></li>
-        </ul>
+      <div class="footer-contact-item">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 6-10 7L2 6"/></svg>
+        <span>mallapurseniorschool@jgschool.org<br>admissions@jgschool.org</span>
       </div>
-      <div>
-        <h5>Portal</h5>
-        <ul>
-          <li><a href="../indexlogin.html">Student Login</a></li>
-          <li><a href="../login.html">Admin Login</a></li>
-        </ul>
-      </div>
-      <div>
-        <h5>Contact</h5>
-        <ul>
-          <li><a href="#">info@jgsicse.org</a></li>
-          <li><a href="#">Instagram</a></li>
-          <li><a href="#">YouTube — JNN</a></li>
-        </ul>
+      <div class="footer-contact-item">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.362 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.338 1.85.573 2.81.7A2 2 0 0 1 22 16.92Z"/></svg>
+        <span>074060 04433</span>
       </div>
     </div>
-    <div class="footer-bottom">
-      <span>© Johnson Grammar School</span>
-      <span>Built by students, for students.</span>
+    <div class="footer-nav-links">
+      <a href="#about">About</a>
+      <a href="clubs/clubs.html">Clubs</a>
+      <a href="alumni.html">Alumni</a>
+      <a href="../login.html">Admin Portal</a>
     </div>
+  </div>
+
+  <div class="footer-bottom">
+    <span>© Johnson Grammar School</span>
+    <span>Built by students, for students.</span>
   </div>
 </footer>
 
