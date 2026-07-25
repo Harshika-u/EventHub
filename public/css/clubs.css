@@ -1,0 +1,171 @@
+/* ══════════════════════════════════════════
+   CLUBS PAGE — bento grid, glass, soft shadow
+   Reuses tokens/fonts from public.css (--ink, --gold, etc.)
+   ══════════════════════════════════════════ */
+
+.clubs-hero { max-width: 1180px; margin: 0 auto; padding: 70px 28px 40px; }
+.clubs-hero .eyebrow { margin-bottom: 14px; }
+.clubs-hero h1 {
+  font-family: var(--font-display); font-weight: 600; font-size: clamp(34px, 4.6vw, 54px);
+  color: var(--ink); margin: 0 0 14px; line-height: 1.1;
+}
+.clubs-hero p { font-size: 16px; color: var(--slate); max-width: 56ch; line-height: 1.7; }
+
+/* ── BENTO GRID ── */
+.bento-grid {
+  max-width: 1180px; margin: 0 auto; padding: 10px 28px 100px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-auto-rows: 190px;
+  grid-auto-flow: dense;
+  gap: 22px;
+}
+.bento-card {
+  position: relative;
+  border-radius: 18px;
+  overflow: hidden;
+  cursor: pointer;
+  box-shadow: 0 14px 34px -14px rgba(27,42,74,.35), 0 4px 10px -4px rgba(27,42,74,.18);
+  transition: transform .4s cubic-bezier(.2,.8,.2,1), box-shadow .4s ease;
+}
+.bento-card:hover {
+  transform: translateY(-6px) scale(1.012);
+  box-shadow: 0 28px 60px -18px rgba(27,42,74,.45), 0 8px 18px -6px rgba(27,42,74,.25);
+  z-index: 3;
+}
+
+/* sizes: mix of spans for a true bento layout */
+.bento-card.-lg  { grid-column: span 2; grid-row: span 2; }
+.bento-card.-wide{ grid-column: span 2; grid-row: span 1; }
+.bento-card.-tall{ grid-column: span 1; grid-row: span 2; }
+.bento-card.-sm  { grid-column: span 1; grid-row: span 1; }
+
+.bento-card img {
+  position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
+  transition: transform .7s cubic-bezier(.2,.7,.2,1);
+}
+.bento-card:hover img { transform: scale(1.06); }
+
+.bento-scrim {
+  position: absolute; inset: 0;
+  background: linear-gradient(180deg, rgba(15,20,35,.05) 0%, rgba(15,20,35,.25) 55%, rgba(15,20,35,.82) 100%);
+  transition: background .4s ease;
+}
+.bento-card:hover .bento-scrim {
+  background: linear-gradient(180deg, rgba(15,20,35,.15) 0%, rgba(15,20,35,.4) 50%, rgba(15,20,35,.88) 100%);
+}
+
+/* glass category tag, top-left */
+.bento-tag {
+  position: absolute; top: 16px; left: 16px; z-index: 2;
+  font-family: var(--font-label); font-size: 10px; letter-spacing: .08em; text-transform: uppercase;
+  color: #fff; background: rgba(255,255,255,.14);
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,.25);
+  padding: 6px 12px; border-radius: 999px;
+}
+
+/* base info (always visible): title + one-liner */
+.bento-info {
+  position: absolute; left: 0; right: 0; bottom: 0; z-index: 2;
+  padding: 20px;
+  color: #fff;
+}
+.bento-info h3 {
+  font-family: var(--font-display); font-weight: 700; margin: 0 0 4px;
+  font-size: 20px; line-height: 1.2;
+}
+.-lg .bento-info h3 { font-size: 27px; }
+.bento-info .line { font-size: 12.5px; color: rgba(255,255,255,.75); }
+
+/* glass hover-reveal panel with description, slides up + blurs the area behind it */
+.bento-reveal {
+  position: absolute; left: 0; right: 0; bottom: 0; z-index: 3;
+  background: rgba(255,255,255,.12);
+  backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+  border-top: 1px solid rgba(255,255,255,.25);
+  padding: 18px 20px;
+  transform: translateY(100%);
+  transition: transform .4s cubic-bezier(.2,.8,.2,1);
+}
+.bento-card:hover .bento-reveal { transform: translateY(0); }
+.bento-reveal p {
+  font-size: 12.5px; line-height: 1.55; color: rgba(255,255,255,.92); margin: 0 0 10px;
+}
+.bento-reveal a {
+  display: block; text-align: right;
+  font-family: var(--font-label); font-size: 10.5px; letter-spacing: .06em; text-transform: uppercase;
+  color: #fff; border-bottom: 1px solid rgba(255,255,255,.6);
+}
+
+/* ── CLUB DETAIL MODAL (opens on card click) ── */
+.club-modal-overlay {
+  position: fixed; inset: 0; z-index: 200; display: none; align-items: center; justify-content: center;
+  padding: 24px; background: rgba(15,20,35,.55); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+}
+.club-modal-overlay.open { display: flex; }
+.club-modal {
+  background: #fff; border-radius: 22px; max-width: 640px; width: 100%; max-height: 88vh; overflow-y: auto;
+  box-shadow: 0 40px 100px rgba(0,0,0,.4);
+  animation: clubModalIn .32s cubic-bezier(.2,.8,.2,1);
+}
+@keyframes clubModalIn { from { opacity: 0; transform: scale(.94) translateY(24px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+.club-modal-banner {
+  position: relative; height: 170px; display: flex; align-items: center; justify-content: center; font-size: 56px;
+}
+.club-modal-close {
+  position: absolute; top: 16px; right: 16px; width: 36px; height: 36px; border-radius: 50%;
+  background: rgba(255,255,255,.85); backdrop-filter: blur(6px); border: none; cursor: pointer;
+  font-size: 15px; color: var(--ink); display: flex; align-items: center; justify-content: center;
+}
+.club-modal-close:hover { background: #fff; }
+.club-modal-body { padding: 28px 30px 36px; }
+.club-modal-body h2 { font-family: var(--font-display); font-size: 27px; margin: 0 0 4px; color: var(--ink); }
+.club-modal-body .club-modal-tagline { color: var(--slate); font-size: 14px; margin-bottom: 22px; }
+.club-modal-tabs { display: flex; gap: 10px; flex-wrap: wrap; padding-bottom: 20px; margin-bottom: 22px; border-bottom: 1px solid var(--paper-line); }
+.club-modal-tabs button {
+  font-family: var(--font-body); font-size: 13px; font-weight: 600; padding: 9px 16px; border-radius: 999px;
+  border: 1px solid var(--paper-line); background: #fff; color: var(--slate); cursor: pointer; transition: all .15s ease;
+}
+.club-modal-tabs button.active { background: var(--ink); border-color: var(--ink); color: #fff; }
+.club-modal-tabs button:hover:not(.active) { border-color: var(--gold); color: var(--ink); }
+.club-modal-pane { display: none; }
+.club-modal-pane.active { display: block; }
+.club-modal-pane h3 { font-family: var(--font-display); font-size: 17px; margin: 0 0 10px; color: var(--ink); }
+.club-modal-pane p { font-size: 14px; line-height: 1.75; color: var(--slate); }
+
+.faculty-card { display: flex; gap: 16px; background: var(--paper); border: 1px solid var(--paper-line); border-radius: 14px; padding: 18px; align-items: flex-start; }
+.faculty-card img { width: 60px; height: 60px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
+.faculty-card h4 { margin: 0; font-size: 15px; color: var(--ink); }
+.faculty-card .role { font-size: 12.5px; color: var(--maroon); font-weight: 600; margin: 2px 0 6px; }
+.faculty-card .email { font-size: 12px; color: var(--slate-light); margin-bottom: 8px; display: block; }
+.faculty-card .bio { font-size: 12.5px; color: var(--slate); line-height: 1.6; margin: 0; }
+
+.leads-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.lead-card { background: var(--paper); border: 1px solid var(--paper-line); border-radius: 14px; padding: 16px; display: flex; gap: 12px; align-items: center; }
+.lead-card .avatar { width: 46px; height: 46px; border-radius: 50%; background: var(--paper-line); flex-shrink: 0; object-fit: cover; }
+.lead-card h4 { margin: 0; font-size: 14px; color: var(--ink); }
+.lead-card .role { font-size: 12px; color: var(--maroon); font-weight: 600; }
+.lead-card .grade { display: inline-block; margin-top: 5px; font-size: 10.5px; background: var(--paper-line); padding: 2px 9px; border-radius: 999px; color: var(--slate); }
+
+.gallery-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.gallery-grid img { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 10px; }
+
+@media (max-width: 560px) {
+  .leads-grid { grid-template-columns: 1fr; }
+  .gallery-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* solid-color fallback cards (no photo yet) keep same glass treatment */
+.bento-card.-solid { background: var(--ink); }
+.bento-card.-solid .bento-scrim { background: linear-gradient(160deg, rgba(255,255,255,.06), transparent 60%); }
+
+@media (max-width: 860px) {
+  .bento-grid { grid-template-columns: repeat(2, 1fr); grid-auto-rows: 200px; }
+  .bento-card.-lg, .bento-card.-wide { grid-column: span 2; grid-row: span 1; }
+  .bento-card.-tall { grid-row: span 1; }
+}
+@media (max-width: 520px) {
+  .bento-grid { grid-template-columns: 1fr; }
+  .bento-card.-lg, .bento-card.-wide, .bento-card.-tall, .bento-card.-sm { grid-column: span 1; grid-row: span 1; height: 240px; }
+}
