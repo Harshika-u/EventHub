@@ -23,106 +23,13 @@
 
 <section class="clubs-hero reveal">
   <div class="eyebrow">Student-run</div>
-  <h1>School Clubs</h1>
-  <p>From the newsletter desk to the debate floor — every club here is planned, run, and grown by JGS students themselves. Click any club to explore what they do, who leads them, and more.</p>
+  <h1>JGS - ISC Clubs</h1>
+  <p>From the newsletter desk to the debate floor — every club here is planned, run, and grown by JGS students themselves. Tap any club to explore what they do, who leads them, and more.</p>
 </section>
 
-<section class="bento-grid">
-
-  <div class="bento-card -lg" onclick="openClubModal('newsletter')">
-    <img src="https://placehold.co/700x700/1b2a4a/e4c95f?text=Newsletter+Club" alt="Newsletter Club">
-    <div class="bento-scrim"></div>
-    <span class="bento-tag">Media</span>
-    <div class="bento-info">
-      <h3>Newsletter Club</h3>
-      <div class="line">Writes and publishes the school's regular newsletter</div>
-    </div>
-    <div class="bento-reveal">
-      <p>Placeholder description — student writers and editors put together JGS's newsletter each month, covering campus news, events, and student work.</p>
-      <a href="#" onclick="event.preventDefault()">View club →</a>
-    </div>
-  </div>
-
-  <div class="bento-card -tall" onclick="openClubModal('jnn')">
-    <img src="https://placehold.co/500x900/7a1f2b/f8f6f0?text=JNN" alt="JNN — JGS News Network">
-    <div class="bento-scrim"></div>
-    <span class="bento-tag">Broadcast</span>
-    <div class="bento-info">
-      <h3>JNN</h3>
-      <div class="line">JGS News Network — video bulletins &amp; interviews</div>
-    </div>
-    <div class="bento-reveal">
-      <p>Placeholder description — JNN covers campus buzz, morning bulletins, and event highlights in video form, produced entirely by students.</p>
-      <a href="#" onclick="event.preventDefault()">View club →</a>
-    </div>
-  </div>
-
-  <div class="bento-card -sm" onclick="openClubModal('achievements')">
-    <img src="https://placehold.co/500x500/c9a227/1b2a4a?text=Achievements" alt="Achievements Cell">
-    <div class="bento-scrim"></div>
-    <div class="bento-info">
-      <h3>Achievements Cell</h3>
-      <div class="line">Tracks student wins</div>
-    </div>
-    <div class="bento-reveal">
-      <p>Collects and showcases student achievements across academics, sports, and the arts.</p>
-      <a href="#" onclick="event.preventDefault()">View club →</a>
-    </div>
-  </div>
-
-  <div class="bento-card -sm" onclick="openClubModal('science')">
-    <img src="https://placehold.co/500x500/2e3f66/e4c95f?text=Science+Club" alt="Science Club">
-    <div class="bento-scrim"></div>
-    <div class="bento-info">
-      <h3>Science Club</h3>
-      <div class="line">Runs Prismatic</div>
-    </div>
-    <div class="bento-reveal">
-      <p>Organizes Prismatic and other science-fest activities across the year.</p>
-      <a href="#" onclick="event.preventDefault()">View club →</a>
-    </div>
-  </div>
-
-  <div class="bento-card -wide" onclick="openClubModal('sports')">
-    <img src="https://placehold.co/900x450/4a1a20/f8f6f0?text=Sports+Club" alt="Sports Club">
-    <div class="bento-scrim"></div>
-    <span class="bento-tag">Athletics</span>
-    <div class="bento-info">
-      <h3>Sports Club</h3>
-      <div class="line">Inter-house meets, leagues, and weekly practice</div>
-    </div>
-    <div class="bento-reveal">
-      <p>Placeholder description — organizes inter-house athletics, basketball &amp; football leagues, and weekly badminton/table tennis sessions.</p>
-      <a href="#" onclick="event.preventDefault()">View club →</a>
-    </div>
-  </div>
-
-  <div class="bento-card -sm" onclick="openClubModal('photography')">
-    <img src="https://placehold.co/500x500/6b5b1f/f8f6f0?text=Photography" alt="Photography Club">
-    <div class="bento-scrim"></div>
-    <div class="bento-info">
-      <h3>Photography</h3>
-      <div class="line">Campus gallery &amp; events</div>
-    </div>
-    <div class="bento-reveal">
-      <p>Shoots and curates the photo gallery for campus events and everyday student life.</p>
-      <a href="#" onclick="event.preventDefault()">View club →</a>
-    </div>
-  </div>
-
-  <div class="bento-card -sm" onclick="openClubModal('debate')">
-    <img src="https://placehold.co/500x500/1b2a4a/c9a227?text=Debate+%26+Literary" alt="Debate & Literary Club">
-    <div class="bento-scrim"></div>
-    <div class="bento-info">
-      <h3>Debate &amp; Literary</h3>
-      <div class="line">Runs Languista</div>
-    </div>
-    <div class="bento-reveal">
-      <p>Organizes debates and Languista, the school's open literary event.</p>
-      <a href="#" onclick="event.preventDefault()">View club →</a>
-    </div>
-  </div>
-
+<!-- Club cards are built here at runtime from Firestore — see buildClubsGrid() below. -->
+<section class="bento-grid" id="clubsGrid">
+  <p class="loading-text">Loading clubs...</p>
 </section>
 
 <!-- CLUB DETAIL MODAL -->
@@ -155,7 +62,6 @@
           <div>
             <h4 id="modalFacultyName"></h4>
             <div class="role" id="modalFacultyRole"></div>
-            <span class="email" id="modalFacultyEmail"></span>
             <p class="bio" id="modalFacultyBio"></p>
           </div>
         </div>
@@ -168,7 +74,11 @@
 
       <div class="club-modal-pane" data-pane="gallery">
         <h3>Photo Gallery</h3>
-        <div class="gallery-grid" id="modalGalleryGrid"></div>
+        <div class="gallery-carousel">
+          <button class="gallery-nav prev" onclick="scrollGallery(-1)" aria-label="Previous photo" type="button">‹</button>
+          <div class="gallery-track" id="modalGalleryGrid"></div>
+          <button class="gallery-nav next" onclick="scrollGallery(1)" aria-label="Next photo" type="button">›</button>
+        </div>
       </div>
     </div>
   </div>
@@ -179,35 +89,35 @@
   <div class="footer-cta reveal">
     <div class="eyebrow light">Get involved</div>
     <h2 class="footer-cta-heading">Ready to see what's happening on campus?</h2>
-    <a href="../../indexlogin.html" class="btn-cta">Enter EventHub</a>
+    <a href="../indexlogin.html" class="btn-cta">Enter EventHub</a>
   </div>
 
   <div class="footer-divider"></div>
 
   <div class="footer-info">
     <div>
-      <h5>Johnson Grammar School</h5>
-      <p class="tagline">The school's digital campus — news, clubs, achievements, and EventHub, all in one place.</p>
+      <h5>Johnson Grammar School - ISC</h5>
+      <p class="tagline">It is very systematic; disciplined & the difficulty level of the subjects is equally distributed in exams.</p>
     </div>
     <div class="footer-contact">
       <div class="footer-contact-item">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 6-9 13-9 13s-9-7-9-13a9 9 0 0 1 18 0Z"/><circle cx="12" cy="10" r="3"/></svg>
-        <span>[School address here]</span>
+        <span>Plot No-A, 16, Nacharam - Mallapur Rd, Baba Nagar, Nacharam, Hyderabad, Secunderabad, Telangana 500076</span>
       </div>
       <div class="footer-contact-item">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 6-10 7L2 6"/></svg>
-        <span>info@jgsicse.org</span>
+        <span>mallapurseniorschool@jgschool.org<br>admissions@jgschool.org</span>
       </div>
       <div class="footer-contact-item">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.362 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.338 1.85.573 2.81.7A2 2 0 0 1 22 16.92Z"/></svg>
-        <span>[Phone number here]</span>
+        <span>074060 04433</span>
       </div>
     </div>
     <div class="footer-nav-links">
-      <a href="../home.html#about">About</a>
-      <a href="clubs.html">Clubs</a>
-      <a href="../alumni.html">Alumni</a>
-      <a href="../../login.html">Admin Portal</a>
+      <a href="#about">About</a>
+      <a href="clubs/clubs.html">Clubs</a>
+      <a href="alumni.html">Alumni</a>
+      <a href="../login.html">Admin Portal</a>
     </div>
   </div>
 
@@ -218,96 +128,129 @@
 </footer>
 
 <script src="../js/public.js"></script>
-<script>
-  const CLUBS = {
-    newsletter: {
-      icon: "📰", gradient: "linear-gradient(135deg,#1b2a4a,#2e3f66)",
-      name: "Newsletter Club", tagline: "The voice of campus news",
-      about: "Placeholder description — student writers, editors, and designers put together JGS's newsletter each month, covering campus news, events, achievements, and student work from across the school.",
-      faculty: { name: "[Faculty Name]", role: "Faculty Coordinator", email: "[email@jgsicse.org]", bio: "[Short placeholder bio — swap in real details.]", photo: "https://placehold.co/120x120/1b2a4a/e4c95f?text=Photo" },
-      leads: [ { name: "[Student Name]", role: "Editor-in-Chief", grade: "Grade 12" }, { name: "[Student Name]", role: "Design Lead", grade: "Grade 11" } ],
-      gallery: [ "https://placehold.co/300x300/1b2a4a/e4c95f?text=1", "https://placehold.co/300x300/2e3f66/e4c95f?text=2", "https://placehold.co/300x300/1b2a4a/f8f6f0?text=3" ]
-    },
-    jnn: {
-      icon: "📺", gradient: "linear-gradient(135deg,#7a1f2b,#4a1a20)",
-      name: "JNN", tagline: "JGS News Network",
-      about: "Placeholder description — JNN produces video bulletins, campus buzz segments, and interviews, entirely shot and edited by students.",
-      faculty: { name: "[Faculty Name]", role: "Faculty Coordinator", email: "[email@jgsicse.org]", bio: "[Short placeholder bio — swap in real details.]", photo: "https://placehold.co/120x120/7a1f2b/f8f6f0?text=Photo" },
-      leads: [ { name: "[Student Name]", role: "Head Anchor", grade: "Grade 12" }, { name: "[Student Name]", role: "Production Lead", grade: "Grade 11" } ],
-      gallery: [ "https://placehold.co/300x300/7a1f2b/f8f6f0?text=1", "https://placehold.co/300x300/4a1a20/f8f6f0?text=2", "https://placehold.co/300x300/7a1f2b/e4c95f?text=3" ]
-    },
-    achievements: {
-      icon: "🏆", gradient: "linear-gradient(135deg,#c9a227,#8a6c1d)",
-      name: "Achievements Cell", tagline: "Tracking student wins across campus",
-      about: "Placeholder description — collects and showcases student achievements across academics, sports, and the arts, and coordinates recognition at school assemblies.",
-      faculty: { name: "[Faculty Name]", role: "Faculty Coordinator", email: "[email@jgsicse.org]", bio: "[Short placeholder bio — swap in real details.]", photo: "https://placehold.co/120x120/c9a227/1b2a4a?text=Photo" },
-      leads: [ { name: "[Student Name]", role: "Coordinator", grade: "Grade 12" } ],
-      gallery: [ "https://placehold.co/300x300/c9a227/1b2a4a?text=1", "https://placehold.co/300x300/8a6c1d/f8f6f0?text=2" ]
-    },
-    science: {
-      icon: "🔬", gradient: "linear-gradient(135deg,#2e3f66,#1b2a4a)",
-      name: "Science Club", tagline: "Where curiosity becomes discovery",
-      about: "Placeholder description — organizes Prismatic and other science-fest activities, hands-on experiments, and STEM challenges across the year.",
-      faculty: { name: "[Faculty Name]", role: "Faculty Coordinator", email: "[email@jgsicse.org]", bio: "[Short placeholder bio — swap in real details.]", photo: "https://placehold.co/120x120/2e3f66/e4c95f?text=Photo" },
-      leads: [ { name: "[Student Name]", role: "President", grade: "Grade 11" }, { name: "[Student Name]", role: "Vice President", grade: "Grade 11" } ],
-      gallery: [ "https://placehold.co/300x300/2e3f66/e4c95f?text=1", "https://placehold.co/300x300/1b2a4a/e4c95f?text=2", "https://placehold.co/300x300/2e3f66/f8f6f0?text=3" ]
-    },
-    sports: {
-      icon: "⚽", gradient: "linear-gradient(135deg,#4a1a20,#7a1f2b)",
-      name: "Sports Club", tagline: "Inter-house meets, leagues, and weekly practice",
-      about: "Placeholder description — organizes inter-house athletics, basketball and football leagues, and weekly badminton/table tennis sessions.",
-      faculty: { name: "[Faculty Name]", role: "Faculty Coordinator", email: "[email@jgsicse.org]", bio: "[Short placeholder bio — swap in real details.]", photo: "https://placehold.co/120x120/4a1a20/f8f6f0?text=Photo" },
-      leads: [ { name: "[Student Name]", role: "Captain", grade: "Grade 12" } ],
-      gallery: [ "https://placehold.co/300x300/4a1a20/f8f6f0?text=1", "https://placehold.co/300x300/7a1f2b/f8f6f0?text=2" ]
-    },
-    photography: {
-      icon: "📷", gradient: "linear-gradient(135deg,#6b5b1f,#4a3f15)",
-      name: "Photography Club", tagline: "Campus gallery & events",
-      about: "Placeholder description — shoots and curates the photo gallery for campus events and everyday student life.",
-      faculty: { name: "[Faculty Name]", role: "Faculty Coordinator", email: "[email@jgsicse.org]", bio: "[Short placeholder bio — swap in real details.]", photo: "https://placehold.co/120x120/6b5b1f/f8f6f0?text=Photo" },
-      leads: [ { name: "[Student Name]", role: "Lead Photographer", grade: "Grade 12" } ],
-      gallery: [ "https://placehold.co/300x300/6b5b1f/f8f6f0?text=1", "https://placehold.co/300x300/4a3f15/f8f6f0?text=2", "https://placehold.co/300x300/6b5b1f/e4c95f?text=3" ]
-    },
-    debate: {
-      icon: "🎤", gradient: "linear-gradient(135deg,#1b2a4a,#7a1f2b)",
-      name: "Debate & Literary Club", tagline: "Runs Languista",
-      about: "Placeholder description — organizes debates and Languista, the school's open literary event, open to all students.",
-      faculty: { name: "[Faculty Name]", role: "Faculty Coordinator", email: "[email@jgsicse.org]", bio: "[Short placeholder bio — swap in real details.]", photo: "https://placehold.co/120x120/1b2a4a/c9a227?text=Photo" },
-      leads: [ { name: "[Student Name]", role: "President", grade: "Grade 12" } ],
-      gallery: [ "https://placehold.co/300x300/1b2a4a/c9a227?text=1", "https://placehold.co/300x300/7a1f2b/f8f6f0?text=2" ]
-    }
+
+<!-- FIREBASE: clubs are now stored in Firestore (collection "clubs") and
+     edited from admin/club_admin.html instead of being hardcoded here. -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+  import {
+    getFirestore, collection, getDocs
+  } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyDMkDxml0p9zUp6gZuo1SeVhmQ3BZamy9o",
+    authDomain: "eventhub-8a8dc.firebaseapp.com",
+    projectId: "eventhub-8a8dc",
+    storageBucket: "eventhub-8a8dc.firebasestorage.app",
+    messagingSenderId: "450946542344",
+    appId: "1:450946542344:web:e54c332ca5bf2358d01abd"
   };
 
-  function openClubModal(id) {
-    const c = CLUBS[id];
-    if (!c) return;
-    document.getElementById("modalBanner").style.background = c.gradient;
-    document.getElementById("modalIcon").textContent = c.icon;
-    document.getElementById("modalIcon").style.fontSize = "56px";
-    document.getElementById("modalName").textContent = c.name;
-    document.getElementById("modalTagline").textContent = c.tagline;
-    document.getElementById("modalAboutHeading").textContent = "About " + c.name;
-    document.getElementById("modalAboutText").textContent = c.about;
+  const app = initializeApp(firebaseConfig);
+  const db  = getFirestore(app);
 
-    document.getElementById("modalFacultyPhoto").src = c.faculty.photo;
-    document.getElementById("modalFacultyName").textContent = c.faculty.name;
-    document.getElementById("modalFacultyRole").textContent = c.faculty.role;
-    document.getElementById("modalFacultyEmail").textContent = c.faculty.email;
-    document.getElementById("modalFacultyBio").textContent = c.faculty.bio;
+  window._allClubs = [];
+
+  // Bento card size -> CSS class, matching the classes already in clubs.css.
+  const SIZE_CLASS = { lg: "-lg", tall: "-tall", wide: "-wide", sm: "-sm" };
+
+  function buildClubCard(c) {
+    const sizeClass = SIZE_CLASS[c.size] || "-sm";
+    const img   = c.cardImage || "https://placehold.co/600x600/1b2a4a/e4c95f?text=" + encodeURIComponent(c.name || "Club");
+    const tag   = c.category ? `<span class="bento-tag">${c.category}</span>` : "";
+    return `
+      <div class="bento-card ${sizeClass}" onclick="openClubModal('${c.id}')">
+        <img src="${img}" alt="${c.name || ""}">
+        <div class="bento-scrim"></div>
+        ${tag}
+        <div class="bento-info">
+          <h3>${c.name || "Untitled Club"}</h3>
+          <div class="line">${c.tagline || ""}</div>
+          <span class="bento-cta">View club <span aria-hidden="true">→</span></span>
+        </div>
+      </div>`;
+  }
+
+  async function loadClubs() {
+    const grid = document.getElementById("clubsGrid");
+    try {
+      const snapshot = await getDocs(collection(db, "clubs"));
+      window._allClubs = [];
+      snapshot.forEach(d => window._allClubs.push({ id: d.id, ...d.data() }));
+
+      if (window._allClubs.length === 0) {
+        grid.innerHTML = '<p class="loading-text">No clubs added yet. Add one from the admin panel.</p>';
+        return;
+      }
+
+      // Optional manual ordering: clubs with an "order" number sort first,
+      // in that order; anything without one falls back to name order.
+      window._allClubs.sort((a, b) => {
+        if (a.order != null && b.order != null) return a.order - b.order;
+        if (a.order != null) return -1;
+        if (b.order != null) return 1;
+        return (a.name || "").localeCompare(b.name || "");
+      });
+
+      grid.innerHTML = window._allClubs.map(buildClubCard).join("");
+    } catch (err) {
+      console.error(err);
+      grid.innerHTML = '<p class="loading-text">Failed to load clubs.</p>';
+    }
+  }
+
+  function buildGallery(images) {
+    const track = document.getElementById("modalGalleryGrid");
+    if (!images || !images.length) {
+      track.innerHTML = `<p class="gallery-empty">No photos added yet.</p>`;
+      return;
+    }
+    track.innerHTML = images.map(src => `<img src="${src}" alt="" loading="lazy">`).join("");
+    track.scrollTo({ left: 0 });
+  }
+
+  window.scrollGallery = function(dir) {
+    const track = document.getElementById("modalGalleryGrid");
+    const firstImg = track.querySelector("img");
+    if (!firstImg) return;
+    const gap = 10;
+    const step = firstImg.getBoundingClientRect().width + gap;
+    track.scrollBy({ left: dir * step * 2, behavior: "smooth" });
+  };
+
+  window.openClubModal = function(id) {
+    const c = window._allClubs.find(club => club.id === id);
+    if (!c) return;
+
+    document.getElementById("modalBanner").style.background = c.bannerColor || "#1b2a4a";
+    document.getElementById("modalIcon").textContent = c.icon || "";
+    document.getElementById("modalIcon").style.fontSize = "56px";
+    document.getElementById("modalName").textContent = c.name || "";
+    document.getElementById("modalTagline").textContent = c.tagline || "";
+    document.getElementById("modalAboutHeading").textContent = "About " + (c.name || "this club");
+    document.getElementById("modalAboutText").textContent = c.about || "No description added yet.";
+
+    const fac = c.faculty || {};
+    document.getElementById("modalFacultyPhoto").src = fac.photo || "https://placehold.co/120x120/1b2a4a/e4c95f?text=Photo";
+    document.getElementById("modalFacultyName").textContent = fac.name || "TBA";
+    document.getElementById("modalFacultyRole").textContent = fac.role || "Faculty Coordinator";
+    document.getElementById("modalFacultyBio").textContent = fac.bio || "";
 
     const leadsGrid = document.getElementById("modalLeadsGrid");
-    leadsGrid.innerHTML = c.leads.map(l => `
-      <div class="lead-card">
-        <div class="avatar"></div>
-        <div>
-          <h4>${l.name}</h4>
-          <div class="role">${l.role}</div>
-          <span class="grade">${l.grade}</span>
-        </div>
-      </div>`).join("");
+    const leads = c.leads || [];
+    leadsGrid.innerHTML = leads.length
+      ? leads.map(l => `
+        <div class="lead-card">
+          <img class="avatar" src="${l.photo || 'https://placehold.co/80x80/1b2a4a/e4c95f?text=' + encodeURIComponent((l.name||'?').charAt(0))}" alt="${l.name || ''}">
+          <div>
+            <h4>${l.name || ""}</h4>
+            <div class="role">${l.role || ""}</div>
+            <span class="grade">${l.grade || ""}</span>
+          </div>
+        </div>`).join("")
+      : `<p class="gallery-empty">No student leads added yet.</p>`;
 
-    const galleryGrid = document.getElementById("modalGalleryGrid");
-    galleryGrid.innerHTML = c.gallery.map(src => `<img src="${src}" alt="">`).join("");
+    buildGallery(c.gallery || []);
 
     // reset to About tab
     document.querySelectorAll(".club-modal-tabs button").forEach(b => b.classList.toggle("active", b.dataset.tab === "about"));
@@ -315,12 +258,12 @@
 
     document.getElementById("clubModalOverlay").classList.add("open");
     document.body.style.overflow = "hidden";
-  }
+  };
 
-  function closeClubModal() {
+  window.closeClubModal = function() {
     document.getElementById("clubModalOverlay").classList.remove("open");
     document.body.style.overflow = "";
-  }
+  };
 
   document.getElementById("clubModalOverlay").addEventListener("click", closeClubModal);
 
@@ -333,6 +276,8 @@
   });
 
   document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeClubModal(); });
+
+  loadClubs();
 </script>
 </body>
 </html>

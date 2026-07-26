@@ -23,12 +23,8 @@ emailjs.init("YOUR_PUBLIC_KEY");
       <li><a href="index.html">Home</a></li>
       <li><a href="events.html" class="active">Events</a></li>
       <li><a href="spotlight.html">Spotlight</a></li>
-      
-    <li>
-    <a href="#" onclick="logout()">
-        Logout
-    </a>
-</li></ul> 
+    </ul>
+    <a href="#" class="nav-cta" onclick="logout()">Logout</a>
   </div>
 </div>
 
@@ -144,18 +140,18 @@ emailjs.init("YOUR_PUBLIC_KEY");
       </div>
       <div>
         <label>Class</label>
-        <input id="regClass" type="text" placeholder="e.g. 12">
+        <input id="regClass" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="4" placeholder="e.g. 12" oninput="onlyDigits(this)">
       </div>
     </div>
 
     <div class="form-row">
       <div>
         <label>Section</label>
-        <input id="regSection" type="text" placeholder="e.g. A">
+        <input id="regSection" type="text" inputmode="text" pattern="[A-Za-z]*" maxlength="4" placeholder="e.g. A" oninput="onlyLetters(this)">
       </div>
       <div>
         <label>Roll Number</label>
-        <input id="regRoll" type="text" placeholder="e.g. 24">
+        <input id="regRoll" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="6" placeholder="e.g. 24" oninput="onlyDigits(this)">
       </div>
     </div>
 
@@ -177,7 +173,7 @@ emailjs.init("YOUR_PUBLIC_KEY");
           </div>
           <div>
             <label>Number of Participants</label>
-            <input id="groupCount" type="number" min="2" value="2" onchange="updateGroupMembers()">
+            <input id="groupCount" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="2" value="2" oninput="onlyDigits(this)" onchange="updateGroupMembers()">
           </div>
         </div>
         <div id="groupMembersList"></div>
@@ -188,6 +184,25 @@ emailjs.init("YOUR_PUBLIC_KEY");
     <p id="regError" style="color:#ef4444; font-size:13px; margin-top:8px; display:none;"></p>
   </div>
 </div>
+
+<!-- ═══ INPUT FORMAT HELPERS ═══ -->
+<script>
+  // Strip anything that isn't 0-9 as the user types (also catches paste, since
+  // the 'input' event fires after paste too).
+  function onlyDigits(el) {
+    const cleaned = el.value.replace(/[^0-9]/g, '');
+    if (cleaned !== el.value) el.value = cleaned;
+  }
+
+  // Strip anything that isn't a letter as the user types.
+  function onlyLetters(el) {
+    const cleaned = el.value.replace(/[^A-Za-z]/g, '');
+    if (cleaned !== el.value) el.value = cleaned;
+  }
+
+  const DIGITS_ONLY  = /^[0-9]+$/;
+  const LETTERS_ONLY = /^[A-Za-z]+$/;
+</script>
 
 <!-- FIREBASE -->
 <script type="module">
@@ -411,9 +426,9 @@ badge.className = "badge " + (status === "Ongoing"   ? "badge-ongoing"
         </div>
         <div class="form-row">
           <div><input type="text" placeholder="Participant ${i} Name" class="member-name"></div>
-          <div><input type="text" placeholder="Class" class="member-class"></div>
-          <div><input type="text" placeholder="Section" class="member-section"></div>
-          <div><input type="text" placeholder="Roll Number" class="member-roll"></div>
+          <div><input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="4" placeholder="Class" class="member-class" oninput="onlyDigits(this)"></div>
+          <div><input type="text" inputmode="text" pattern="[A-Za-z]*" maxlength="4" placeholder="Section" class="member-section" oninput="onlyLetters(this)"></div>
+          <div><input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="6" placeholder="Roll Number" class="member-roll" oninput="onlyDigits(this)"></div>
         </div>
       `;
       list.appendChild(row);
@@ -459,6 +474,25 @@ async function sendConfirmationEmail(studentEmail, studentName, eventName) {
       errEl.style.display = "block";
       return;
     }
+
+    // Format checks (backstop in case something bypassed the live filtering,
+    // e.g. a paste on a browser that doesn't fire 'input' the same way).
+    if (!isGroup && !DIGITS_ONLY.test(regClass)) {
+      errEl.innerText = "Class must contain numbers only.";
+      errEl.style.display = "block";
+      return;
+    }
+    if (!isGroup && !LETTERS_ONLY.test(regSection)) {
+      errEl.innerText = "Section must contain letters only.";
+      errEl.style.display = "block";
+      return;
+    }
+    if (!isGroup && !DIGITS_ONLY.test(rollNumber)) {
+      errEl.innerText = "Roll number must contain numbers only.";
+      errEl.style.display = "block";
+      return;
+    }
+
     if (isGroup && !groupName) {
       errEl.innerText = "Please enter a group name.";
       errEl.style.display = "block";
@@ -475,6 +509,21 @@ async function sendConfirmationEmail(studentEmail, studentName, eventName) {
         const mRoll = row.querySelector(".member-roll").value.trim();
         if (!mName || !mClass || !mSection || !mRoll) {
           errEl.innerText = "Please fill in all participant details.";
+          errEl.style.display = "block";
+          return;
+        }
+        if (!DIGITS_ONLY.test(mClass)) {
+          errEl.innerText = "Each participant's class must contain numbers only.";
+          errEl.style.display = "block";
+          return;
+        }
+        if (!LETTERS_ONLY.test(mSection)) {
+          errEl.innerText = "Each participant's section must contain letters only.";
+          errEl.style.display = "block";
+          return;
+        }
+        if (!DIGITS_ONLY.test(mRoll)) {
+          errEl.innerText = "Each participant's roll number must contain numbers only.";
           errEl.style.display = "block";
           return;
         }

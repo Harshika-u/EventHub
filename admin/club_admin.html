@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Manage Clubs | EventHub Admin</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif; }
+  body { background:#f5f7fa; color:#0f172a; display:flex; min-height:100vh; }
+
+  /* ── SIDEBAR (mirrors the existing admin dashboard) ── */
+  .sidebar {
+    width:240px; flex-shrink:0; background:#0f172a; color:#fff;
+    display:flex; flex-direction:column; padding:28px 20px; position:sticky; top:0; height:100vh;
+  }
+  .sidebar h1 { font-size:17px; font-weight:800; }
+  .sidebar .admin-email { font-size:12px; color:#94a3b8; margin-top:4px; margin-bottom:32px; }
+  .sidebar nav { display:flex; flex-direction:column; gap:6px; flex:1; }
+  .sidebar nav a {
+    display:block; text-decoration:none; color:#cbd5e1; font-size:14px; font-weight:600;
+    padding:11px 14px; border-radius:10px; transition:background .15s ease, color .15s ease;
+  }
+  .sidebar nav a:hover { background:#1e293b; color:#fff; }
+  .sidebar nav a.active { background:#3b82f6; color:#fff; }
+  .sidebar .logout-btn {
+    background:#1e293b; color:#fff; border:none; border-radius:10px; padding:12px;
+    font-size:14px; font-weight:600; cursor:pointer;
+  }
+  .sidebar .logout-btn:hover { background:#334155; }
+
+  /* ── MAIN ── */
+  .main { flex:1; padding:36px 40px; }
+  .page-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:28px; }
+  .page-header h2 { font-size:26px; font-weight:800; }
+  .add-btn {
+    background:#3b82f6; color:#fff; border:none; padding:12px 22px; border-radius:10px;
+    font-size:14px; font-weight:700; cursor:pointer; transition:background .15s ease;
+  }
+  .add-btn:hover { background:#2563eb; }
+
+  .club-row {
+    display:flex; gap:20px; align-items:center; background:#fff; border:1px solid #e2e8f0;
+    border-radius:16px; padding:18px; margin-bottom:16px;
+  }
+  .club-row img { width:90px; height:90px; object-fit:cover; border-radius:12px; flex-shrink:0; background:#e2e8f0; }
+  .club-row .info { flex:1; min-width:0; }
+  .club-row h3 { font-size:16px; font-weight:700; }
+  .club-row p { font-size:13px; color:#64748b; margin-top:4px; }
+  .club-row .tags { display:flex; gap:8px; margin-top:8px; flex-wrap:wrap; }
+  .club-row .tag { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.04em; background:#f1f5f9; color:#475569; padding:3px 10px; border-radius:999px; }
+  .row-actions { display:flex; gap:10px; flex-shrink:0; }
+  .edit-btn, .delete-btn {
+    border:1px solid; background:#fff; padding:9px 18px; border-radius:8px; font-size:13px; font-weight:700; cursor:pointer;
+  }
+  .edit-btn { color:#3b82f6; border-color:#3b82f6; }
+  .edit-btn:hover { background:#eff6ff; }
+  .delete-btn { color:#ef4444; border-color:#ef4444; }
+  .delete-btn:hover { background:#fef2f2; }
+
+  .loading-text, .empty-text { color:#94a3b8; font-size:14px; padding:20px 0; }
+
+  /* ── MODAL ── */
+  .modal-overlay {
+    display:none; position:fixed; inset:0; background:rgba(15,23,42,.55); z-index:200;
+    align-items:flex-start; justify-content:center; padding:40px 20px; overflow-y:auto;
+  }
+  .modal-overlay.open { display:flex; }
+  .modal-box { background:#fff; border-radius:20px; max-width:640px; width:100%; padding:30px 32px 36px; }
+  .modal-box h2 { font-size:20px; font-weight:800; margin-bottom:22px; }
+
+  .field-group { margin-bottom:16px; }
+  .field-row { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:16px; }
+  label { display:block; font-size:12.5px; font-weight:700; color:#475569; margin-bottom:6px; }
+  input[type=text], input[type=email], input[type=number], input[type=url], textarea, select {
+    width:100%; padding:10px 12px; border:1px solid #e2e8f0; border-radius:9px; font-size:14px; outline:none;
+    font-family:inherit;
+  }
+  input:focus, textarea:focus, select:focus { border-color:#3b82f6; }
+  textarea { resize:vertical; min-height:70px; }
+
+  .section-title { font-size:14px; font-weight:800; margin:22px 0 12px; padding-top:16px; border-top:1px solid #e2e8f0; }
+
+  .repeat-row { display:grid; grid-template-columns:1fr 1fr 1fr auto; gap:10px; margin-bottom:10px; align-items:end; }
+  .repeat-row.gallery-row { grid-template-columns:1fr auto auto; }
+  .remove-row-btn {
+    background:#fef2f2; color:#ef4444; border:1px solid #fecaca; border-radius:8px; width:38px; height:38px;
+    cursor:pointer; font-size:16px; line-height:1;
+  }
+  .add-row-btn {
+    background:#f1f5f9; color:#334155; border:1px dashed #cbd5e1; border-radius:9px; padding:9px 16px;
+    font-size:13px; font-weight:700; cursor:pointer; margin-top:4px;
+  }
+  .add-row-btn:hover { background:#e2e8f0; }
+
+  /* ── IMAGE UPLOAD (card image / faculty photo / lead photo) ── */
+  .image-field { display:flex; gap:10px; align-items:center; }
+  .image-field input[type=url] { flex:1; }
+  .upload-btn {
+    background:#eff6ff; color:#3b82f6; border:1px solid #bfdbfe; border-radius:9px; padding:10px 14px;
+    font-size:13px; font-weight:700; cursor:pointer; white-space:nowrap; flex-shrink:0;
+  }
+  .upload-btn:hover { background:#dbeafe; }
+  .upload-btn.small { padding:8px 12px; font-size:12.5px; }
+  .upload-status { font-size:12px; color:#64748b; margin-top:6px; display:block; min-height:16px; }
+  .img-thumb {
+    width:44px; height:44px; border-radius:8px; object-fit:cover; flex-shrink:0; background:#e2e8f0; display:none;
+  }
+
+  /* ── STUDENT LEAD CARD (name/role/grade row + photo row) ── */
+  .lead-row-card { border:1px solid #e2e8f0; border-radius:12px; padding:12px; margin-bottom:12px; background:#f8fafc; }
+  .lead-row-card .repeat-row { margin-bottom:10px; }
+  .lead-photo-row { display:flex; gap:10px; align-items:center; }
+  .lead-photo-row input[type=url] { flex:1; }
+
+  .modal-actions { display:flex; justify-content:space-between; align-items:center; margin-top:26px; gap:12px; }
+  .save-btn { background:#3b82f6; color:#fff; border:none; padding:12px 26px; border-radius:10px; font-size:14px; font-weight:700; cursor:pointer; }
+  .save-btn:hover { background:#2563eb; }
+  .cancel-btn { background:none; border:none; color:#64748b; font-size:14px; font-weight:600; cursor:pointer; }
+  .form-error { color:#ef4444; font-size:13px; margin-top:10px; display:none; }
+</style>
+</head>
+<body>
+
+<div class="sidebar">
+  <h1>EventHub Admin</h1>
+  <p class="admin-email">admin@schoolhub.local</p>
+  <nav>
+    <a href="dashboard.html">Events</a>
+    <a href="dashboard.html">Participants</a>
+    <a href="spot.html">Spotlight</a>
+    <a href="club_admin.html" class="active">Clubs</a>
+  </nav>
+  <button class="logout-btn" onclick="logout()">Logout</button>
+</div>
+
+<div class="main">
+  <div class="page-header">
+    <h2>Manage Clubs</h2>
+    <button class="add-btn" onclick="openClubForm()">Add Club</button>
+  </div>
+
+  <div id="clubsList">
+    <p class="loading-text">Loading clubs...</p>
+  </div>
+</div>
+
+<!-- ═══ ADD / EDIT CLUB MODAL ═══ -->
+<div class="modal-overlay" id="clubModal">
+  <div class="modal-box">
+    <h2 id="formTitle">Add Club</h2>
+
+    <div class="field-row">
+      <div class="field-group">
+        <label>Club Name</label>
+        <input type="text" id="fName" placeholder="e.g. Newsletter Club">
+      </div>
+      <div class="field-group">
+        <label>Tagline</label>
+        <input type="text" id="fTagline" placeholder="e.g. The voice of campus news">
+      </div>
+    </div>
+
+    <div class="field-row">
+      <div class="field-group">
+        <label>Category Tag (optional)</label>
+        <input type="text" id="fCategory" placeholder="e.g. Media">
+      </div>
+      <div class="field-group">
+        <label>Card Size</label>
+        <select id="fSize">
+          <option value="sm">Small</option>
+          <option value="wide">Wide</option>
+          <option value="tall">Tall</option>
+          <option value="lg">Large</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="field-row">
+      <div class="field-group">
+        <label>Card Image</label>
+        <div class="image-field">
+          <input type="url" id="fCardImage" placeholder="https://... or click Upload">
+          <button type="button" class="upload-btn" onclick="document.getElementById('fCardImageFile').click()">Upload</button>
+          <input type="file" id="fCardImageFile" accept="image/*" style="display:none">
+        </div>
+        <span class="upload-status" id="fCardImageStatus"></span>
+      </div>
+      <div class="field-group">
+        <label>Icon / Emoji (optional)</label>
+        <input type="text" id="fIcon" placeholder="e.g. 📰" maxlength="4">
+      </div>
+    </div>
+
+    <div class="field-group">
+      <label>Modal Banner Color</label>
+      <input type="text" id="fBannerColor" placeholder="e.g. #1b2a4a or a linear-gradient(...)">
+    </div>
+
+    <div class="field-group">
+      <label>About</label>
+      <textarea id="fAbout" placeholder="What does this club do?"></textarea>
+    </div>
+
+    <div class="section-title">Faculty Coordinator</div>
+    <div class="field-row">
+      <div class="field-group">
+        <label>Name</label>
+        <input type="text" id="fFacName" placeholder="Faculty name">
+      </div>
+      <div class="field-group">
+        <label>Role</label>
+        <input type="text" id="fFacRole" placeholder="e.g. Faculty Coordinator">
+      </div>
+    </div>
+    <div class="field-group">
+      <label>Photo</label>
+      <div class="image-field">
+        <input type="url" id="fFacPhoto" placeholder="https://... or click Upload">
+        <button type="button" class="upload-btn" onclick="document.getElementById('fFacPhotoFile').click()">Upload</button>
+        <input type="file" id="fFacPhotoFile" accept="image/*" style="display:none">
+      </div>
+      <span class="upload-status" id="fFacPhotoStatus"></span>
+    </div>
+    <div class="field-group">
+      <label>Short Bio</label>
+      <textarea id="fFacBio" placeholder="A line or two about them"></textarea>
+    </div>
+
+    <div class="section-title">Student Leads</div>
+    <div id="leadsRows"></div>
+    <button type="button" class="add-row-btn" onclick="addLeadRow()">+ Add student lead</button>
+
+    <div class="section-title">Gallery Images</div>
+    <div id="galleryRows"></div>
+    <button type="button" class="add-row-btn" onclick="addGalleryRow()">+ Add photo</button>
+
+    <p class="form-error" id="formError"></p>
+
+    <div class="modal-actions">
+      <button class="cancel-btn" onclick="closeClubForm()">Cancel</button>
+      <button class="save-btn" id="saveBtn" onclick="saveClub()">Save Club</button>
+    </div>
+  </div>
+</div>
+
+<!-- FIREBASE -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+  import {
+    getFirestore, collection, getDocs, addDoc, updateDoc, deleteDoc, doc
+  } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyDMkDxml0p9zUp6gZuo1SeVhmQ3BZamy9o",
+    authDomain: "eventhub-8a8dc.firebaseapp.com",
+    projectId: "eventhub-8a8dc",
+    storageBucket: "eventhub-8a8dc.firebasestorage.app",
+    messagingSenderId: "450946542344",
+    appId: "1:450946542344:web:e54c332ca5bf2358d01abd"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db  = getFirestore(app);
+
+  window._db = db;
+  window._fb = { collection, getDocs, addDoc, updateDoc, deleteDoc, doc };
+  window._allClubs = [];
+  window._editingId = null;
+
+  /* ── IMAGE UPLOAD (Cloudinary — same account/preset used for events) ── */
+  const CLOUDINARY_CLOUD  = "danjlladp";
+  const CLOUDINARY_PRESET = "EventHub";
+
+  async function uploadImageToCloudinary(file) {
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("upload_preset", CLOUDINARY_PRESET);
+    const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD}/image/upload`, {
+      method: "POST",
+      body: formData
+    });
+    const data = await res.json();
+    if (!data.secure_url) throw new Error("Upload failed");
+    return data.secure_url;
+  }
+
+  // Wire a single static file input (card image / faculty photo) to its URL field.
+  function wireImageUpload(fileInputId, urlInputId, statusId) {
+    const fileInput = document.getElementById(fileInputId);
+    const urlInput  = document.getElementById(urlInputId);
+    const status    = document.getElementById(statusId);
+    fileInput.addEventListener("change", async () => {
+      const file = fileInput.files[0];
+      if (!file) return;
+      status.innerText = "Uploading...";
+      try {
+        urlInput.value = await uploadImageToCloudinary(file);
+        status.innerText = "Uploaded ✓";
+      } catch (err) {
+        console.error(err);
+        status.innerText = "Upload failed — try again.";
+      }
+    });
+  }
+
+  wireImageUpload("fCardImageFile", "fCardImage", "fCardImageStatus");
+  wireImageUpload("fFacPhotoFile", "fFacPhoto", "fFacPhotoStatus");
+
+  // Lead photo file inputs are created dynamically (one per lead row), so use
+  // event delegation on the container instead of wiring each one individually.
+  document.getElementById("leadsRows").addEventListener("change", async (ev) => {
+    if (!ev.target.classList.contains("lead-photo-file")) return;
+    const file = ev.target.files[0];
+    if (!file) return;
+    const card   = ev.target.closest(".lead-row-card");
+    const urlInput = card.querySelector(".lead-photo");
+    const status    = card.querySelector(".lead-photo-status");
+    status.innerText = "Uploading...";
+    try {
+      urlInput.value = await uploadImageToCloudinary(file);
+      status.innerText = "Uploaded ✓";
+    } catch (err) {
+      console.error(err);
+      status.innerText = "Upload failed — try again.";
+    }
+  });
+
+  // Gallery photo file inputs are also created dynamically — same pattern.
+  document.getElementById("galleryRows").addEventListener("change", async (ev) => {
+    if (!ev.target.classList.contains("gallery-file")) return;
+    const file = ev.target.files[0];
+    if (!file) return;
+    const row      = ev.target.closest(".gallery-row");
+    const urlInput = row.querySelector(".gallery-url");
+    urlInput.placeholder = "Uploading...";
+    try {
+      urlInput.value = await uploadImageToCloudinary(file);
+    } catch (err) {
+      console.error(err);
+      alert("Upload failed — please try again.");
+    } finally {
+      urlInput.placeholder = "https://... or click Upload";
+    }
+  });
+
+  /* ── LOAD + RENDER LIST ── */
+  async function loadClubs() {
+    const list = document.getElementById("clubsList");
+    try {
+      const snapshot = await getDocs(collection(db, "clubs"));
+      window._allClubs = [];
+      snapshot.forEach(d => window._allClubs.push({ id: d.id, ...d.data() }));
+
+      if (window._allClubs.length === 0) {
+        list.innerHTML = '<p class="empty-text">No clubs added yet. Click "Add Club" to create one.</p>';
+        return;
+      }
+
+      list.innerHTML = window._allClubs.map(c => `
+        <div class="club-row">
+          <img src="${c.cardImage || 'https://placehold.co/200x200/1b2a4a/e4c95f?text=' + encodeURIComponent(c.name || 'Club')}" alt="">
+          <div class="info">
+            <h3>${c.name || "Untitled Club"}</h3>
+            <p>${c.tagline || "No tagline yet"}</p>
+            <div class="tags">
+              ${c.category ? `<span class="tag">${c.category}</span>` : ""}
+              <span class="tag">${(c.leads || []).length} lead${(c.leads || []).length === 1 ? "" : "s"}</span>
+              <span class="tag">${(c.gallery || []).length} photo${(c.gallery || []).length === 1 ? "" : "s"}</span>
+            </div>
+          </div>
+          <div class="row-actions">
+            <button class="edit-btn" onclick="openClubForm('${c.id}')">Edit</button>
+            <button class="delete-btn" onclick="deleteClub('${c.id}')">Delete</button>
+          </div>
+        </div>`).join("");
+    } catch (err) {
+      console.error(err);
+      list.innerHTML = '<p class="empty-text">Failed to load clubs.</p>';
+    }
+  }
+
+  /* ── DYNAMIC ROWS: student leads ── */
+  window.addLeadRow = function(lead) {
+    const card = document.createElement("div");
+    card.className = "lead-row-card";
+    card.innerHTML = `
+      <div class="repeat-row lead-row">
+        <div><input type="text" placeholder="Name" class="lead-name" value="${lead?.name || ""}"></div>
+        <div><input type="text" placeholder="Role" class="lead-role" value="${lead?.role || ""}"></div>
+        <div><input type="text" placeholder="Grade" class="lead-grade" value="${lead?.grade || ""}"></div>
+        <button type="button" class="remove-row-btn" onclick="this.closest('.lead-row-card').remove()">✕</button>
+      </div>
+      <div class="lead-photo-row">
+        <input type="url" placeholder="Photo URL or click Upload" class="lead-photo" value="${lead?.photo || ""}">
+        <button type="button" class="upload-btn small" onclick="this.nextElementSibling.click()">Upload</button>
+        <input type="file" accept="image/*" class="lead-photo-file" style="display:none">
+      </div>
+      <span class="upload-status lead-photo-status"></span>
+    `;
+    document.getElementById("leadsRows").appendChild(card);
+  };
+
+  /* ── DYNAMIC ROWS: gallery photos (URL or upload) ── */
+  window.addGalleryRow = function(url) {
+    const row = document.createElement("div");
+    row.className = "repeat-row gallery-row";
+    row.innerHTML = `
+      <div><input type="url" placeholder="https://... or click Upload" class="gallery-url" value="${url || ""}"></div>
+      <button type="button" class="upload-btn small" onclick="this.nextElementSibling.click()">Upload</button>
+      <input type="file" accept="image/*" class="gallery-file" style="display:none">
+      <button type="button" class="remove-row-btn" onclick="this.closest('.gallery-row').remove()">✕</button>
+    `;
+    document.getElementById("galleryRows").appendChild(row);
+  };
+
+  /* ── OPEN FORM (add or edit) ── */
+  window.openClubForm = function(id) {
+    window._editingId = id || null;
+    document.getElementById("formTitle").innerText = id ? "Edit Club" : "Add Club";
+    document.getElementById("formError").style.display = "none";
+    document.getElementById("leadsRows").innerHTML = "";
+    document.getElementById("galleryRows").innerHTML = "";
+
+    const c = id ? window._allClubs.find(club => club.id === id) : null;
+
+    document.getElementById("fName").value        = c?.name || "";
+    document.getElementById("fTagline").value      = c?.tagline || "";
+    document.getElementById("fCategory").value     = c?.category || "";
+    document.getElementById("fSize").value         = c?.size || "sm";
+    document.getElementById("fCardImage").value    = c?.cardImage || "";
+    document.getElementById("fIcon").value         = c?.icon || "";
+    document.getElementById("fBannerColor").value  = c?.bannerColor || "";
+    document.getElementById("fAbout").value        = c?.about || "";
+
+    const fac = c?.faculty || {};
+    document.getElementById("fFacName").value  = fac.name  || "";
+    document.getElementById("fFacRole").value  = fac.role  || "";
+    document.getElementById("fFacPhoto").value = fac.photo || "";
+    document.getElementById("fFacBio").value   = fac.bio   || "";
+
+    const leads = c?.leads || [];
+    if (leads.length) leads.forEach(l => addLeadRow(l));
+    else addLeadRow();
+
+    const gallery = c?.gallery || [];
+    if (gallery.length) gallery.forEach(url => addGalleryRow(url));
+    else addGalleryRow();
+
+    document.getElementById("clubModal").classList.add("open");
+  };
+
+  window.closeClubForm = function() {
+    document.getElementById("clubModal").classList.remove("open");
+  };
+
+  /* ── SAVE (create or update) ── */
+  window.saveClub = async function() {
+    const errEl = document.getElementById("formError");
+    errEl.style.display = "none";
+
+    const name = document.getElementById("fName").value.trim();
+    if (!name) {
+      errEl.innerText = "Club name is required.";
+      errEl.style.display = "block";
+      return;
+    }
+
+    const leads = [...document.querySelectorAll(".lead-row-card")].map(card => ({
+      name:  card.querySelector(".lead-name").value.trim(),
+      role:  card.querySelector(".lead-role").value.trim(),
+      grade: card.querySelector(".lead-grade").value.trim(),
+      photo: card.querySelector(".lead-photo").value.trim()
+    })).filter(l => l.name || l.role || l.grade || l.photo);
+
+    const gallery = [...document.querySelectorAll(".gallery-url")]
+      .map(input => input.value.trim())
+      .filter(Boolean);
+
+    const clubData = {
+      name,
+      tagline: document.getElementById("fTagline").value.trim(),
+      category: document.getElementById("fCategory").value.trim(),
+      size: document.getElementById("fSize").value,
+      cardImage: document.getElementById("fCardImage").value.trim(),
+      icon: document.getElementById("fIcon").value.trim(),
+      bannerColor: document.getElementById("fBannerColor").value.trim(),
+      about: document.getElementById("fAbout").value.trim(),
+      faculty: {
+        name:  document.getElementById("fFacName").value.trim(),
+        role:  document.getElementById("fFacRole").value.trim(),
+        photo: document.getElementById("fFacPhoto").value.trim(),
+        bio:   document.getElementById("fFacBio").value.trim()
+      },
+      leads,
+      gallery,
+      updatedAt: new Date().toISOString()
+    };
+
+    const btn = document.getElementById("saveBtn");
+    btn.disabled = true;
+    btn.innerText = "Saving...";
+
+    try {
+      const { collection, addDoc, updateDoc, doc } = window._fb;
+      if (window._editingId) {
+        await updateDoc(doc(window._db, "clubs", window._editingId), clubData);
+      } else {
+        clubData.createdAt = new Date().toISOString();
+        await addDoc(collection(window._db, "clubs"), clubData);
+      }
+      closeClubForm();
+      await loadClubs();
+    } catch (err) {
+      console.error(err);
+      errEl.innerText = "Failed to save. Please try again.";
+      errEl.style.display = "block";
+    } finally {
+      btn.disabled = false;
+      btn.innerText = "Save Club";
+    }
+  };
+
+  /* ── DELETE ── */
+  window.deleteClub = async function(id) {
+    const c = window._allClubs.find(club => club.id === id);
+    if (!confirm(`Delete "${c?.name || "this club"}"? This can't be undone.`)) return;
+    try {
+      const { deleteDoc, doc } = window._fb;
+      await deleteDoc(doc(window._db, "clubs", id));
+      await loadClubs();
+    } catch (err) {
+      console.error(err);
+      alert("Failed to delete. Please try again.");
+    }
+  };
+
+  window.addEventListener("click", ev => {
+    if (ev.target.id === "clubModal") closeClubForm();
+  });
+
+  window.logout = function () {
+    localStorage.removeItem("student");
+    localStorage.removeItem("studentEmail");
+    sessionStorage.clear();
+    window.location.replace("../login.html");
+  };
+
+  loadClubs();
+</script>
+</body>
+</html>

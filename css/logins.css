@@ -156,6 +156,19 @@ form { width: 100%; }
   transition: 1.8s ease-in-out;
 }
 
+.toggle-panel .btn {
+  width: 160px;
+  height: 46px;
+  background: transparent;
+  border: 2px solid #c9d6ff;
+  box-shadow: none;
+}
+
+.toggle-panel .btn:hover {
+  background: #c9d6ff;
+  color: #2a448b;
+}
+
 .container.active .toggle-box::before { left: 50%; }
 
 /* ── TOGGLE PANELS ── */
