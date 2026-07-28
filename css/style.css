@@ -7,12 +7,17 @@
   font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
-
 body {
-  background: #f5f5dc;
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
   color: #1e293b;
+  background-image: url("background.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
 }
-
 
 /* NAVBAR — floating rounded/pill capsule, same colors as before.
    3-column layout keeps the tabs perfectly centered regardless of how
