@@ -132,7 +132,7 @@ window.handleAdminLogin = () => {
 
   if (email === "admin@schoolhub.local" && pass === "EventHub@123") {
     localStorage.setItem("admin", "true");
-    window.location.href = "admin/dashboard.html";
+    window.location.href = "../admin/dashboard.html";
   } else {
     errorDiv.innerText = "Invalid email or password.";
     errorDiv.style.display = "block";

@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Spotlight — Johnson Grammar School - ISC</title>
+<link rel="stylesheet" href="css/public.css">
+</head>
+<body class="jgs-public">
+
+<!-- NAVBAR (transparent overlay on hero, goes solid on scroll) -->
+<nav class="jgs-nav nav-overlay">
+  <div class="jgs-nav-inner">
+    <a href="home.html" class="jgs-brand"><span class="crest">ISC</span> Johnson Grammar School - ISC</a>
+    <ul class="jgs-links">
+      <li><a href="home.html#about">About</a></li>
+      <li><a href="spotlight.html" class="current">Spotlight</a></li>
+      <li><a href="alumni.html">Alumni</a></li>
+      <li><a href="clubs/clubs.html">Clubs</a></li>
+      <li><a href="../indexlogin.html" class="cta">EventHub →</a></li>
+    </ul>
+  </div>
+</nav>
+
+<!-- SPOTLIGHT HERO
+     To change the background image: edit the --spot-hero-image value below.
+     Any image URL works (a local path like 'images/hero.jpg' or a full https:// URL).
+     Leave it as none to keep the plain navy background. -->
+<section class="spot-hero" style="--spot-hero-image: url('images/spotlight-hero.jpg');">
+  <div class="spot-marquee spot-marquee-top" aria-hidden="true">
+    <div class="spot-marquee-track" id="spotMarqueeTopTrack"></div>
+  </div>
+
+  <div class="spot-hero-content">
+    <div class="eyebrow light">Johnson Grammar School - ISC</div>
+    <h1 class="spot-hero-title">Spotlight</h1>
+    <p class="spot-hero-sub">Celebrating the achievements, leadership, innovation and success stories of our students, alumni and faculty.</p>
+  </div>
+
+  <div class="spot-marquee spot-marquee-bottom" aria-hidden="true">
+    <div class="spot-marquee-track" id="spotMarqueeBottomTrack"></div>
+  </div>
+</section>
+
+<!-- FEATURED SPOTLIGHT (populated live from Firestore by public.js) -->
+<section class="spot-featured reveal">
+  <div class="spot-featured-inner">
+    <div class="spot-featured-avatar zoom-hover" id="featuredAvatar">
+      <img id="featuredImage" src="" alt="" style="display:none;">
+      <div class="spot-featured-badge" id="featuredBadge"></div>
+    </div>
+    <div class="spot-featured-content">
+      <span class="hof-tag" id="featuredTag"></span>
+      <h2 class="spot-featured-name" id="featuredName"></h2>
+      <p class="spot-featured-line" id="featuredLine"></p>
+      <p class="spot-featured-desc" id="featuredDesc"></p>
+      <button class="btn btn-primary" id="featuredReadStory">Read Story →</button>
+    </div>
+  </div>
+</section>
+
+<!-- HALL OF FAME (horizontal carousel) -->
+<section class="hof-section reveal" id="hall-of-fame">
+  <div class="hof-inner">
+
+    <div class="hof-header">
+      <div>
+        <div class="eyebrow">Hall of Fame</div>
+        <h2 class="hof-heading">Hall of Fame</h2>
+      </div>
+      <div class="hof-select-wrap">
+        <select id="hofCategorySelect" class="hof-select">
+          <option value="all">All Categories</option>
+          <option value="Academic Excellence">Academic Excellence</option>
+          <option value="Sports">Sports</option>
+          <option value="Cultural">Cultural</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="hof-carousel">
+      <button class="hof-arrow prev" id="hofPrev" aria-label="Previous">‹</button>
+      <div class="hof-viewport" id="hofViewport">
+        <div class="hof-track" id="hofTrack"><!-- injected by public.js from Firestore --></div>
+      </div>
+      <button class="hof-arrow next" id="hofNext" aria-label="Next">›</button>
+    </div>
+
+  </div>
+</section>
+
+<!-- MODAL (shared: featured "Read Story" + Hall of Fame cards) -->
+<div class="hof-modal-overlay" id="hofModalOverlay">
+  <div class="hof-modal">
+    <button class="hof-modal-close" id="hofModalClose" aria-label="Close">✕</button>
+    <div class="hof-modal-top">
+      <div class="hof-modal-avatar" id="modalAvatar"></div>
+      <div>
+        <span class="hof-tag" id="modalTag"></span>
+        <h3 class="hof-modal-name" id="modalName"></h3>
+        <span class="hof-modal-meta" id="modalMeta"></span>
+      </div>
+    </div>
+    <div class="hof-modal-quote">
+      <p id="modalLine"></p>
+    </div>
+    <div class="hof-modal-body" id="modalBody"></div>
+    <div class="hof-modal-highlights" id="modalHighlightsBlock">
+      <div class="hof-modal-highlights-label">🏅 Achievement Highlights</div>
+      <ul id="modalHighlights"></ul>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer class="jgs-footer">
+  <div class="footer-cta reveal">
+    <div class="eyebrow light">Get involved</div>
+    <h2 class="footer-cta-heading">Ready to see what's happening on campus?</h2>
+    <a href="../indexlogin.html" class="btn-cta">Enter EventHub</a>
+  </div>
+
+  <div class="footer-divider"></div>
+
+  <div class="footer-info">
+    <div>
+      <h5>Johnson Grammar School - ISC</h5>
+      <p class="tagline">It is very systematic; disciplined & the difficulty level of the subjects is equally distributed in exams.</p>
+    </div>
+    <div class="footer-contact">
+      <div class="footer-contact-item">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 6-9 13-9 13s-9-7-9-13a9 9 0 0 1 18 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+        <span>Plot No-A, 16, Nacharam - Mallapur Rd, Baba Nagar, Nacharam, Hyderabad, Secunderabad, Telangana 500076</span>
+      </div>
+      <div class="footer-contact-item">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 6-10 7L2 6"/></svg>
+        <span>mallapurseniorschool@jgschool.org<br>admissions@jgschool.org</span>
+      </div>
+      <div class="footer-contact-item">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.362 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.338 1.85.573 2.81.7A2 2 0 0 1 22 16.92Z"/></svg>
+        <span>074060 04433</span>
+      </div>
+    </div>
+    <div class="footer-nav-links">
+      <a href="home.html#about">About</a>
+      <a href="spotlight.html">Spotlight</a>
+      <a href="clubs/clubs.html">Clubs</a>
+      <a href="alumni.html">Alumni</a>
+      <a href="../login.html">Admin Portal</a>
+    </div>
+  </div>
+
+  <div class="footer-bottom">
+    <span>© Johnson Grammar School</span>
+    <span>Built by students, for students.</span>
+  </div>
+</footer>
+
+<script src="js/public.js"></script>
+</body>
+</html>

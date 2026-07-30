@@ -280,4 +280,208 @@ a { text-decoration: none; color: inherit; }
   .vm-cards { grid-template-columns: 1fr; }
   .alumni-row { grid-template-columns: repeat(2, 1fr); }
   .footer-info { grid-template-columns: 1fr 1fr; }
-} 
+}
+
+/* ══════════════════════════════════════════
+   SPOTLIGHT / HALL OF FAME — page-specific styles
+   Uses the same design tokens (--ink, --maroon, --gold,
+   --paper, --ivory, fonts) — nothing here redefines the palette.
+   ══════════════════════════════════════════ */
+
+/* ── SPOTLIGHT HERO ──
+   Background image is set via the --spot-hero-image inline CSS variable
+   on the .spot-hero element in spotlight.html — swap the url() there to
+   change the photo. A dark scrim (::before) sits over it so the title
+   and marquees stay readable regardless of the image. */
+.spot-hero {
+  position: relative;
+  background-color: var(--ink);
+  background-image: var(--spot-hero-image, none);
+  background-size: cover;
+  background-position: center;
+  min-height: 78vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  overflow: hidden;
+}
+.spot-hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(15,23,42,.74) 0%, rgba(15,23,42,.58) 100%);
+  z-index: 1;
+}
+.spot-hero-content {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 0 28px;
+}
+.spot-hero-title {
+  font-family: var(--font-display); font-weight: 700; font-size: clamp(48px, 8vw, 96px);
+  color: var(--ivory); margin: 18px 0 20px; line-height: 1;
+}
+.spot-hero-sub {
+  font-size: 16px; color: rgba(248,246,240,.78); line-height: 1.7; max-width: 52ch; margin: 0 auto;
+}
+.spot-hero .eyebrow.light { justify-content: center; }
+.spot-hero .eyebrow.light::before { display: none; }
+
+/* Scrolling marquee ticker, top and bottom edges of hero.
+   The track's content is built and duplicated by JS (initMarquee in public.js)
+   so it always tiles seamlessly at -50% no matter the screen width —
+   no more gap once the words run out. */
+.spot-marquee {
+  width: 100%; overflow: hidden; padding: 14px 0;
+  border-top: 1px solid rgba(248,246,240,.12);
+  border-bottom: 1px solid rgba(248,246,240,.12);
+  position: relative;
+  z-index: 2;
+}
+.spot-marquee-top { position: absolute; top: 0; left: 0; }
+.spot-marquee-bottom { position: absolute; bottom: 0; left: 0; }
+.spot-marquee-track {
+  display: flex; gap: 40px; white-space: nowrap; width: max-content;
+  animation: spot-scroll 26s linear infinite;
+}
+.spot-marquee-track span {
+  font-family: var(--font-label); font-size: 12px; letter-spacing: .12em; text-transform: uppercase;
+  color: var(--gold-soft); opacity: .55;
+}
+@keyframes spot-scroll {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+@media (prefers-reduced-motion: reduce) { .spot-marquee-track { animation: none; } }
+
+/* ── FEATURED SPOTLIGHT ── */
+.spot-featured { background: var(--bg-about, var(--paper)); padding: 100px 28px; }
+.spot-featured-inner {
+  max-width: 1180px; margin: 0 auto; display: grid; grid-template-columns: 0.85fr 1.15fr; gap: 70px; align-items: center;
+}
+.spot-featured-avatar {
+  position: relative; aspect-ratio: 1; border-radius: 8px; overflow: hidden;
+  background: var(--paper-line); box-shadow: var(--shadow);
+  display: flex; align-items: center; justify-content: center;
+}
+.spot-featured-avatar span {
+  font-family: var(--font-display); font-size: 96px; color: var(--ink); opacity: .35;
+}
+.spot-featured-badge {
+  position: absolute; left: 24px; bottom: 24px; background: var(--ink); color: var(--ivory);
+  padding: 10px 18px; border-radius: 999px; font-family: var(--font-label); font-size: 11px;
+  letter-spacing: .06em; text-transform: uppercase; box-shadow: 0 10px 24px rgba(0,0,0,.2);
+}
+.spot-featured-name { font-family: var(--font-display); font-weight: 600; font-size: clamp(28px, 3.2vw, 42px); margin: 14px 0 8px; color: var(--ink); }
+.spot-featured-line { font-family: var(--font-display); font-style: italic; font-size: 17px; color: var(--maroon); margin: 0 0 18px; }
+.spot-featured-desc { font-size: 15px; line-height: 1.8; color: var(--slate); margin: 0 0 28px; max-width: 56ch; }
+
+/* Shared small tag pill — used on featured card + Hall of Fame cards + modal */
+.hof-tag {
+  display: inline-block; font-family: var(--font-label); font-size: 10.5px; letter-spacing: .06em; text-transform: uppercase;
+  background: rgba(122, 31, 43, 0.08); color: var(--maroon); padding: 6px 13px; border-radius: 999px; margin-bottom: 10px;
+}
+
+/* ── HALL OF FAME ── */
+.hof-section { background: var(--bg-page, var(--paper)); padding: 30px 28px 110px; }
+.hof-inner { max-width: 1180px; margin: 0 auto; }
+.hof-header { display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 20px; margin-bottom: 30px; }
+.hof-heading { font-family: var(--font-display); font-weight: 600; font-size: clamp(30px, 3.4vw, 42px); margin: 14px 0 0; color: var(--ink); }
+.hof-select-wrap { display: flex; }
+.hof-select {
+  appearance: none; font-family: var(--font-body); font-size: 14px; color: var(--ink);
+  background: var(--white) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%234a5568' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") no-repeat right 18px center;
+  border: 1px solid var(--paper-line); border-radius: 999px; padding: 13px 42px 13px 22px; cursor: pointer;
+}
+
+.hof-filters { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 36px; }
+.hof-filter {
+  font-family: var(--font-body); font-size: 14px; font-weight: 500; color: var(--slate);
+  background: none; border: none; padding: 11px 20px; border-radius: 999px; cursor: pointer; transition: background .2s, color .2s;
+}
+.hof-filter:hover { color: var(--ink); }
+.hof-filter.active { background: var(--maroon); color: var(--ivory); }
+
+/* Horizontal carousel — replaces the old paginated grid */
+.hof-carousel { position: relative; }
+.hof-viewport { overflow: hidden; padding: 10px 4px 30px; }
+.hof-track { display: flex; gap: 24px; transition: transform .45s cubic-bezier(.2,.8,.2,1); will-change: transform; }
+
+.hof-card {
+  flex: 0 0 270px;
+  background: var(--white); border: 1px solid var(--paper-line); border-radius: 6px;
+  padding: 28px 24px; cursor: pointer; transition: transform .25s ease, box-shadow .25s ease;
+  display: flex; flex-direction: column;
+}
+.hof-card:hover { transform: translateY(-4px); box-shadow: var(--shadow); }
+.hof-card-avatar {
+  width: 64px; height: 64px; border-radius: 12px; background: var(--paper-line);
+  display: flex; align-items: center; justify-content: center; margin-bottom: 20px;
+}
+.hof-card-avatar span {
+  width: 46px; height: 46px; border-radius: 50%; border: 1px solid var(--slate-light);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-display); font-size: 15px; color: var(--ink);
+}
+.hof-card-name { font-family: var(--font-display); font-size: 19px; font-weight: 600; color: var(--ink); margin: 0 0 3px; }
+.hof-card-meta { font-family: var(--font-label); font-size: 10.5px; letter-spacing: .06em; text-transform: uppercase; color: var(--slate-light); display: block; margin-bottom: 14px; }
+.hof-card-line { font-family: var(--font-display); font-style: italic; font-size: 14.5px; color: var(--slate); line-height: 1.5; margin: 0 0 22px; flex-grow: 1; }
+
+.hof-arrow {
+  position: absolute; top: 45%; transform: translateY(-50%); width: 42px; height: 42px; border-radius: 50%;
+  background: var(--white); border: 1px solid var(--paper-line); box-shadow: var(--shadow);
+  display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 16px; color: var(--ink); z-index: 5;
+  transition: background .2s, color .2s;
+}
+.hof-arrow:hover:not(:disabled) { background: var(--ink); color: var(--ivory); }
+.hof-arrow:disabled { opacity: .35; cursor: not-allowed; }
+.hof-arrow.prev { left: -21px; }
+.hof-arrow.next { right: -21px; }
+
+/* ── MODAL (featured "Read Story" + Hall of Fame card click) ── */
+.hof-modal-overlay {
+  position: fixed; inset: 0; background: rgba(27,42,74,.55); backdrop-filter: blur(2px);
+  display: none; align-items: center; justify-content: center; z-index: 200; padding: 28px;
+}
+.hof-modal-overlay.open { display: flex; }
+.hof-modal {
+  background: var(--ivory); max-width: 620px; width: 100%; max-height: 86vh; overflow-y: auto;
+  border-radius: 8px; padding: 44px; position: relative; box-shadow: 0 30px 70px -20px rgba(0,0,0,.4);
+}
+.hof-modal-close {
+  position: absolute; top: 20px; right: 20px; width: 38px; height: 38px; border-radius: 50%;
+  background: var(--paper); border: none; font-size: 14px; color: var(--ink); cursor: pointer;
+}
+.hof-modal-close:hover { background: var(--paper-line); }
+.hof-modal-top { display: flex; gap: 20px; align-items: flex-start; margin-bottom: 22px; }
+.hof-modal-avatar {
+  width: 82px; height: 82px; border-radius: 50%; background: var(--paper-line); flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center; font-family: var(--font-display); font-size: 26px; color: var(--ink);
+}
+.hof-modal-name { font-family: var(--font-display); font-size: 26px; font-weight: 600; color: var(--ink); margin: 2px 0 4px; }
+.hof-modal-meta { font-family: var(--font-label); font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: var(--slate-light); }
+.hof-modal-quote { border-left: 3px solid var(--maroon); padding-left: 16px; margin-bottom: 22px; }
+.hof-modal-quote p { font-family: var(--font-display); font-style: italic; font-size: 18px; color: var(--ink); margin: 0; }
+.hof-modal-body p { font-size: 14.5px; line-height: 1.8; color: var(--slate); margin: 0 0 16px; }
+.hof-modal-highlights { background: var(--paper); border-radius: 6px; padding: 22px 24px; margin-top: 8px; }
+.hof-modal-highlights-label { font-family: var(--font-label); font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: var(--maroon); margin-bottom: 12px; }
+.hof-modal-highlights ul { margin: 0; padding-left: 18px; }
+.hof-modal-highlights li { font-size: 13.5px; color: var(--slate); line-height: 1.8; }
+
+.jgs-links a.current { color: var(--maroon); }
+.jgs-nav.nav-overlay .jgs-links a.current { color: var(--gold-soft); }
+
+/* ── SPOTLIGHT RESPONSIVE ── */
+@media (max-width: 860px) {
+  .spot-featured-inner { grid-template-columns: 1fr; }
+  .hof-card { flex-basis: 220px; }
+  .hof-arrow.prev { left: 4px; }
+  .hof-arrow.next { right: 4px; }
+}
+@media (max-width: 560px) {
+  .hof-filters { overflow-x: auto; flex-wrap: nowrap; padding-bottom: 4px; }
+  .hof-card { flex-basis: 78vw; }
+}
