@@ -1,0 +1,1196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Visual Diary & Library Gallery</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500&family=IBM+Plex+Mono:wght@500;600&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+  /* ==========================================
+     GLOBAL & SHARED VARIABLES / STYLES
+     ========================================== */
+  :root {
+    --cream: #fdfcfa;
+    --parchment: #f1ede4;
+    --card: #ffffff;
+    --ink: #211d1a;
+    --ink-soft: #6b645d;
+    --line: #e8e3db;
+    --pill: #f3efe8;
+    --pill-active: #211d1a;
+    --pill-active-text: #fdfcfa;
+    --olive: #565a3f;
+    --brass-deep: #7d5522;
+    --shadow-deep: 0 30px 60px -20px rgba(33,29,26,0.35);
+    --ease-spring: cubic-bezier(.22,1,.36,1);
+    --ease-soft: cubic-bezier(.4,0,.2,1);
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--parchment);
+    background-image: radial-gradient(rgba(33,31,26,0.025) 1px, transparent 1px);
+    background-size: 3px 3px;
+    font-family: 'Poppins', sans-serif;
+    color: var(--ink);
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+  }
+
+  /* ==========================================
+     AMBIENT TEXTURE + VIGNETTE
+     ========================================== */
+  .grain {
+    position: fixed;
+    inset: 0;
+    z-index: 999;
+    pointer-events: none;
+    opacity: 0.05;
+    mix-blend-mode: multiply;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    animation: grainShift 8s steps(6) infinite;
+  }
+
+  @keyframes grainShift {
+    0%,100% { transform: translate(0,0); }
+    20% { transform: translate(-2%,-3%); }
+    40% { transform: translate(-4%,2%); }
+    60% { transform: translate(2%,-2%); }
+    80% { transform: translate(-1%,3%); }
+  }
+
+  .vignette {
+    position: fixed;
+    inset: 0;
+    z-index: 998;
+    pointer-events: none;
+    background: radial-gradient(ellipse at 50% 0%, rgba(33,29,26,0) 55%, rgba(33,29,26,0.05) 100%);
+  }
+
+  /* ==========================================
+     DRIFTING DIARY EPHEMERA (decorative)
+     ========================================== */
+  .ephemera {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .ephemera svg {
+    position: absolute;
+    opacity: 0.5;
+  }
+
+  .ephemera .plane {
+    top: 18%;
+    left: 6%;
+    width: 34px;
+    animation: driftPlane 22s ease-in-out infinite;
+  }
+
+  .ephemera .leaf-a {
+    top: 62%;
+    right: 9%;
+    width: 26px;
+    animation: driftLeaf 16s ease-in-out infinite;
+    animation-delay: -3s;
+  }
+
+  .ephemera .compass {
+    top: 8%;
+    right: 5%;
+    width: 68px;
+    opacity: 0.35;
+    animation: compassSpin 60s linear infinite;
+  }
+
+  @keyframes driftPlane {
+    0%   { transform: translate(0,0) rotate(0deg); }
+    50%  { transform: translate(40px,-26px) rotate(6deg); }
+    100% { transform: translate(0,0) rotate(0deg); }
+  }
+
+  @keyframes driftLeaf {
+    0%   { transform: translate(0,0) rotate(0deg); }
+    50%  { transform: translate(-24px,18px) rotate(-10deg); }
+    100% { transform: translate(0,0) rotate(0deg); }
+  }
+
+  @keyframes compassSpin {
+    to { transform: rotate(360deg); }
+  }
+
+  /* ==========================================
+     SCROLL REVEAL
+     ========================================== */
+  .reveal {
+    opacity: 0;
+    transform: translateY(26px);
+    transition: opacity .8s var(--ease-spring), transform .8s var(--ease-spring);
+  }
+  .reveal.in-view {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* ==========================================
+     TORN PAPER DIVIDER
+     ========================================== */
+  .torn-divider {
+    max-width: 1220px;
+    margin: 0 auto;
+    height: 22px;
+    opacity: 0.9;
+  }
+  .torn-divider svg { width: 100%; height: 100%; display: block; }
+
+  /* ==========================================
+     SECTION 1: HERO CAROUSEL STYLES
+     ========================================== */
+  .hero-section {
+    padding: 64px 24px 80px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .stage {
+    position: relative;
+    z-index: 1;
+    max-width: 1100px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .eyebrow {
+    font-size: 11px;
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    font-weight: 500;
+    opacity: 0;
+    transform: translateY(10px);
+    animation: fadeUp .7s var(--ease-spring) forwards;
+    animation-delay: .05s;
+  }
+
+  .hero-section h1 {
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-size: clamp(32px, 5vw, 46px);
+    letter-spacing: -0.01em;
+    margin-top: 10px;
+    opacity: 0;
+    transform: translateY(14px);
+    animation: fadeUp .8s var(--ease-spring) forwards;
+    animation-delay: .14s;
+  }
+
+  .sub {
+    margin-top: 10px;
+    font-size: 14.5px;
+    color: var(--ink-soft);
+    text-align: center;
+    max-width: 360px;
+    line-height: 1.5;
+    opacity: 0;
+    transform: translateY(14px);
+    animation: fadeUp .8s var(--ease-spring) forwards;
+    animation-delay: .22s;
+  }
+
+  @keyframes fadeUp { to { opacity:1; transform:translateY(0); } }
+
+  .carousel-wrap {
+    position: relative;
+    width: 100%;
+    height: 420px;
+    margin-top: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    perspective: 1600px;
+  }
+
+  .track {
+    position: relative;
+    width: 100%;
+    height: 100%;
+  }
+
+  .flight-path {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0.4;
+    pointer-events: none;
+    z-index: 0;
+    animation: dashTravel 6s linear infinite;
+  }
+
+  @keyframes dashTravel {
+    to { stroke-dashoffset: -120; }
+  }
+
+  .card {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 300px;
+    height: 380px;
+    border-radius: 22px;
+    overflow: hidden;
+    background: #ddd;
+    box-shadow: var(--shadow-deep);
+    cursor: pointer;
+    transform-origin: center center;
+    transition:
+      transform 1.05s var(--ease-spring),
+      filter .85s var(--ease-soft),
+      opacity .85s var(--ease-soft),
+      box-shadow .85s var(--ease-soft),
+      z-index 0s;
+    will-change: transform, filter, opacity;
+  }
+
+  .card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    pointer-events: none;
+  }
+
+  .card::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(0,0,0,0) 55%, rgba(0,0,0,0.35) 100%);
+    opacity: 0;
+    transition: opacity .6s var(--ease-soft);
+  }
+
+  .card.center::after { opacity: 0; }
+
+  .card .play {
+    position: absolute;
+    right: 16px;
+    bottom: 16px;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.92);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transform: scale(.7);
+    transition: opacity .5s var(--ease-spring) .15s, transform .5s var(--ease-spring) .15s;
+  }
+
+  .card.center .play { opacity: 1; transform: scale(1); }
+  .card .play svg { width: 14px; height: 14px; margin-left: 2px; }
+
+  .nav {
+    display: flex;
+    gap: 14px;
+    margin-top: 40px;
+  }
+
+  .nav button {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    border: 1px solid var(--line);
+    background: var(--cream);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background .3s var(--ease-soft), transform .3s var(--ease-spring), border-color .3s var(--ease-soft);
+  }
+
+  .nav button:hover {
+    background: var(--ink);
+    border-color: var(--ink);
+    transform: translateY(-2px);
+  }
+
+  .nav button:hover svg path { stroke: var(--cream); }
+  .nav button:active { transform: scale(.92) translateY(0); }
+  .nav svg path { transition: stroke .3s var(--ease-soft); }
+
+  /* ==========================================
+     SECTION 2: LIBRARY GALLERY STYLES
+     ========================================== */
+  .shell {
+    max-width: 1220px;
+    margin: 0 auto;
+    padding: 40px 32px 100px;
+  }
+
+  .topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 30px;
+  }
+
+  .brand {
+    position: relative;
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: 15px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    padding-bottom: 4px;
+    cursor: default;
+  }
+
+  .brand::after {
+    content: "";
+    position: absolute;
+    left: 0; bottom: 0;
+    width: 100%;
+    height: 1.5px;
+    background: var(--brass-deep);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform .5s var(--ease-spring);
+  }
+
+  .brand:hover::after { transform: scaleX(1); }
+
+  .menu-btn {
+    width: 38px; height: 38px;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    background: var(--card);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    transition: background .3s var(--ease-soft), transform .3s var(--ease-spring);
+  }
+  .menu-btn:hover { background: var(--olive); transform: translateY(-1px); }
+  .menu-btn:hover svg rect { fill: #fff; }
+  .menu-btn svg rect { transition: fill .3s var(--ease-soft); }
+
+  .section-head {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    margin-bottom: 6px;
+  }
+
+  .section-head .dash { color: var(--ink-soft); font-size: 18px; }
+
+  .section-head h2 {
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-size: 22px;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+  }
+
+  .section-sub {
+    font-size: 13px;
+    color: var(--ink-soft);
+    margin: 0 0 26px 28px;
+  }
+
+  .count-live {
+    font-family: 'IBM Plex Mono', monospace;
+    font-weight: 600;
+    color: var(--brass-deep);
+  }
+
+  .year-rail-wrap {
+    position: sticky;
+    top: 16px;
+    z-index: 20;
+    margin-bottom: 34px;
+  }
+
+  .year-rail {
+    position: relative;
+    display: flex;
+    gap: 4px;
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 6px;
+    overflow-x: auto;
+    box-shadow: 0 8px 24px -14px rgba(33,31,26,0.18);
+  }
+
+  .year-pill {
+    position: relative;
+    z-index: 2;
+    flex: none;
+    padding: 9px 18px;
+    border: none;
+    background: none;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    color: var(--ink-soft);
+    cursor: pointer;
+    border-radius: 9px;
+    transition: color .35s var(--ease-soft);
+    white-space: nowrap;
+  }
+
+  .year-pill.active { color: #fbf9f3; }
+
+  .year-indicator {
+    position: absolute;
+    top: 6px; bottom: 6px; left: 6px;
+    width: 60px;
+    border-radius: 9px;
+    background: var(--olive);
+    z-index: 1;
+    transition: left .5s var(--ease-spring), width .5s var(--ease-spring);
+  }
+
+  .view {
+    opacity: 0;
+    transform: translateY(14px);
+    pointer-events: none;
+    position: absolute;
+    left: 0; right: 0;
+    transition: opacity .55s var(--ease-soft), transform .6s var(--ease-spring);
+  }
+
+  .view.active {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+    position: relative;
+  }
+
+  .view-stack { position: relative; }
+
+  .gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    grid-auto-rows: 150px;
+    grid-auto-flow: dense;
+    gap: 16px;
+  }
+
+  .g-card {
+    grid-column: span 3;
+    grid-row: span 2;
+    position: relative;
+    border-radius: 16px;
+    overflow: hidden;
+    cursor: pointer;
+    background: var(--card);
+    box-shadow: 0 1px 2px rgba(33,31,26,0.06);
+    opacity: 0;
+    transform: translateY(18px) scale(.97);
+    animation: cardIn .7s var(--ease-spring) forwards;
+    transition: box-shadow .4s var(--ease-soft), transform .5s var(--ease-spring), opacity .4s var(--ease-soft), grid-column .3s, grid-row .3s;
+  }
+
+  .g-card.hide { display: none; }
+
+  .g-card.leaving {
+    opacity: 0 !important;
+    transform: scale(.9) !important;
+    pointer-events: none;
+  }
+
+  .g-card.size-wide { grid-column: span 4; grid-row: span 2; }
+  .g-card.size-tall { grid-column: span 2; grid-row: span 3; }
+  .g-card.size-big { grid-column: span 4; grid-row: span 3; }
+  .g-card.size-small { grid-column: span 2; grid-row: span 2; }
+
+  @keyframes cardIn { to { opacity: 1; transform: translateY(0) scale(1); } }
+
+  .g-card img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform .8s var(--ease-spring), filter .5s var(--ease-soft);
+    filter: saturate(.92) contrast(1.02);
+  }
+
+  .g-card:hover {
+    box-shadow: 0 20px 36px -16px rgba(33,31,26,0.28);
+    transform: translateY(-4px);
+  }
+  .g-card:hover img { transform: scale(1.06); filter: saturate(1.05) contrast(1.03); }
+
+  .g-card::before {
+    content: "";
+    position: absolute; inset: 0;
+    background: linear-gradient(180deg, rgba(0,0,0,0) 50%, rgba(20,18,12,0.62) 100%);
+    opacity: 0;
+    transition: opacity .4s var(--ease-soft);
+  }
+
+  .g-card:hover::before { opacity: 1; }
+
+  .g-tag {
+    position: absolute;
+    left: 14px; bottom: 14px;
+    right: 14px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 8px;
+    color: #fbf9f3;
+    transform: translateY(8px);
+    opacity: 0;
+    transition: transform .4s var(--ease-spring), opacity .4s var(--ease-soft);
+  }
+
+  .g-card:hover .g-tag { transform: translateY(0); opacity: 1; }
+  .g-tag-label { font-size: 13.5px; font-weight: 500; letter-spacing: 0.01em; }
+
+  .g-stamp {
+    position: absolute;
+    top: 12px; right: 12px;
+    padding: 5px 10px;
+    border-radius: 999px;
+    background: rgba(241,237,228,0.92);
+    color: var(--brass-deep);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    backdrop-filter: blur(3px);
+    box-shadow: 0 2px 6px rgba(33,31,26,0.12);
+    transition: transform .4s var(--ease-spring);
+  }
+
+  .g-card:hover .g-stamp { transform: rotate(-4deg) scale(1.04); }
+
+  .corner-fold {
+    position: absolute;
+    top: 0; left: 0;
+    width: 34px; height: 34px;
+    background: linear-gradient(135deg, rgba(253,252,250,0.94) 50%, rgba(180,172,158,0.35) 50%);
+    clip-path: polygon(0 0, 100% 0, 0 100%);
+    transform: translate(-100%, -100%);
+    transition: transform .5s var(--ease-spring);
+    z-index: 3;
+  }
+
+  .g-card:hover .corner-fold { transform: translate(0,0); }
+
+  .view-stamp {
+    position: absolute;
+    left: 14px; top: 14px;
+    width: 64px; height: 64px;
+    border: 1.5px solid rgba(251,249,243,0.85);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: #fbf9f3;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 9.5px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    line-height: 1.3;
+    transform: scale(1.6) rotate(-16deg);
+    opacity: 0;
+    transition: opacity .35s var(--ease-soft), transform .45s var(--ease-spring);
+    z-index: 3;
+  }
+
+  .g-card:hover .view-stamp {
+    opacity: 1;
+    transform: scale(1) rotate(-10deg);
+    transition: opacity .3s var(--ease-soft), transform .4s cubic-bezier(.34,1.56,.64,1);
+  }
+
+  .detail-head {
+    text-align: center;
+    margin: 6px 0 40px;
+  }
+
+  .back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    border: none;
+    background: none;
+    color: var(--ink-soft);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    margin-bottom: 26px;
+    transition: color .3s var(--ease-soft), gap .3s var(--ease-soft);
+  }
+
+  .back-btn:hover { color: var(--ink); gap: 12px; }
+
+  .detail-head h3 {
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-size: clamp(26px, 4vw, 36px);
+  }
+
+  .detail-head .accent {
+    display: block;
+    font-style: italic;
+    font-weight: 400;
+    color: var(--olive);
+    margin-top: 2px;
+  }
+
+  .masonry {
+    column-count: 3;
+    column-gap: 16px;
+  }
+
+  .m-item {
+    position: relative;
+    break-inside: avoid;
+    margin-bottom: 16px;
+    border-radius: 14px;
+    overflow: hidden;
+    opacity: 0;
+    transform: translateY(20px);
+    animation: cardIn .65s var(--ease-spring) forwards;
+    box-shadow: 0 1px 2px rgba(33,31,26,0.05);
+    transition: transform .5s var(--ease-spring), box-shadow .5s var(--ease-soft);
+  }
+
+  .m-item:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 18px 30px -16px rgba(33,31,26,0.25);
+  }
+
+  .m-item:hover img { transform: scale(1.04); }
+
+  .m-item img {
+    width: 100%;
+    height: auto;
+    display: block;
+    transition: transform .7s var(--ease-spring);
+  }
+
+  .m-item::before {
+    content: "";
+    position: absolute;
+    top: -6px; left: 50%;
+    width: 48px; height: 18px;
+    background: rgba(125,85,34,0.28);
+    border: 1px solid rgba(125,85,34,0.18);
+    transform: translateX(-50%) rotate(var(--tape-rot, -3deg));
+    z-index: 2;
+    box-shadow: 0 2px 4px rgba(33,31,26,0.1);
+  }
+
+  .m-item:nth-child(3n)::before { --tape-rot: 3deg; }
+  .m-item:nth-child(3n+1)::before { --tape-rot: -2deg; left: 22%; }
+  .m-item:nth-child(3n+2)::before { display: none; }
+
+  /* Responsive Rules */
+  @media (max-width:900px) {
+    .gallery-grid { grid-template-columns: repeat(2,1fr); }
+    .g-card, .g-card.size-wide, .g-card.size-tall, .g-card.size-big, .g-card.size-small {
+      grid-column: span 2 !important; grid-row: span 2 !important;
+    }
+    .masonry { column-count: 2; }
+  }
+
+  @media (max-width:640px) {
+    .card { width: 210px; height: 280px; }
+    .carousel-wrap { height: 320px; }
+  }
+
+  @media (max-width:560px) {
+    .gallery-grid { grid-template-columns: 1fr; }
+    .g-card, .g-card.size-wide, .g-card.size-tall, .g-card.size-big, .g-card.size-small {
+      grid-column: span 1 !important; grid-row: span 3 !important;
+    }
+    .masonry { column-count: 1; }
+    .shell { padding: 28px 18px 80px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { animation-duration: .001ms !important; transition-duration: .001ms !important; }
+  }
+</style>
+</head>
+<body>
+
+  <div class="grain"></div>
+  <div class="vignette"></div>
+
+  <section class="hero-section">
+    <div class="ephemera">
+      <svg class="plane" viewBox="0 0 24 24" fill="none"><path d="M21 12L3 5l3 7-3 7 18-7z" stroke="#6b645d" stroke-width="1.2" stroke-linejoin="round"/></svg>
+      <svg class="leaf-a" viewBox="0 0 24 24" fill="none"><path d="M4 20c8 0 16-8 16-16-8 0-16 8-16 16z" stroke="#565a3f" stroke-width="1.2" stroke-linejoin="round"/><path d="M4 20c4-6 8-10 16-16" stroke="#565a3f" stroke-width="1"/></svg>
+      <svg class="compass" viewBox="0 0 48 48" fill="none">
+        <circle cx="24" cy="24" r="20" stroke="#6b645d" stroke-width="1"/>
+        <circle cx="24" cy="24" r="1.6" fill="#7d5522"/>
+        <path d="M24 6L28 22L24 26L20 22Z" fill="#7d5522"/>
+        <path d="M24 42L20 26L24 22L28 26Z" fill="#6b645d" fill-opacity=".5"/>
+        <path d="M6 24L22 20L26 24L22 28Z" fill="#6b645d" fill-opacity=".5"/>
+        <path d="M42 24L26 28L22 24L26 20Z" fill="#6b645d" fill-opacity=".5"/>
+      </svg>
+    </div>
+    <div class="stage">
+      <span class="eyebrow">Visual Diary</span>
+      <h1>Featured Highlights</h1>
+      <p class="sub">Explore recent highlights and stories from around the world.</p>
+
+      <div class="carousel-wrap">
+        <svg class="flight-path" viewBox="0 0 900 420" preserveAspectRatio="none" aria-hidden="true">
+          <path d="M40 380 Q 450 40 860 380" fill="none" stroke="#6b645d" stroke-width="1.4" stroke-dasharray="2 10" stroke-linecap="round"/>
+        </svg>
+        <div class="track" id="track"></div>
+      </div>
+
+      <div class="nav">
+        <button id="prev" aria-label="Previous">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M10 3L5 8L10 13" stroke="#211d1a" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <button id="next" aria-label="Next">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M6 3L11 8L6 13" stroke="#211d1a" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <div class="torn-divider" aria-hidden="true">
+    <svg viewBox="0 0 1220 22" preserveAspectRatio="none">
+      <path d="M0 11 L20 6 L40 14 L60 4 L80 12 L100 7 L120 15 L140 5 L160 11 L180 8 L200 13 L220 6 L240 12 L260 9 L280 14 L300 5 L320 11 L340 8 L360 13 L380 6 L400 12 L420 9 L440 14 L460 5 L480 11 L500 8 L520 13 L540 6 L560 12 L580 9 L600 14 L620 5 L640 11 L660 8 L680 13 L700 6 L720 12 L740 9 L760 14 L780 5 L800 11 L820 8 L840 13 L860 6 L880 12 L900 9 L920 14 L940 5 L960 11 L980 8 L1000 13 L1020 6 L1040 12 L1060 9 L1080 14 L1100 5 L1120 11 L1140 8 L1160 13 L1180 6 L1200 12 L1220 9"
+        fill="none" stroke="#e8e3db" stroke-width="1.4"/>
+    </svg>
+  </div>
+
+  <section class="shell">
+    <div class="topbar">
+      <div class="brand">The Library</div>
+      <button class="menu-btn" aria-label="Menu">
+        <svg width="16" height="12" viewBox="0 0 16 12" fill="none">
+          <rect width="16" height="1.6" fill="#211f1a"/>
+          <rect y="5.2" width="16" height="1.6" fill="#211f1a"/>
+          <rect y="10.4" width="16" height="1.6" fill="#211f1a"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="view-stack">
+      <div class="view active" id="view-home">
+        <div class="section-head reveal">
+          <span class="dash">—</span>
+          <h2>Gallery</h2>
+        </div>
+        <p class="section-sub reveal">Browsing <span class="count-live" id="countLive">6</span> entries from the archive</p>
+
+        <div class="year-rail-wrap reveal">
+          <div class="year-rail" id="yearRail">
+            <div class="year-indicator" id="yearIndicator"></div>
+          </div>
+        </div>
+
+        <div class="gallery-grid" id="galleryGrid"></div>
+      </div>
+
+      <div class="view" id="view-detail">
+        <button class="back-btn" id="backBtn">
+          <svg width="14" height="10" viewBox="0 0 14 10" fill="none"><path d="M5.5 1L1 5L5.5 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M1 5H13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          Back to gallery
+        </button>
+
+        <div class="detail-head">
+          <h3 id="detailTitle">Title</h3>
+          <span class="accent" id="detailAccent">in customer photos</span>
+        </div>
+
+        <div class="masonry" id="detailMasonry"></div>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    // --- 1. CAROUSEL SCRIPT ---
+    (function(){
+      const images = [
+        "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?q=80&w=800&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1436491865332-7a61a109cc05?q=80&w=800&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?q=80&w=800&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1519681393784-d120267933ba?q=80&w=800&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1519046904884-53103b34b206?q=80&w=800&auto=format&fit=crop",
+         "https://images.unsplash.com/photo-1519681393784-d120267933ba?q=80&w=800&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1519046904884-53103b34b206?q=80&w=800&auto=format&fit=crop",
+      ];
+
+      const track = document.getElementById('track');
+      let current = 2;
+
+      const cards = images.map((src) => {
+        const el = document.createElement('div');
+        el.className = 'card';
+        el.innerHTML = `<img src="${src}" alt="Travel photo"><div class="play">
+          <svg viewBox="0 0 12 12" fill="none"><path d="M2 1.5L10 6L2 10.5V1.5Z" fill="#211d1a"/></svg>
+        </div>`;
+        track.appendChild(el);
+        return el;
+      });
+
+      cards.forEach((card, i) => {
+        card.addEventListener('click', () => {
+          if (i === current) return;
+          current = i;
+          render();
+        });
+      });
+
+      function layoutFor(offset){
+        const abs = Math.abs(offset);
+        if (abs > 2) return null;
+
+        const spacing = 195;
+        const x = offset * spacing;
+        const scale = offset === 0 ? 1 : abs === 1 ? 0.82 : 0.68;
+        const rotateY = offset === 0 ? 0 : (offset > 0 ? -14 : 14);
+        const z = offset === 0 ? 0 : -140 * abs;
+        const opacity = offset === 0 ? 1 : abs === 1 ? 0.85 : 0.45;
+        const blur = offset === 0 ? 0 : abs === 1 ? 0.5 : 2.5;
+        const zIndex = 10 - abs;
+
+        return { x, scale, rotateY, z, opacity, blur, zIndex };
+      }
+
+      function render(){
+        cards.forEach((card, i) => {
+          const offset = i - current;
+          const layout = layoutFor(offset);
+          card.classList.toggle('center', offset === 0);
+
+          if (!layout){
+            card.style.opacity = '0';
+            card.style.pointerEvents = 'none';
+            card.style.transform = `translate(-50%,-50%) translateX(${offset * 195}px) scale(.6)`;
+            return;
+          }
+
+          card.style.pointerEvents = 'auto';
+          card.style.zIndex = layout.zIndex;
+          card.style.opacity = layout.opacity;
+          card.style.filter = `blur(${layout.blur}px)`;
+          card.style.transform =
+            `translate(-50%,-50%) translateX(${layout.x}px) translateZ(${layout.z}px) rotateY(${layout.rotateY}deg) scale(${layout.scale})`;
+        });
+      }
+
+      function goNext(){
+        current = current >= cards.length - 1 ? 0 : current + 1;
+        render();
+      }
+
+      function goPrev(){
+        current = current <= 0 ? cards.length - 1 : current - 1;
+        render();
+      }
+
+      document.getElementById('next').addEventListener('click', () => { goNext(); restartAutoplay(); });
+      document.getElementById('prev').addEventListener('click', () => { goPrev(); restartAutoplay(); });
+
+      const AUTOPLAY_DELAY = 3500;
+      const RESUME_DELAY = 4500;
+      let autoplayTimer = null;
+      let resumeTimer = null;
+
+      function startAutoplay(){
+        stopAutoplay();
+        autoplayTimer = setInterval(goNext, AUTOPLAY_DELAY);
+      }
+
+      function stopAutoplay(){
+        if (autoplayTimer){ clearInterval(autoplayTimer); autoplayTimer = null; }
+      }
+
+      function restartAutoplay(){
+        stopAutoplay();
+        if (resumeTimer) clearTimeout(resumeTimer);
+        resumeTimer = setTimeout(startAutoplay, RESUME_DELAY);
+      }
+
+      const wrap = document.querySelector('.carousel-wrap');
+      wrap.addEventListener('mouseenter', stopAutoplay);
+      wrap.addEventListener('mouseleave', startAutoplay);
+      wrap.addEventListener('touchstart', () => stopAutoplay(), {passive:true});
+      wrap.addEventListener('touchend', () => restartAutoplay(), {passive:true});
+
+      cards.forEach(card => card.addEventListener('click', restartAutoplay));
+
+      startAutoplay();
+
+      let startX = 0;
+      wrap.addEventListener('touchstart', e => startX = e.touches[0].clientX, {passive:true});
+      wrap.addEventListener('touchend', e => {
+        const dx = e.changedTouches[0].clientX - startX;
+        if (dx > 40){ goPrev(); restartAutoplay(); }
+        else if (dx < -40){ goNext(); restartAutoplay(); }
+      }, {passive:true});
+
+      render();
+    })();
+const heroSection = document.querySelector('.hero-section');
+const tornDivider = document.querySelector('.torn-divider');
+    // --- 2. GALLERY GRID & DETAIL SCRIPT ---
+    (function(){
+      // Shared with the Archive Desk admin portal — both read/write this key,
+      // so entries created, edited, or deleted there appear here automatically.
+      const STORAGE_KEY = 'archive_desk_entries';
+
+      // Used to seed localStorage the very first time this page runs
+      // (before any admin entries exist), so both this page AND the admin
+      // ledger start from the same shared list of entries.
+    
+
+      function loadEntries(){
+        let stored = null;
+        try { stored = JSON.parse(localStorage.getItem(STORAGE_KEY)); } catch(e) { stored = null; }
+
+        if (Array.isArray(stored) && stored.length){
+          return stored;
+        }
+
+        // First run on this browser / origin: nothing archived yet, so seed
+        // localStorage with the starter events. This also makes them show up
+        // (and be editable/deletable) in the Archive Desk admin ledger.
+        try { localStorage.setItem(STORAGE_KEY, JSON.stringify(seedEvents)); } catch(e) { /* storage unavailable */ }
+        return seedEvents;
+      }
+
+      let events = loadEntries();
+
+      const galleryGrid = document.getElementById('galleryGrid');
+      const viewHome = document.getElementById('view-home');
+      const viewDetail = document.getElementById('view-detail');
+      const detailTitle = document.getElementById('detailTitle');
+      const detailAccent = document.getElementById('detailAccent');
+      const detailMasonry = document.getElementById('detailMasonry');
+      const backBtn = document.getElementById('backBtn');
+      const yearRail = document.getElementById('yearRail');
+      const yearIndicator = document.getElementById('yearIndicator');
+      const countLive = document.getElementById('countLive');
+
+      let activeYear = 'All';
+
+      function buildYearRail(){
+        yearRail.querySelectorAll('.year-pill').forEach(p => p.remove());
+        const years = ['All', ...Array.from(new Set(events.map(e => e.year))).sort((a,b) => b - a)];
+        if (!years.includes(activeYear)) activeYear = 'All';
+
+        years.forEach((y) => {
+          const btn = document.createElement('button');
+          btn.className = 'year-pill' + (y === activeYear ? ' active' : '');
+          btn.textContent = y;
+          btn.dataset.year = y;
+          btn.addEventListener('click', () => setYear(y, btn));
+          yearRail.appendChild(btn);
+        });
+
+        requestAnimationFrame(() => {
+          const activeBtn = yearRail.querySelector('.year-pill.active');
+          if (activeBtn) moveIndicator(activeBtn);
+        });
+      }
+
+      function moveIndicator(btn){
+        const railRect = yearRail.getBoundingClientRect();
+        const btnRect = btn.getBoundingClientRect();
+        yearIndicator.style.left = (btnRect.left - railRect.left) + 'px';
+        yearIndicator.style.width = btnRect.width + 'px';
+      }
+
+      function setYear(y, btn){
+        activeYear = y;
+        yearRail.querySelectorAll('.year-pill').forEach(p => p.classList.remove('active'));
+        btn.classList.add('active');
+        moveIndicator(btn);
+        applyFilter();
+      }
+
+      function applyFilter(){
+        const cards = Array.from(document.querySelectorAll('.g-card'));
+        const toShow = [];
+        const toHide = [];
+
+        cards.forEach(card => {
+          const match = activeYear === 'All' || String(card.dataset.year) === String(activeYear);
+          (match ? toShow : toHide).push(card);
+        });
+
+        cards.forEach(card => card.classList.add('leaving'));
+
+        window.setTimeout(() => {
+          toHide.forEach(card => card.classList.add('hide'));
+          toShow.forEach((card) => {
+            card.classList.remove('hide');
+            galleryGrid.appendChild(card);
+          });
+
+          requestAnimationFrame(() => {
+            toShow.forEach((card, i) => {
+              card.classList.remove('leaving');
+              card.style.animation = 'none';
+              void card.offsetWidth;
+              card.style.animationDelay = (i * 0.05) + 's';
+              card.style.animation = 'cardIn .6s var(--ease-spring) forwards';
+            });
+          });
+
+          countLive.textContent = toShow.length;
+        }, 220);
+      }
+
+      function renderCards(){
+        galleryGrid.innerHTML = '';
+        events.forEach((ev, i) => {
+          const card = document.createElement('div');
+          card.className = 'g-card ' + (ev.size || '');
+          card.dataset.year = ev.year;
+          card.style.animationDelay = (i * 0.07) + 's';
+          card.innerHTML = `
+            <img src="${ev.cover}" alt="${ev.tag}">
+            <span class="corner-fold"></span>
+            <span class="view-stamp">Open<br>Entry</span>
+            <span class="g-stamp">${ev.year}</span>
+            <span class="g-tag"><span class="g-tag-label">${ev.tag}</span></span>
+          `;
+          card.addEventListener('click', () => openEvent(ev.id));
+          galleryGrid.appendChild(card);
+        });
+        countLive.textContent = events.length;
+      }
+
+      window.addEventListener('resize', () => {
+        const activeBtn = yearRail.querySelector('.year-pill.active');
+        if (activeBtn) moveIndicator(activeBtn);
+      });
+
+      function openEvent(id){
+        const ev = events.find(e => e.id === id);
+        if (!ev) return;
+
+        detailTitle.textContent = ev.title;
+        detailAccent.textContent = ev.accent && ev.accent.trim()
+          ? ev.accent
+          : 'archived ' + ev.year + ' · ' + ev.tag.toLowerCase();
+        detailMasonry.innerHTML = '';
+
+        ev.gallery.forEach((src, i) => {
+          const item = document.createElement('div');
+          item.className = 'm-item';
+          item.style.animationDelay = (i * 0.06) + 's';
+          const img = document.createElement('img');
+          img.src = src;
+          img.alt = ev.title + ' photo ' + (i + 1);
+          item.appendChild(img);
+          detailMasonry.appendChild(item);
+        });
+
+        viewHome.classList.remove('active');
+        viewDetail.classList.add('active');
+       heroSection.style.display = 'none';   // ADD THIS
+tornDivider.style.display = 'none';   // ADD THIS
+window.scrollTo({ top: viewDetail.offsetTop - 20, behavior:'smooth' });
+      }
+
+    backBtn.addEventListener('click', () => {
+  viewDetail.classList.remove('active');
+  viewHome.classList.add('active');
+  heroSection.style.display = '';   // ADD THIS
+  tornDivider.style.display = '';   // ADD THIS
+});
+
+      function renderAll(){
+        buildYearRail();
+        renderCards();
+      }
+
+      renderAll();
+
+      // --- Live sync with the Archive Desk admin portal ---
+      // Cross-tab: the native 'storage' event fires in every other tab on the
+      // same origin the instant admin.html writes to localStorage.
+      let lastSnapshot = JSON.stringify(events);
+
+      function syncFromStorage(){
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw && raw !== lastSnapshot){
+          lastSnapshot = raw;
+          try {
+            const parsed = JSON.parse(raw);
+            if (Array.isArray(parsed)){
+              events = parsed;
+              if (viewDetail.classList.contains('active')) {
+  viewDetail.classList.remove('active');
+  viewHome.classList.add('active');
+  heroSection.style.display = '';
+  tornDivider.style.display = '';
+}
+              renderAll();
+            }
+          } catch(e) { /* ignore malformed data */ }
+        }
+      }
+
+      window.addEventListener('storage', (e) => {
+        if (e.key === STORAGE_KEY) syncFromStorage();
+      });
+
+      // Same-tab fallback (e.g. admin opened via window.open from this page,
+      // or browsers that don't fire 'storage' reliably on file:// origins).
+      setInterval(syncFromStorage, 2500);
+
+    })();
+
+    // --- 3. SCROLL REVEAL ---
+    (function(){
+      const io = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting){
+            entry.target.classList.add('in-view');
+            io.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.2, rootMargin: '0px 0px -40px 0px' });
+
+      document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+    })();
+
+    // --- 4. MAGNETIC BUTTONS ---
+    (function(){
+      const magnets = document.querySelectorAll('.nav button, .menu-btn');
+      magnets.forEach(btn => {
+        btn.addEventListener('mousemove', (e) => {
+          const rect = btn.getBoundingClientRect();
+          const x = e.clientX - rect.left - rect.width / 2;
+          const y = e.clientY - rect.top - rect.height / 2;
+          btn.style.transform = `translate(${x * 0.28}px, ${y * 0.28}px)`;
+        });
+        btn.addEventListener('mouseleave', () => {
+          btn.style.transform = '';
+        });
+      });
+    })();
+  </script>
+</body>
+</html>

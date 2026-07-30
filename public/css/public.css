@@ -280,4 +280,4 @@ a { text-decoration: none; color: inherit; }
   .vm-cards { grid-template-columns: 1fr; }
   .alumni-row { grid-template-columns: repeat(2, 1fr); }
   .footer-info { grid-template-columns: 1fr 1fr; }
-}
+} 

@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EventHub Admin — Alumni</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/teacher.css">
+  <style>
+    /* small additions specific to the alumni admin page — kept local so
+       nothing in teacher.css / style.css needs to change */
+    .admin-event-card img.alumni-thumb{
+      width:90px; height:90px; border-radius:50%; object-fit:cover;
+    }
+    .status-toggle{
+      display:flex; gap:10px; margin-top:6px;
+    }
+    .status-toggle label{
+      flex:1;
+      display:flex; align-items:center; justify-content:center; gap:8px;
+      padding:10px 12px;
+      border:1.5px solid #d1d5db;
+      border-radius:10px;
+      font-size:13.5px; font-weight:600; color:#374151;
+      cursor:pointer;
+      transition:border-color .2s, background .2s, color .2s;
+    }
+    .status-toggle input{ width:auto; margin:0; }
+    .status-toggle input:checked + span{ color:#2563eb; }
+    .status-toggle label:has(input:checked){
+      border-color:#3b82f6;
+      background:#eff6ff;
+    }
+    .field-group{ display:none; }
+    .field-group.active{ display:block; }
+    .current-photo-preview{
+      width:64px; height:64px; border-radius:50%; object-fit:cover;
+      margin-top:8px; border:1px solid #e2e8f0; display:none;
+    }
+  </style>
+</head>
+<body>
+
+<div class="dashboard">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div>
+      <h2>EventHub Admin</h2>
+      <p class="admin-email">admin@schoolhub.local</p>
+      <ul class="sidebar-menu">
+        <li onclick="window.location.href='dashboard.html'">Events</li>
+        <li onclick="window.location.href='dashboard.html'">Event Participants</li>
+        <li onclick="window.location.href='dashboard.html'">Spotlight</li>
+        <li onclick="window.location.href='club_admin.html'">Clubs</li>
+        <li id="tab-alumni" class="active" onclick="showTab('alumni')">Alumni</li>
+      </ul>
+    </div>
+    <button class="logout-btn" onclick="logout()">Logout</button>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <div class="dashboard-main">
+
+    <div id="panel-alumni">
+      <div class="top-bar">
+        <h1>Manage Alumni</h1>
+        <button class="add-btn" onclick="openAddAlumni()">Add Alumni</button>
+      </div>
+      <div class="events-container" id="alumniContainer">
+        <p class="loading-text">Loading alumni...</p>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ADD/EDIT ALUMNI MODAL -->
+<div class="modal" id="alumniModal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2 id="modalTitle">Add New Alumnus</h2>
+      <button class="modal-close" onclick="closeModal()">X</button>
+    </div>
+    <p class="modal-sub">Add their photo, current status, batch, and a message to students.</p>
+
+    <label>Full Name</label>
+    <input id="alName" type="text" placeholder="e.g. Priya Nair">
+
+    <label>Photo URL</label>
+    <input id="alImageURL" type="text" placeholder="Paste image URL (optional)">
+    <label>Upload Photo</label>
+    <input id="alImageFile" type="file" accept="image/*">
+    <img id="alImagePreview" class="current-photo-preview" alt="">
+
+    <label>Current Status</label>
+    <div class="status-toggle">
+      <label>
+        <input type="radio" name="alStatus" value="studying" onchange="toggleStatusFields()" checked>
+        <span>Studying</span>
+      </label>
+      <label>
+        <input type="radio" name="alStatus" value="working" onchange="toggleStatusFields()">
+        <span>Working</span>
+      </label>
+    </div>
+
+    <div id="fieldsStudying" class="field-group active">
+      <label>University Name</label>
+      <input id="alUniversity" type="text" placeholder="e.g. IIT Bombay">
+    </div>
+
+    <div id="fieldsWorking" class="field-group">
+      <div class="form-row">
+        <div>
+          <label>Role</label>
+          <input id="alRole" type="text" placeholder="e.g. Product Designer">
+        </div>
+        <div>
+          <label>Company Name</label>
+          <input id="alCompany" type="text" placeholder="e.g. Lumen Studio">
+        </div>
+      </div>
+    </div>
+
+    <label>Batch (Class of)</label>
+    <input id="alYear" type="number" min="1960" max="2100" placeholder="e.g. 2011">
+
+    <label>Message to Students</label>
+    <textarea id="alQuote" placeholder="A short message or quote for current students..."></textarea>
+
+    <button onclick="saveAlumni()" class="save-btn" id="saveBtn">Add Alumni</button>
+  </div>
+</div>
+
+<!-- FIREBASE -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+  import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyDMkDxml0p9zUp6gZuo1SeVhmQ3BZamy9o",
+    authDomain: "eventhub-8a8dc.firebaseapp.com",
+    projectId: "eventhub-8a8dc",
+    storageBucket: "eventhub-8a8dc.firebasestorage.app",
+    messagingSenderId: "450946542344",
+    appId: "1:450946542344:web:e54c332ca5bf2358d01abd"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  window.db = db;
+  window.firebaseFns = { collection, addDoc, getDocs, deleteDoc, doc, updateDoc };
+
+  window.onload = () => {
+    if (localStorage.getItem("admin") !== "true") {
+      window.location.href = "login.html";
+      return;
+    }
+    loadAlumni();
+  };
+</script>
+
+<script>
+let alumniList = [];
+let alumniIds = [];
+let editIndex = -1;
+
+/* ── STATUS FIELD TOGGLE ── */
+function toggleStatusFields() {
+  const status = document.querySelector('input[name="alStatus"]:checked').value;
+  document.getElementById('fieldsStudying').classList.toggle('active', status === 'studying');
+  document.getElementById('fieldsWorking').classList.toggle('active', status === 'working');
+}
+
+/* ── OPEN ADD ── */
+function openAddAlumni() {
+  document.getElementById("alumniModal").style.display = "flex";
+  document.getElementById("modalTitle").innerText = "Add New Alumnus";
+  document.getElementById("saveBtn").innerText = "Add Alumni";
+  clearForm();
+  editIndex = -1;
+}
+
+/* ── OPEN EDIT ── */
+function openEditAlumni(index) {
+  const a = alumniList[index];
+  document.getElementById("alumniModal").style.display = "flex";
+  document.getElementById("modalTitle").innerText = "Edit Alumnus";
+  document.getElementById("saveBtn").innerText = "Save Changes";
+
+  document.getElementById("alName").value = a.name || "";
+  document.getElementById("alImageURL").value = a.image || "";
+  document.getElementById("alYear").value = a.year || "";
+  document.getElementById("alQuote").value = a.quote || "";
+  document.getElementById("alUniversity").value = a.university || "";
+  document.getElementById("alRole").value = a.role || "";
+  document.getElementById("alCompany").value = a.company || "";
+
+  const statusVal = a.status || "studying";
+  document.querySelector(`input[name="alStatus"][value="${statusVal}"]`).checked = true;
+  toggleStatusFields();
+
+  const preview = document.getElementById("alImagePreview");
+  if (a.image) {
+    preview.src = a.image;
+    preview.style.display = "block";
+  } else {
+    preview.style.display = "none";
+  }
+
+  editIndex = index;
+}
+
+/* ── CLOSE MODAL ── */
+function closeModal() {
+  document.getElementById("alumniModal").style.display = "none";
+}
+window.onclick = function(ev) {
+  if (ev.target.id === "alumniModal") closeModal();
+}
+
+/* ── CLEAR FORM ── */
+function clearForm() {
+  ["alName","alImageURL","alYear","alQuote","alUniversity","alRole","alCompany"].forEach(id => {
+    document.getElementById(id).value = "";
+  });
+  document.getElementById("alImageFile").value = "";
+  document.getElementById("alImagePreview").style.display = "none";
+  document.querySelector('input[name="alStatus"][value="studying"]').checked = true;
+  toggleStatusFields();
+}
+
+/* ── SAVE ALUMNI ── */
+async function saveAlumni() {
+  const name = document.getElementById("alName").value.trim();
+  if (!name) {
+    alert("Name is required!");
+    return;
+  }
+
+  const status = document.querySelector('input[name="alStatus"]:checked').value;
+  const university = document.getElementById("alUniversity").value.trim();
+  const role = document.getElementById("alRole").value.trim();
+  const company = document.getElementById("alCompany").value.trim();
+
+  if (status === "studying" && !university) {
+    alert("University name is required for a studying alumnus!");
+    return;
+  }
+  if (status === "working" && (!role || !company)) {
+    alert("Role and company name are required for a working alumnus!");
+    return;
+  }
+
+  const saveBtn = document.getElementById("saveBtn");
+  saveBtn.disabled = true;
+  saveBtn.innerText = "Saving...";
+
+  try {
+    const { collection, addDoc, updateDoc, doc } = window.firebaseFns;
+
+    const imageURL  = document.getElementById("alImageURL").value.trim();
+    const imageFile = document.getElementById("alImageFile").files[0];
+    let finalImage  = imageURL;
+
+    if (imageFile) {
+      const cloudName = "danjlladp";
+      const uploadPreset = "EventHub";
+
+      const formData = new FormData();
+      formData.append("file", imageFile);
+      formData.append("upload_preset", uploadPreset);
+
+      const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
+        method: "POST",
+        body: formData
+      });
+      const data = await res.json();
+      finalImage = data.secure_url;
+    }
+
+    const alumniData = {
+      name,
+      image: finalImage,
+      status,
+      university: status === "studying" ? university : "",
+      role: status === "working" ? role : "",
+      company: status === "working" ? company : "",
+      year: document.getElementById("alYear").value || "",
+      quote: document.getElementById("alQuote").value.trim(),
+      createdAt: editIndex === -1 ? Date.now() : (alumniList[editIndex].createdAt || Date.now())
+    };
+
+    if (editIndex === -1) {
+      await addDoc(collection(window.db, "alumni"), alumniData);
+    } else {
+      await updateDoc(doc(window.db, "alumni", alumniIds[editIndex]), alumniData);
+    }
+
+    closeModal();
+    loadAlumni();
+
+  } catch (error) {
+    console.error(error);
+    alert("Error saving alumnus: " + error.message);
+  } finally {
+    saveBtn.disabled = false;
+    saveBtn.innerText = editIndex === -1 ? "Add Alumni" : "Save Changes";
+  }
+}
+
+/* ── DELETE ALUMNI ── */
+function deleteAlumni(index) {
+  const overlay = document.createElement("div");
+  overlay.style.cssText = "position:fixed;inset:0;background:rgba(15,10,30,0.6);backdrop-filter:blur(4px);z-index:9999;display:flex;align-items:center;justify-content:center;animation:fadeIn 0.2s ease";
+
+  overlay.innerHTML = `
+    <style>
+      @keyframes popIn{from{opacity:0;transform:scale(0.85) translateY(20px)}to{opacity:1;transform:scale(1) translateY(0)}}
+      @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+    </style>
+    <div style="background:white;border-radius:24px;padding:36px 40px;max-width:380px;width:90%;text-align:center;box-shadow:0 32px 80px rgba(0,0,0,0.2);animation:popIn 0.3s cubic-bezier(0.175,0.885,0.32,1.275);">
+      <div style="width:64px;height:64px;border-radius:20px;background:linear-gradient(135deg,#fef2f2,#fee2e2);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none">
+          <polyline points="3,6 5,6 21,6" stroke="#ef4444" stroke-width="2" stroke-linecap="round"/>
+          <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" stroke="#ef4444" stroke-width="2" stroke-linecap="round"/>
+          <path d="M10 11v6M14 11v6" stroke="#ef4444" stroke-width="2" stroke-linecap="round"/>
+          <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" stroke="#ef4444" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <h2 style="font-size:20px;font-weight:800;color:#0f172a;margin:0 0 8px;">Delete Alumnus?</h2>
+      <p style="font-size:14px;color:#94a3b8;margin:0 0 28px;line-height:1.6;">This action is permanent and cannot be undone. They will disappear from the public alumni page immediately.</p>
+      <div style="display:flex;gap:12px;">
+        <button id="cancelDeleteBtn" style="flex:1;padding:12px;border-radius:12px;border:1.5px solid #e2e8f0;background:white;font-size:14px;font-weight:600;color:#64748b;cursor:pointer;"
+          onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background='white'">Cancel</button>
+        <button id="confirmDeleteBtn" style="flex:1;padding:12px;border-radius:12px;border:none;background:linear-gradient(135deg,#ef4444,#dc2626);font-size:14px;font-weight:700;color:white;cursor:pointer;box-shadow:0 4px 12px rgba(239,68,68,0.35);"
+          onmouseover="this.style.transform='translateY(-1px)'" onmouseout="this.style.transform='translateY(0)'">Yes, Delete</button>
+      </div>
+    </div>
+  `;
+
+  document.body.appendChild(overlay);
+  document.getElementById("cancelDeleteBtn").onclick = () => document.body.removeChild(overlay);
+  document.getElementById("confirmDeleteBtn").onclick = async () => {
+    document.body.removeChild(overlay);
+    try {
+      const { deleteDoc, doc } = window.firebaseFns;
+      await deleteDoc(doc(window.db, "alumni", alumniIds[index]));
+      loadAlumni();
+    } catch (error) {
+      console.error(error);
+      alert("Error deleting alumnus.");
+    }
+  };
+  overlay.addEventListener("click", (e) => {
+    if (e.target === overlay) document.body.removeChild(overlay);
+  });
+}
+
+/* ── RENDER ALUMNI CARDS ── */
+function renderAlumni() {
+  const container = document.getElementById("alumniContainer");
+  if (alumniList.length === 0) {
+    container.innerHTML = '<p class="loading-text">No alumni yet. Click "Add Alumni" to create one.</p>';
+    return;
+  }
+
+  container.innerHTML = alumniList.map((a, i) => {
+    const statusLine = a.status === "working"
+      ? `${a.role || ""} · ${a.company || ""}`
+      : `${a.university || ""}`;
+
+    return `
+    <div class="admin-event-card">
+      <img class="alumni-thumb" src="${a.image || 'https://via.placeholder.com/90x90'}" alt="${a.name}">
+      <div class="event-info">
+        <h3>${a.name}</h3>
+        <span>
+          ${statusLine}<br>
+          Class of ${a.year || "—"}<br>
+          ${a.quote ? `"${a.quote.length > 80 ? a.quote.slice(0,80) + '…' : a.quote}"` : "No message added"}
+        </span>
+      </div>
+      <div class="event-actions">
+        <button class="edit" onclick="openEditAlumni(${i})">Edit</button>
+        <button class="delete" onclick="deleteAlumni(${i})">Delete</button>
+      </div>
+    </div>`;
+  }).join("");
+}
+
+/* ── LOAD ALUMNI FROM FIREBASE ── */
+async function loadAlumni() {
+  try {
+    const { collection, getDocs } = window.firebaseFns;
+    const snapshot = await getDocs(collection(window.db, "alumni"));
+
+    alumniList = [];
+    alumniIds = [];
+
+    snapshot.forEach(docSnap => {
+      alumniList.push(docSnap.data());
+      alumniIds.push(docSnap.id);
+    });
+
+    renderAlumni();
+
+  } catch (error) {
+    console.error(error);
+    document.getElementById("alumniContainer").innerHTML =
+      '<p class="loading-text">Failed to load alumni. Check your connection.</p>';
+  }
+}
+
+function logout() {
+  localStorage.removeItem("admin");
+  window.location.href = "login.html";
+}
+</script>
+
+</body>
+</html>

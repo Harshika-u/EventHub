@@ -3,113 +3,21 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>JGS Alumni </title>
+<title>JGS Alumni</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/public.css">
 <style>
   :root{
     --crimson:#a6192e;
     --crimson-dark:#7e1223;
-    --ink:#141414;
-    --off-white:#f7f4ef;
-    --line: rgba(255,255,255,.25);
     --paper:#faf6ec;
     --paper-line:#e6dfc9;
     --gold:#b8902f;
     --muted:#7a7364;
   }
-  *{margin:0;padding:0;box-sizing:border-box;}
-  body{
-    font-family:'Inter',sans-serif;
-    background:#000;
-    color:#fff;
-  }
 
-
-  /* ---------- HEADER ---------- */
-  header{
-    position:absolute;
-    top:0;left:0;right:0;
-    display:flex;
-    align-items:stretch;
-    z-index:50;
-  }
-  .logo-block{
-    background:linear-gradient(135deg,var(--crimson) 0%, var(--crimson-dark) 100%);
-    padding:22px 40px;
-    display:flex;
-    align-items:center;
-    min-width:340px;
-  }
-  .logo-block .brand{
-    font-family:'Playfair Display',serif;
-    font-size:28px;
-    font-weight:700;
-    letter-spacing:.3px;
-  }
-  .logo-block .brand span{
-    font-style:italic;
-    font-weight:500;
-    font-size:24px;
-    margin-left:6px;
-    opacity:.9;
-  }
-  .nav-wrap{
-    flex:1;
-    background:rgba(10,10,10,.55);
-    backdrop-filter:blur(2px);
-    display:flex;
-    flex-direction:column;
-    justify-content:space-between;
-  }
-  .top-links{
-    display:flex;
-    justify-content:flex-end;
-    align-items:center;
-    gap:28px;
-    padding:14px 32px 6px;
-    font-size:13.5px;
-    font-weight:600;
-  }
-  .top-links a{color:#fff;text-decoration:none;opacity:.9;}
-  .top-links a:hover{opacity:1;text-decoration:underline;}
-  .search-btn{
-    border:1.5px solid var(--crimson);
-    border-radius:999px;
-    padding:7px 16px;
-    font-size:13.5px;
-    font-weight:700;
-    display:flex;
-    align-items:center;
-    gap:6px;
-    cursor:pointer;
-    transition:background .2s;
-  }
-  .search-btn:hover{background:rgba(166,25,46,.25);}
-  nav.main-nav{
-    display:flex;
-    gap:34px;
-    padding:8px 32px 18px;
-    font-size:16px;
-    font-weight:700;
-  }
-  nav.main-nav a{
-    color:#fff;
-    text-decoration:none;
-    display:flex;
-    align-items:center;
-    gap:4px;
-    padding-bottom:4px;
-    border-bottom:2px solid transparent;
-    transition:border-color .2s;
-  }
-  nav.main-nav a:hover{border-color:var(--crimson);}
-  nav.main-nav svg{width:11px;height:11px;opacity:.8;}
-
-
-  /* ---------- HERO GRID ---------- */
   html{overflow-x:hidden;}
-  html,body{height:100%;width:100%;}
-  .hero{
+  .alumni-hero{
     position:relative;
     width:100%;
     display:grid;
@@ -117,88 +25,66 @@
     grid-template-rows:repeat(3,1fr);
     min-height:100vh;
   }
-  .hero img{
+  .alumni-hero img{
     width:100%;height:100%;min-height:100%;object-fit:cover;object-position:center;display:block;
-    filter:saturate(.9);
+    filter:saturate(.85);
   }
-  .hero::after{
+  .alumni-hero::after{
     content:"";
     position:absolute;inset:0;
-    background:linear-gradient(180deg, rgba(0,0,0,.55) 0%, rgba(0,0,0,.72) 45%, rgba(0,0,0,.8) 100%);
+    background:linear-gradient(180deg, rgba(20,20,20,.55) 0%, rgba(20,20,20,.72) 45%, rgba(20,20,20,.82) 100%);
   }
-
-
-  .hero-copy{
+  .alumni-hero-copy{
     position:absolute;
     inset:0;
-    z-index:10;
+    z-index:5;
     display:flex;
     flex-direction:column;
     align-items:center;
     justify-content:center;
     text-align:center;
-    padding:140px 20px 40px;
+    padding:120px 20px 40px;
+    color:#fff;
   }
-  .eyebrow{
+  .alumni-hero-copy .eyebrow-hero{
     font-family:'Playfair Display',serif;
     font-style:italic;
-    font-size:26px;
+    font-size:24px;
     font-weight:500;
-    margin-bottom:14px;
+    margin-bottom:12px;
     opacity:.95;
+    color:#fff;
   }
-  .headline{
+  .alumni-hero-copy h1{
     font-family:'Playfair Display',serif;
     font-weight:700;
-    font-size:clamp(40px,6.5vw,84px);
+    font-size:clamp(38px,6vw,78px);
     line-height:1.05;
     text-shadow:0 4px 30px rgba(0,0,0,.5);
+    margin:0;
   }
-  .sub{
-    max-width:640px;
-    margin:26px auto 0;
-    font-size:17px;
+  .alumni-hero-copy p{
+    max-width:600px;
+    margin:24px auto 0;
+    font-size:16px;
     line-height:1.6;
     color:#f1efe9;
   }
-  .actions{
-    display:flex;
-    gap:36px;
-    margin-top:34px;
-    font-size:15px;
-    font-weight:700;
-    flex-wrap:wrap;
-    justify-content:center;
-  }
-  .actions a{
-    color:#fff;
-    text-decoration:none;
-    display:flex;
-    align-items:center;
-    gap:8px;
-    opacity:.95;
-  }
-  .actions a:hover{color:var(--crimson);}
-  .actions svg{width:16px;height:16px;stroke:currentColor;}
-
-
-  .bottom-bar{
+  .alumni-hero-note{
     position:absolute;
     bottom:0;left:0;right:0;
     padding:16px 40px;
-    font-size:14px;
+    font-size:13px;
     color:#e8e4dc;
-    background:linear-gradient(0deg, rgba(0,0,0,.6), transparent);
-    z-index:10;
+    background:linear-gradient(0deg, rgba(0,0,0,.55), transparent);
+    z-index:5;
   }
 
-
-  /* ================= LEDGER WALL ================= */
   .wall{
     position:relative;
     background:var(--paper);
-    color:var(--ink);
-    padding:0 0 100px;
+    color:#141414;
+    padding:0 0 90px;
     background-image:
       repeating-linear-gradient(rgba(20,20,20,.05) 0 1px, transparent 1px 42px);
   }
@@ -217,7 +103,7 @@
     max-width:760px;
     margin:0 auto;
     text-align:center;
-    padding:110px 24px 50px;
+    padding:90px 24px 50px;
   }
   .wall-head .eyebrow-2{
     font-family:'JetBrains Mono',monospace;
@@ -233,7 +119,7 @@
     font-style:italic;
     font-size:clamp(34px,4.6vw,58px);
     margin:14px 0 16px;
-    color:var(--ink);
+    color:#141414;
   }
   .wall-head p{
     font-size:16px;
@@ -243,99 +129,27 @@
     margin:0 auto;
   }
 
-
-  /* stat strip */
-  .stats{
-    display:flex;
-    justify-content:center;
-    gap:0;
-    max-width:720px;
-    margin:44px auto 0;
-    border-top:1px solid var(--paper-line);
-    border-bottom:1px solid var(--paper-line);
-  }
-  .stat{
-    flex:1;
-    text-align:center;
-    padding:22px 10px;
-    border-right:1px solid var(--paper-line);
-  }
-  .stat:last-child{border-right:none;}
-  .stat .num{
-    font-family:'Playfair Display',serif;
-    font-weight:700;
-    font-size:clamp(26px,3vw,36px);
-    color:var(--crimson-dark);
-    display:block;
-  }
-  .stat .label{
-    font-family:'JetBrains Mono',monospace;
-    font-size:10.5px;
-    letter-spacing:.15em;
-    text-transform:uppercase;
-    color:var(--muted);
-    margin-top:6px;
-    display:block;
-  }
-
-
-  /* decade filter ribbon */
-  .ribbon{
-    display:flex;
-    gap:14px;
-    justify-content:center;
-    flex-wrap:wrap;
-    margin:56px auto 54px;
-    padding:0 24px;
-  }
-  .ribbon button{
-    font-family:'JetBrains Mono',monospace;
-    font-size:12.5px;
-    letter-spacing:.08em;
-    font-weight:500;
-    background:#fff;
-    border:1px solid var(--paper-line);
-    color:var(--ink);
-    padding:9px 20px;
-    border-radius:2px;
-    cursor:pointer;
-    position:relative;
-    box-shadow:0 2px 6px rgba(0,0,0,.05);
-    transition:transform .2s ease, background .2s ease, color .2s ease;
-  }
-  .ribbon button:nth-child(odd){transform:rotate(-1.2deg);}
-  .ribbon button:nth-child(even){transform:rotate(1deg);}
-  .ribbon button:hover{transform:rotate(0) translateY(-2px);}
-  .ribbon button.active{
-    background:var(--crimson);
-    border-color:var(--crimson);
-    color:#fff;
-    transform:rotate(0) translateY(-2px);
-    box-shadow:0 6px 14px rgba(166,25,46,.3);
-  }
-
-
-  /* card grid */
   .card-grid{
-    max-width:1760px;
+    max-width:1400px;
     width:100%;
-    margin:0 auto;
-    padding:0 48px;
+    margin:50px auto 0;
+    padding:0 64px;
     display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
-    gap:46px 40px;
+    grid-template-columns:repeat(3, 1fr);
+    gap:76px 60px;
   }
   .alumni-card{
     position:relative;
-    perspective:1400px;
-    height:400px;
+    background:#fff;
+    border-radius:3px;
+    box-shadow:0 14px 30px rgba(20,15,5,.16), 0 2px 6px rgba(20,15,5,.08);
     transform:rotate(var(--r,0deg));
     opacity:0;
     translate:0 26px;
-    transition:transform .45s cubic-bezier(.2,.7,.3,1), translate .6s ease, opacity .6s ease;
+    transition:transform .3s ease, translate .6s ease, opacity .6s ease, box-shadow .3s ease;
   }
   .alumni-card.in-view{opacity:1; translate:0 0;}
-  .alumni-card:hover{transform:rotate(0deg) translateY(-10px); z-index:6;}
+  .alumni-card:hover{transform:rotate(0deg) translateY(-8px); box-shadow:0 20px 38px rgba(20,15,5,.22); z-index:6;}
   .alumni-card::before{
     content:"";
     position:absolute;
@@ -347,64 +161,42 @@
     box-shadow:0 3px 4px rgba(0,0,0,.35);
     z-index:8;
   }
-  .flip-inner{
-    position:relative;
-    width:100%; height:100%;
-    transform-style:preserve-3d;
-    transition:transform .7s cubic-bezier(.2,.8,.2,1);
-  }
-  .alumni-card:hover .flip-inner{transform:rotateY(180deg);}
-  .face{
-    position:absolute; inset:0;
-    backface-visibility:hidden;
-    -webkit-backface-visibility:hidden;
-    border-radius:3px;
-    overflow:hidden;
-    background:#fff;
-    box-shadow:0 14px 30px rgba(20,15,5,.16), 0 2px 6px rgba(20,15,5,.08);
-    display:flex;
-    flex-direction:column;
-  }
-  .face-front .photo{
-    height:62%;
+  .card-photo{
+    aspect-ratio:3/5;
     width:100%;
     overflow:hidden;
     position:relative;
   }
-  .face-front .photo img{
+  .card-photo img{
     width:100%; height:100%; object-fit:cover;
-    filter:grayscale(.15) saturate(.95);
+    filter:grayscale(.1) saturate(.95);
   }
-  .tape{
-    position:absolute; top:-8px; left:16px;
-    width:64px; height:22px;
-    background:rgba(255,255,255,.55);
-    border:1px solid rgba(255,255,255,.7);
-    transform:rotate(-8deg);
-    box-shadow:0 2px 4px rgba(0,0,0,.1);
-  }
-  .face-front .info{
-    flex:1;
-    padding:14px 16px 16px;
+  .card-info{
+    padding:16px 18px 18px;
     display:flex;
     flex-direction:column;
-    gap:4px;
+    gap:3px;
   }
-  .face-front .name{
+  .card-info .name{
     font-family:'Playfair Display',serif;
     font-weight:700;
     font-size:18px;
-    color:var(--ink);
+    color:#141414;
     line-height:1.2;
   }
-  .face-front .role{
+  .card-info .university{
     font-size:12.5px;
-    color:#5c5648;
+    font-weight:600;
+    color:var(--crimson-dark);
     line-height:1.4;
   }
-  .face-front .year{
-    align-self:flex-start;
+  .card-bottom{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
     margin-top:auto;
+  }
+  .card-bottom .year{
     font-family:'JetBrains Mono',monospace;
     font-size:10.5px;
     letter-spacing:.09em;
@@ -412,256 +204,358 @@
     background:var(--gold);
     padding:3px 9px;
     border-radius:2px;
+    white-space:nowrap;
   }
-  .face-back{
-    transform:rotateY(180deg);
-    background:
-      radial-gradient(circle at 30% 20%, rgba(255,255,255,.08), transparent 45%),
-      linear-gradient(155deg, var(--crimson-dark), #4a0c15);
-    color:#fdf1e7;
-    align-items:center;
-    justify-content:center;
-    text-align:center;
-    padding:34px 26px;
-  }
-  .face-back .mark{
-    font-family:'Playfair Display',serif;
-    font-style:italic;
-    font-size:40px;
-    line-height:.5;
-    color:var(--gold);
-    margin-bottom:10px;
-    display:block;
-  }
-  .face-back .quote{
-    font-family:'Playfair Display',serif;
-    font-style:italic;
-    font-size:16.5px;
-    line-height:1.55;
-  }
-  .face-back .who{
-    margin-top:16px;
+  .read-more-btn{
     font-family:'JetBrains Mono',monospace;
     font-size:10.5px;
-    letter-spacing:.1em;
+    letter-spacing:.06em;
+    text-transform:uppercase;
+    font-weight:700;
+    color:var(--crimson-dark);
+    background:none;
+    border:1px solid var(--crimson-dark);
+    padding:5px 11px;
+    border-radius:2px;
+    cursor:pointer;
+    transition:background .2s ease, color .2s ease;
+  }
+  .read-more-btn:hover{background:var(--crimson-dark); color:#fff;}
+
+  .modal-overlay{
+    position:fixed; inset:0;
+    background:rgba(15,10,5,.65);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    z-index:200;
+    padding:20px;
+  }
+  .modal-overlay.open{display:flex;}
+  .modal-box{
+    position:relative;
+    max-width:760px;
+    width:100%;
+    max-height:88vh;
+    overflow-y:auto;
+    background:#fff;
+    border-radius:8px;
+    box-shadow:0 30px 60px rgba(0,0,0,.4);
+  }
+  .modal-close{
+    position:absolute;
+    top:14px; right:14px;
+    width:34px; height:34px;
+    border-radius:50%;
+    background:rgba(255,255,255,.92);
+    border:none;
+    color:#141414;
+    font-size:20px;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    z-index:10;
+    line-height:1;
+  }
+  .modal-close:hover{background:#fff;}
+  .modal-photo{
+    position:relative;
+    width:100%;
+    height:300px;
+    overflow:hidden;
+  }
+  .modal-photo img{
+    width:100%; height:100%; object-fit:cover;
+  }
+  .modal-photo-scrim{
+    position:absolute; inset:0;
+    background:linear-gradient(0deg, rgba(10,10,10,.88) 0%, rgba(10,10,10,.2) 55%, rgba(10,10,10,0) 78%);
+  }
+  .modal-photo-text{
+    position:absolute; left:28px; right:28px; bottom:22px;
+    color:#fff;
+  }
+  .modal-name{
+    font-family:'Playfair Display',serif;
+    font-weight:700;
+    font-size:32px;
+    line-height:1.1;
+    text-shadow:0 2px 10px rgba(0,0,0,.4);
+  }
+  .modal-role{
+    font-size:14px;
+    color:#f1efe9;
+    margin-top:8px;
+  }
+  .modal-year{
+    display:inline-block;
+    margin-top:10px;
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px;
+    letter-spacing:.08em;
     text-transform:uppercase;
     color:var(--gold);
+    font-weight:700;
   }
-  .alumni-card.hide{display:none;}
-
-
-  @media (max-width:640px){
-    .spine{display:none;}
-    .stats{flex-direction:column;}
-    .stat{border-right:none; border-bottom:1px solid var(--paper-line);}
-    .stat:last-child{border-bottom:none;}
-    .alumni-card{height:360px;}
+  .modal-body{
+    padding:28px 30px 32px;
   }
-
+  .modal-body h4{
+    font-family:'Playfair Display',serif;
+    font-weight:700;
+    font-size:19px;
+    margin:0 0 14px;
+    color:#141414;
+  }
+  .modal-body .quote{
+    font-family:'Playfair Display',serif;
+    font-style:italic;
+    font-size:16px;
+    line-height:1.7;
+    color:#3a362c;
+    margin:0;
+  }
 
   @media (max-width:900px){
-    header{position:absolute;flex-direction:column;}
-    .logo-block{min-width:0;}
-    .hero{grid-template-columns:repeat(3,1fr);min-height:100vh;}
-    nav.main-nav{flex-wrap:wrap;gap:18px;font-size:14px;}
-    .hero-copy{padding:220px 16px 40px;}
+    .alumni-hero{grid-template-columns:repeat(3,1fr);min-height:100vh;}
+    .alumni-hero-copy{padding:210px 16px 40px;}
+    .card-grid{ grid-template-columns:repeat(2, 1fr); gap:50px 36px; padding:0 36px; }
   }
-
-
+  @media (max-width:640px){
+    .spine{display:none;}
+    .card-grid{ grid-template-columns:1fr; gap:44px; padding:0 24px; }
+    .alumni-card{height:auto;}
+  }
 </style>
 </head>
-<body>
+<body class="jgs-public">
 
-
-<header>
-  <div class="logo-block">
-    <div class="brand">JGS<span>alumni</span></div>
+<!-- NAVBAR -->
+<nav class="jgs-nav nav-overlay">
+  <div class="jgs-nav-inner">
+    <a href="home.html" class="jgs-brand"><span class="crest">ISC</span> Johnson Grammar School - ISC</a>
+    <ul class="jgs-links">
+      <li><a href="home.html#about">About</a></li>
+      <li><a href="alumni.html">Alumni</a></li>
+      <li><a href="clubs/clubs.html">Clubs</a></li>
+      <li><a href="../indexlogin.html" class="cta">EventHub →</a></li>
+    </ul>
   </div>
-  <div class="nav-wrap">
-    <div class="top-links">
-      <a href="#">Alumni Directory ↗</a>
-      <a href="#">Email ↗</a>
-      <a href="#">Log in</a>
-      <div class="search-btn">Search
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="14" height="14"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-      </div>
-    </div>
-    <nav class="main-nav">
-      <a href="#">Events <svg viewBox="0 0 10 6"><polygon points="0,0 10,0 5,6" fill="currentColor"/></svg></a>
-      <a href="#">Reading &amp; Resources <svg viewBox="0 0 10 6"><polygon points="0,0 10,0 5,6" fill="currentColor"/></svg></a>
-      <a href="#">Programs &amp; Perks <svg viewBox="0 0 10 6"><polygon points="0,0 10,0 5,6" fill="currentColor"/></svg></a>
-      <a href="#">Communities <svg viewBox="0 0 10 6"><polygon points="0,0 10,0 5,6" fill="currentColor"/></svg></a>
-      <a href="#">Volunteer <svg viewBox="0 0 10 6"><polygon points="0,0 10,0 5,6" fill="currentColor"/></svg></a>
-      <a href="#">About <svg viewBox="0 0 10 6"><polygon points="0,0 10,0 5,6" fill="currentColor"/></svg></a>
-    </nav>
+</nav>
+
+<!-- HERO PHOTO COLLAGE -->
+<div class="alumni-hero hero-full">
+  <img src="https://placehold.co/500x500/1b2a4a/e4c95f?text=Photo" alt="">
+  <img src="https://placehold.co/500x500/7a1f2b/f8f6f0?text=Photo" alt="">
+  <img src="https://placehold.co/500x500/2e3f66/e4c95f?text=Photo" alt="">
+  <img src="https://placehold.co/500x500/c9a227/1b2a4a?text=Photo" alt="">
+  <img src="https://placehold.co/500x500/4a1a20/f8f6f0?text=Photo" alt="">
+
+  <img src="https://placehold.co/500x500/6b5b1f/f8f6f0?text=Photo" alt="">
+  <img src="https://placehold.co/500x500/1b2a4a/e4c95f?text=Photo" alt="">
+  <img src="https://placehold.co/500x500/7a1f2b/f8f6f0?text=Photo" alt="">
+  <img src="https://placehold.co/500x500/2e3f66/e4c95f?text=Photo" alt="">
+  <img src="https://placehold.co/500x500/c9a227/1b2a4a?text=Photo" alt="">
+
+  <img src="https://placehold.co/500x500/4a1a20/f8f6f0?text=Photo" alt="">
+  <img src="https://placehold.co/500x500/6b5b1f/f8f6f0?text=Photo" alt="">
+  <img src="https://placehold.co/500x500/1b2a4a/e4c95f?text=Photo" alt="">
+  <img src="https://placehold.co/500x500/7a1f2b/f8f6f0?text=Photo" alt="">
+  <img src="https://placehold.co/500x500/2e3f66/e4c95f?text=Photo" alt="">
+
+  <div class="alumni-hero-copy">
+    <div class="eyebrow-hero">JGS Alumni Directory</div>
+    <h1>Who Will<br>You Discover?</h1>
+    <p>Connect with your JGS Alumni community. Explore your official destination for finding fellow graduates.</p>
   </div>
-</header>
-
-
-<div class="hero">
-  <img src="https://i.pravatar.cc/500?img=11" alt="">
-  <img src="https://i.pravatar.cc/500?img=32" alt="">
-  <img src="https://i.pravatar.cc/500?img=15" alt="">
-  <img src="https://i.pravatar.cc/500?img=44" alt="">
-  <img src="https://i.pravatar.cc/500?img=5" alt="">
-
-
-  <img src="https://i.pravatar.cc/500?img=52" alt="">
-  <img src="https://i.pravatar.cc/500?img=47" alt="">
-  <img src="https://i.pravatar.cc/500?img=60" alt="">
-  <img src="https://i.pravatar.cc/500?img=23" alt="">
-  <img src="https://i.pravatar.cc/500?img=13" alt="">
-
-
-  <img src="https://i.pravatar.cc/500?img=57" alt="">
-  <img src="https://i.pravatar.cc/500?img=25" alt="">
-  <img src="https://i.pravatar.cc/500?img=33" alt="">
-  <img src="https://i.pravatar.cc/500?img=68" alt="">
-  <img src="https://i.pravatar.cc/500?img=8" alt="">
-
-
-  <div class="hero-copy">
-    <div class="eyebrow">JGS Alumni Directory</div>
-    <div class="headline">Who Will<br>You Discover?</div>
-    <p class="sub">Connect with your JGS Alumni community. Explore your official destination for finding fellow graduates.</p>
-  </div>
-  <div class="bottom-bar">Before they were famous, they were here. Our favourite troublemakers, now with jobs.</div>
+  <div class="alumni-hero-note">Before they were famous, they were here. Our favourite troublemakers, now with jobs.</div>
 </div>
 
-
+<!-- LEDGER WALL -->
 <section class="wall">
-  <div class="spine">REGISTRY&nbsp;·&nbsp;NO.&nbsp;001–248&nbsp;·&nbsp;EST.&nbsp;1962</div>
-
+  <div class="spine">REGISTRY&nbsp;·&nbsp;JGS&nbsp;ALUMNI</div>
 
   <div class="wall-head">
     <div class="eyebrow-2">The Ledger Wall</div>
     <h2>Every name, a chapter.</h2>
-    <p>A living register of JGS graduates — pinned, catalogued, and still writing their next page. Hover a card to read where they landed.</p>
+    <p>A living register of JGS graduates — pinned, catalogued, and still writing their next page.</p>
   </div>
-
-
-  <div class="stats">
-    <div class="stat"><span class="num" data-count="12400">0</span><span class="label">Alumni Worldwide</span></div>
-    <div class="stat"><span class="num" data-count="86">0</span><span class="label">Countries</span></div>
-    <div class="stat"><span class="num" data-count="1962">0</span><span class="label">Founded</span></div>
-  </div>
-
-
-  <div class="ribbon" id="ribbon">
-    <button class="active" data-decade="all">All Classes</button>
-    <button data-decade="1990s">1990s</button>
-    <button data-decade="2000s">2000s</button>
-    <button data-decade="2010s">2010s</button>
-    <button data-decade="2020s">2020s</button>
-  </div>
-
 
   <div class="card-grid" id="cardGrid">
-    <!-- cards injected by JS -->
+    <p class="loading-text" style="grid-column:1/-1; text-align:center; color:#7a7364;">Loading alumni...</p>
   </div>
 </section>
 
+<!-- FOOTER -->
+<footer class="jgs-footer">
+  <div class="footer-cta reveal">
+    <div class="eyebrow light">Get involved</div>
+    <h2 class="footer-cta-heading">Ready to see what's happening on campus?</h2>
+    <a href="../indexlogin.html" class="btn-cta">Enter EventHub</a>
+  </div>
 
-<script>
-  const alumni = [
-    {img:1, name:"Maya Ellison", year:2024, decade:"2020s", role:"Product Designer · Lumen Studio", quote:"Ridgeway taught me to sketch the question before I ever touch the answer."},
-    {img:2, name:"Daniel Osei", year:1996, decade:"1990s", role:"Founder & CEO · Osei Bio-labs", quote:"Thirty years on, I still think in the theorems I argued over in the quad."},
-    {img:3, name:"Priya Nair", year:2011, decade:"2010s", role:"Chief Architect · Northwind Systems", quote:"They handed me a blank whiteboard and told me to be curious. I still am."},
-    {img:4, name:"Lucas Bianchi", year:2007, decade:"2000s", role:"Professor of Astrophysics · Veyra Institute", quote:"Every star I map, I'm still that freshman staring up from the quad lawn."},
-    {img:6, name:"Amara Chukwu", year:2022, decade:"2020s", role:"Climate Policy Fellow · UN Habitat", quote:"My thesis advisor said 'be stubborn about the right things.' I never forgot it."},
-    {img:7, name:"Elena Marsh", year:1994, decade:"1990s", role:"Retired Federal Judge", quote:"Every case I heard, I asked myself: what would my ethics seminar say?"},
-    {img:9, name:"Théo Laurent", year:2016, decade:"2010s", role:"Head Chef · Maison Laurent", quote:"I learned rigor in a lab and used it to perfect a sauce. Same discipline."},
-    {img:10, name:"Sofia Reyes", year:2003, decade:"2000s", role:"Founder · Reyes Micro-finance", quote:"They gave me the numbers. I decided who they'd be spent on."},
-    {img:12, name:"Kenji Watanabe", year:2020, decade:"2020s", role:"Robotics Engineer · Orbital Dynamics", quote:"Failing forward was a class requirement before it was a career skill."},
-    {img:14, name:"Grace Whitfield", year:1999, decade:"1990s", role:"Novelist & Essayist", quote:"The library taught me silence is where every good sentence begins."},
-    {img:16, name:"Omar Farouk", year:2014, decade:"2010s", role:"Director of Public Health · WHO Regional Office", quote:"A single seminar on epidemiology rerouted the rest of my life."},
-    {img:17, name:"Isla Sinclair", year:2025, decade:"2020s", role:"Incoming Associate · Hartwell Law", quote:"I haven't graduated a year and I already miss the debate hall."},
-  ];
+  <div class="footer-divider"></div>
 
+  <div class="footer-info">
+    <div>
+      <h5>Johnson Grammar School - ISC</h5>
+      <p class="tagline">It is very systematic; disciplined & the difficulty level of the subjects is equally distributed in exams.</p>
+    </div>
+    <div class="footer-contact">
+      <div class="footer-contact-item">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 6-9 13-9 13s-9-7-9-13a9 9 0 0 1 18 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+        <span>Plot No-A, 16, Nacharam - Mallapur Rd, Baba Nagar, Nacharam, Hyderabad, Secunderabad, Telangana 500076</span>
+      </div>
+      <div class="footer-contact-item">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 6-10 7L2 6"/></svg>
+        <span>mallapurseniorschool@jgschool.org<br>admissions@jgschool.org</span>
+      </div>
+      <div class="footer-contact-item">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.362 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.338 1.85.573 2.81.7A2 2 0 0 1 22 16.92Z"/></svg>
+        <span>074060 04433</span>
+      </div>
+    </div>
+    <div class="footer-nav-links">
+      <a href="home.html#about">About</a>
+      <a href="clubs/clubs.html">Clubs</a>
+      <a href="alumni.html">Alumni</a>
+      <a href="../login.html">Admin Portal</a>
+    </div>
+  </div>
+
+  <div class="footer-bottom">
+    <span>© Johnson Grammar School</span>
+    <span>Built by students, for students.</span>
+  </div>
+</footer>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal-box">
+    <button class="modal-close" id="modalClose" aria-label="Close">&times;</button>
+    <div class="modal-photo">
+      <img id="modalImg" src="" alt="">
+      <div class="modal-photo-scrim"></div>
+      <div class="modal-photo-text">
+        <div class="modal-name" id="modalName"></div>
+        <div class="modal-role" id="modalRole"></div>
+        <div class="modal-year" id="modalYear"></div>
+      </div>
+    </div>
+    <div class="modal-body">
+      <h4>Message to Students</h4>
+      <p class="quote" id="modalQuote"></p>
+    </div>
+  </div>
+</div>
+
+<script src="js/public.js"></script>
+
+<!-- FIREBASE — pulls alumni added from the admin dashboard -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+  import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyDMkDxml0p9zUp6gZuo1SeVhmQ3BZamy9o",
+    authDomain: "eventhub-8a8dc.firebaseapp.com",
+    projectId: "eventhub-8a8dc",
+    storageBucket: "eventhub-8a8dc.firebasestorage.app",
+    messagingSenderId: "450946542344",
+    appId: "1:450946542344:web:e54c332ca5bf2358d01abd"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
 
   const grid = document.getElementById('cardGrid');
   const tilts = [-4,3,-2,5,-3,2,4,-5,3,-2,4,-3];
 
+  async function loadAlumni() {
+    try {
+      const snap = await getDocs(collection(db, "alumni"));
+      const alumni = [];
+      snap.forEach(d => alumni.push(d.data()));
 
-  alumni.forEach((a,i)=>{
-    const card = document.createElement('div');
-    card.className = 'alumni-card';
-    card.style.setProperty('--r', tilts[i % tilts.length] + 'deg');
-    card.dataset.decade = a.decade;
-    card.innerHTML = `
-      <div class="flip-inner">
-        <div class="face face-front">
-          <div class="photo">
-            <div class="tape"></div>
-            <img src="https://i.pravatar.cc/400?img=${a.img}" alt="${a.name}">
+      alumni.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+
+      if (alumni.length === 0) {
+        grid.innerHTML = '<p style="grid-column:1/-1; text-align:center; color:#7a7364;">No alumni added yet.</p>';
+        return;
+      }
+
+      grid.innerHTML = "";
+      alumni.forEach((a, i) => {
+        const line = a.status === "working"
+          ? `${a.role || ""}${a.role && a.company ? " · " : ""}${a.company || ""}`
+          : (a.university || "");
+
+        const card = document.createElement('div');
+        card.className = 'alumni-card';
+        card.style.setProperty('--r', tilts[i % tilts.length] + 'deg');
+        card.innerHTML = `
+          <div class="card-photo">
+            <img src="${a.image || 'https://placehold.co/400x400/1b2a4a/e4c95f?text=Photo'}" alt="${a.name}">
           </div>
-          <div class="info">
+          <div class="card-info">
             <div class="name">${a.name}</div>
-            <div class="role">${a.role}</div>
-            <span class="year">CLASS OF ${a.year}</span>
-          </div>
-        </div>
-        <div class="face face-back">
-          <div>
-            <span class="mark">&ldquo;</span>
-            <p class="quote">${a.quote}</p>
-            <div class="who">— ${a.name.split(' ')[0]}, ${a.year}</div>
-          </div>
-        </div>
-      </div>`;
-    grid.appendChild(card);
-  });
+            <div class="university">${line}</div>
+            <div class="card-bottom">
+              <span class="year">CLASS OF ${a.year}</span>
+              <button class="read-more-btn"
+                data-name="${a.name}"
+                data-role="${line}"
+                data-year="CLASS OF ${a.year}"
+                data-quote="${(a.quote || '').replace(/"/g,'&quot;')}">Read More</button>
+            </div>
+          </div>`;
+        grid.appendChild(card);
+      });
 
+      const io = new IntersectionObserver((entries)=>{
+        entries.forEach((entry, idx)=>{
+          if(entry.isIntersecting){
+            setTimeout(()=>entry.target.classList.add('in-view'), idx * 60);
+            io.unobserve(entry.target);
+          }
+        });
+      }, {threshold:.15});
+      document.querySelectorAll('.alumni-card').forEach(c=>io.observe(c));
 
-  // scroll reveal
-  const io = new IntersectionObserver((entries)=>{
-    entries.forEach((entry, idx)=>{
-      if(entry.isIntersecting){
-        setTimeout(()=>entry.target.classList.add('in-view'), idx * 60);
-        io.unobserve(entry.target);
-      }
-    });
-  }, {threshold:.15});
-  document.querySelectorAll('.alumni-card').forEach(c=>io.observe(c));
+    } catch (err) {
+      console.error(err);
+      grid.innerHTML = '<p style="grid-column:1/-1; text-align:center; color:#7a7364;">Failed to load alumni.</p>';
+    }
+  }
 
+  loadAlumni();
 
-  // decade filter
-  document.getElementById('ribbon').addEventListener('click', e=>{
-    const btn = e.target.closest('button');
+  // modal logic
+  const overlay = document.getElementById('modalOverlay');
+  const modalImg = document.getElementById('modalImg');
+  const modalName = document.getElementById('modalName');
+  const modalRole = document.getElementById('modalRole');
+  const modalYear = document.getElementById('modalYear');
+  const modalQuote = document.getElementById('modalQuote');
+
+  grid.addEventListener('click', e=>{
+    const btn = e.target.closest('.read-more-btn');
     if(!btn) return;
-    document.querySelectorAll('.ribbon button').forEach(b=>b.classList.remove('active'));
-    btn.classList.add('active');
-    const decade = btn.dataset.decade;
-    document.querySelectorAll('.alumni-card').forEach(card=>{
-      const match = decade === 'all' || card.dataset.decade === decade;
-      card.classList.toggle('hide', !match);
-    });
+    const cardImg = btn.closest('.alumni-card').querySelector('.card-photo img');
+    modalImg.src = cardImg.src;
+    modalName.textContent = btn.dataset.name;
+    modalRole.textContent = btn.dataset.role;
+    modalYear.textContent = btn.dataset.year;
+    modalQuote.textContent = btn.dataset.quote;
+    overlay.classList.add('open');
   });
 
-
-  // count-up stats
-  const statObserver = new IntersectionObserver((entries)=>{
-    entries.forEach(entry=>{
-      if(entry.isIntersecting){
-        const el = entry.target;
-        const target = parseInt(el.dataset.count, 10);
-        const dur = 1400;
-        const start = performance.now();
-        function tick(now){
-          const p = Math.min((now - start) / dur, 1);
-          const eased = 1 - Math.pow(1 - p, 3);
-          el.textContent = Math.floor(eased * target).toLocaleString();
-          if(p < 1) requestAnimationFrame(tick);
-          else el.textContent = target.toLocaleString();
-        }
-        requestAnimationFrame(tick);
-        statObserver.unobserve(el);
-      }
-    });
-  }, {threshold:.6});
-  document.querySelectorAll('.stat .num').forEach(n=>statObserver.observe(n));
+  function closeModal(){ overlay.classList.remove('open'); }
+  document.getElementById('modalClose').addEventListener('click', closeModal);
+  overlay.addEventListener('click', e=>{ if(e.target === overlay) closeModal(); });
+  document.addEventListener('keydown', e=>{ if(e.key === 'Escape') closeModal(); });
 </script>
-
 
 </body>
 </html>

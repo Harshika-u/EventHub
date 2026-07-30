@@ -1,0 +1,1397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Archive Desk — Admin Portal</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500&family=IBM+Plex+Mono:wght@500;600&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+  /* ==========================================
+     GLOBAL & SHARED VARIABLES / STYLES
+     (matched to the public gallery token system)
+     ========================================== */
+  :root {
+    --cream: #fdfcfa;
+    --parchment: #f1ede4;
+    --card: #ffffff;
+    --ink: #211d1a;
+    --ink-soft: #6b645d;
+    --line: #e8e3db;
+    --pill: #f3efe8;
+    --olive: #565a3f;
+    --olive-deep: #3d4030;
+    --brass-deep: #7d5522;
+    --brass-soft: #b98a4f;
+    --danger: #9a3324;
+    --shadow-deep: 0 30px 60px -20px rgba(33,29,26,0.35);
+    --shadow-soft: 0 18px 40px -22px rgba(33,29,26,0.28);
+    --ease-spring: cubic-bezier(.22,1,.36,1);
+    --ease-soft: cubic-bezier(.4,0,.2,1);
+    --ease-pop: cubic-bezier(.34,1.56,.64,1);
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--parchment);
+    background-image: radial-gradient(rgba(33,31,26,0.03) 1px, transparent 1px);
+    background-size: 3px 3px;
+    font-family: 'Poppins', sans-serif;
+    color: var(--ink);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  ::selection { background: var(--olive); color: var(--cream); }
+
+  /* ==========================================
+     SECTION 0: VAULT / PASSCODE GATE
+     ========================================== */
+  .vault {
+    position: fixed;
+    inset: 0;
+    z-index: 500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background:
+      radial-gradient(ellipse at 50% 20%, rgba(125,85,34,0.10), transparent 60%),
+      var(--ink);
+    transition: opacity .9s var(--ease-soft), visibility .9s;
+  }
+
+  .vault.unlocked {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+
+  .vault-card {
+    width: min(360px, 88vw);
+    text-align: center;
+    opacity: 0;
+    transform: translateY(18px);
+    animation: fadeUp .8s var(--ease-spring) forwards .15s;
+  }
+
+  @keyframes fadeUp { to { opacity:1; transform:translateY(0); } }
+
+  .vault-dial {
+    width: 74px; height: 74px;
+    margin: 0 auto 22px;
+    border-radius: 50%;
+    border: 1.5px solid rgba(251,249,243,0.28);
+    display: flex; align-items: center; justify-content: center;
+    position: relative;
+    animation: dialFloat 5s ease-in-out infinite;
+  }
+
+  @keyframes dialFloat {
+    0%,100% { transform: translateY(0) rotate(0deg); }
+    50% { transform: translateY(-4px) rotate(4deg); }
+  }
+
+  .vault-dial::before,
+  .vault-dial::after {
+    content: "";
+    position: absolute;
+    background: var(--brass-soft);
+  }
+  .vault-dial::before { width: 1px; height: 14px; top: 6px; left: 50%; transform: translateX(-50%); }
+  .vault-dial::after { width: 4px; height: 4px; border-radius: 50%; top: 50%; left: 50%; transform: translate(-50%,-50%); }
+
+  .vault-eyebrow {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    color: rgba(251,249,243,0.55);
+  }
+
+  .vault-card h1 {
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-size: 26px;
+    color: #fbf9f3;
+    margin: 10px 0 26px;
+  }
+
+  .vault-form { position: relative; }
+
+  .vault-input {
+    width: 100%;
+    padding: 15px 18px;
+    border-radius: 12px;
+    border: 1px solid rgba(251,249,243,0.18);
+    background: rgba(251,249,243,0.06);
+    color: #fbf9f3;
+    font-family: 'IBM Plex Mono', monospace;
+    letter-spacing: 0.3em;
+    font-size: 14px;
+    text-align: center;
+    outline: none;
+    transition: border-color .35s var(--ease-soft), background .35s var(--ease-soft);
+  }
+
+  .vault-input:focus { border-color: var(--brass-soft); background: rgba(251,249,243,0.1); }
+  .vault-input::placeholder { color: rgba(251,249,243,0.28); letter-spacing: 0.2em; }
+
+  .vault-card.shake { animation: shakeX .5s var(--ease-soft); }
+  @keyframes shakeX {
+    0%,100% { transform: translateX(0); }
+    20% { transform: translateX(-9px); }
+    40% { transform: translateX(7px); }
+    60% { transform: translateX(-5px); }
+    80% { transform: translateX(3px); }
+  }
+
+  .vault-submit {
+    margin-top: 14px;
+    width: 100%;
+    padding: 13px;
+    border-radius: 12px;
+    border: none;
+    background: var(--brass-soft);
+    color: var(--ink);
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    font-size: 13px;
+    letter-spacing: 0.04em;
+    cursor: pointer;
+    transition: transform .3s var(--ease-spring), background .3s var(--ease-soft);
+  }
+
+  .vault-submit:hover { transform: translateY(-2px); background: #c99a5f; }
+  .vault-submit:active { transform: scale(.97); }
+
+  .vault-hint {
+    margin-top: 16px;
+    font-size: 11.5px;
+    color: rgba(251,249,243,0.4);
+    letter-spacing: 0.02em;
+  }
+
+  .vault-hint b { color: rgba(251,249,243,0.65); font-weight: 600; }
+
+  /* ==========================================
+     SECTION 1: TOPBAR
+     ========================================== */
+  .admin-shell {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 34px 32px 100px;
+  }
+
+  .topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 26px;
+    flex-wrap: wrap;
+    gap: 16px;
+    opacity: 0;
+    animation: fadeUp .7s var(--ease-spring) forwards .1s;
+  }
+
+  .brand-block { display: flex; align-items: center; gap: 12px; }
+
+  .brand-mark {
+    width: 40px; height: 40px;
+    border-radius: 10px;
+    background: linear-gradient(155deg, var(--olive), var(--olive-deep));
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 8px 18px -8px rgba(86,90,63,0.55);
+  }
+
+  .brand-text .eyebrow-sm {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10.5px;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+  }
+
+  .brand-text h1 {
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-size: 22px;
+    letter-spacing: -0.01em;
+  }
+
+  .topbar-actions { display: flex; align-items: center; gap: 10px; }
+
+  .stat-chip {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    padding: 9px 16px;
+    border-radius: 999px;
+    background: var(--card);
+    border: 1px solid var(--line);
+    font-size: 12.5px;
+    color: var(--ink-soft);
+    box-shadow: 0 2px 6px rgba(33,31,26,0.05);
+  }
+
+  .stat-chip b {
+    font-family: 'IBM Plex Mono', monospace;
+    color: var(--brass-deep);
+    font-size: 13px;
+  }
+
+  .ghost-btn {
+    padding: 10px 18px;
+    border-radius: 999px;
+    border: 1px solid var(--line);
+    background: var(--cream);
+    color: var(--ink);
+    font-size: 12.5px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background .3s var(--ease-soft), transform .3s var(--ease-spring), border-color .3s var(--ease-soft);
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+  }
+
+  .ghost-btn:hover { background: var(--ink); color: var(--cream); border-color: var(--ink); transform: translateY(-2px); }
+  .ghost-btn:hover svg path, .ghost-btn:hover svg rect { stroke: var(--cream); }
+  .ghost-btn:active { transform: scale(.96); }
+
+  .sync-note {
+    font-size: 12px;
+    color: var(--ink-soft);
+    background: var(--pill);
+    border: 1px solid var(--line);
+    padding: 10px 16px;
+    border-radius: 12px;
+    margin-bottom: 24px;
+    opacity: 0;
+    animation: fadeUp .7s var(--ease-spring) forwards .2s;
+  }
+
+  /* ==========================================
+     SECTION 2: LAYOUT GRID
+     ========================================== */
+  .workspace {
+    display: grid;
+    grid-template-columns: 1.15fr 0.85fr;
+    gap: 26px;
+    align-items: start;
+  }
+
+  .panel {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 20px;
+    padding: 28px;
+    box-shadow: var(--shadow-soft);
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fadeUp .75s var(--ease-spring) forwards;
+  }
+
+  .panel.form-panel { animation-delay: .18s; }
+  .panel.preview-panel { animation-delay: .26s; position: sticky; top: 24px; }
+
+  .panel-head {
+    display: flex;
+    align-items: baseline;
+    gap: 9px;
+    margin-bottom: 4px;
+  }
+
+  .panel-head .dash { color: var(--ink-soft); font-size: 16px; }
+
+  .panel-head h2 {
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-size: 18px;
+    letter-spacing: 0.01em;
+    text-transform: uppercase;
+  }
+
+  .panel-sub {
+    font-size: 12.5px;
+    color: var(--ink-soft);
+    margin: 4px 0 24px 25px;
+  }
+
+  /* ==========================================
+     SECTION 3: FLOATING-LABEL FIELDS
+     ========================================== */
+  .field {
+    position: relative;
+    margin-bottom: 20px;
+  }
+
+  .field input, .field textarea {
+    width: 100%;
+    padding: 18px 16px 8px;
+    border-radius: 12px;
+    border: 1.5px solid var(--line);
+    background: var(--cream);
+    font-family: 'Poppins', sans-serif;
+    font-size: 14px;
+    color: var(--ink);
+    outline: none;
+    transition: border-color .3s var(--ease-soft), box-shadow .3s var(--ease-soft);
+  }
+
+  .field textarea { resize: vertical; min-height: 64px; padding-top: 20px; }
+
+  .field label {
+    position: absolute;
+    left: 16px; top: 17px;
+    font-size: 14px;
+    color: var(--ink-soft);
+    pointer-events: none;
+    transform-origin: left top;
+    transition: transform .25s var(--ease-spring), color .25s var(--ease-soft), top .25s var(--ease-spring);
+  }
+
+  .field input:focus, .field textarea:focus {
+    border-color: var(--olive);
+    box-shadow: 0 0 0 4px rgba(86,90,63,0.1);
+  }
+
+  .field input:focus + label,
+  .field input.has-value + label,
+  .field textarea:focus + label,
+  .field textarea.has-value + label {
+    top: 8px;
+    transform: scale(0.76);
+    color: var(--brass-deep);
+    font-weight: 600;
+  }
+
+  .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+  /* ==========================================
+     SECTION 4: SIZE PICKER (segmented, sliding highlight)
+     ========================================== */
+  .size-label {
+    font-size: 11.5px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    margin-bottom: 10px;
+    display: block;
+  }
+
+  .size-picker {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 4px;
+    background: var(--parchment);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 5px;
+    margin-bottom: 22px;
+  }
+
+  .size-indicator {
+    position: absolute;
+    top: 5px; bottom: 5px; left: 5px;
+    width: calc(25% - 4px);
+    border-radius: 10px;
+    background: var(--ink);
+    z-index: 1;
+    transition: left .45s var(--ease-spring);
+    box-shadow: 0 6px 14px -6px rgba(33,31,26,0.4);
+  }
+
+  .size-opt {
+    position: relative;
+    z-index: 2;
+    border: none;
+    background: none;
+    padding: 12px 4px 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    border-radius: 10px;
+    color: var(--ink-soft);
+    transition: color .35s var(--ease-soft);
+  }
+
+  .size-opt.active { color: #fbf9f3; }
+  .size-opt span { font-size: 10.5px; font-weight: 600; letter-spacing: 0.02em; }
+
+  .size-opt .shape { width: 22px; height: 16px; border: 1.6px solid currentColor; border-radius: 3px; }
+  .size-opt[data-size="size-wide"] .shape { width: 26px; height: 12px; }
+  .size-opt[data-size="size-tall"] .shape { width: 12px; height: 22px; }
+  .size-opt[data-size="size-small"] .shape { width: 16px; height: 16px; }
+  .size-opt[data-size="size-big"] .shape { width: 26px; height: 20px; }
+
+  /* ==========================================
+     SECTION 5: DROPZONES
+     ========================================== */
+  .drop-label { display:block; margin-bottom: 10px; }
+
+  .dropzone {
+    position: relative;
+    border: 1.5px dashed var(--line);
+    border-radius: 16px;
+    background: var(--parchment);
+    padding: 26px 16px;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color .35s var(--ease-soft), background .35s var(--ease-soft), transform .3s var(--ease-spring);
+    margin-bottom: 22px;
+    overflow: hidden;
+  }
+
+  .dropzone::before {
+    content: "";
+    position: absolute; inset: 0;
+    border-radius: 16px;
+    background: repeating-linear-gradient(90deg, var(--brass-soft) 0 8px, transparent 8px 16px);
+    background-size: 200% 100%;
+    background-position-y: 0;
+    height: 2px;
+    top: auto; bottom: 0; left: 0; right: 0;
+    opacity: 0;
+    animation: marchAnts 1.4s linear infinite;
+    transition: opacity .3s var(--ease-soft);
+  }
+
+  .dropzone.drag-over::before { opacity: 1; }
+  @keyframes marchAnts { to { background-position-x: -32px; } }
+
+  .dropzone.drag-over {
+    border-color: var(--olive);
+    background: #eef0e6;
+    transform: scale(1.01);
+  }
+
+  .dropzone svg { margin-bottom: 10px; }
+  .dropzone .dz-title { font-size: 13.5px; font-weight: 500; }
+  .dropzone .dz-sub { font-size: 11.5px; color: var(--ink-soft); margin-top: 3px; }
+  .dropzone input[type="file"] { display: none; }
+
+  .cover-preview {
+    position: relative;
+    border-radius: 14px;
+    overflow: hidden;
+    margin-bottom: 22px;
+    height: 150px;
+    display: none;
+    animation: cardIn .5s var(--ease-pop) forwards;
+  }
+
+  .cover-preview.show { display: block; }
+  .cover-preview img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+  .cover-preview .remove-x {
+    position: absolute;
+    top: 8px; right: 8px;
+    width: 26px; height: 26px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(33,29,26,0.65);
+    color: #fff;
+    font-size: 13px;
+    cursor: pointer;
+    transition: background .25s var(--ease-soft), transform .25s var(--ease-spring);
+  }
+  .cover-preview .remove-x:hover { background: var(--danger); transform: scale(1.1); }
+
+  @keyframes cardIn { from { opacity:0; transform: scale(.94); } to { opacity:1; transform: scale(1); } }
+
+  .thumb-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin-bottom: 22px;
+  }
+
+  .thumb {
+    position: relative;
+    aspect-ratio: 1;
+    border-radius: 10px;
+    overflow: hidden;
+    opacity: 0;
+    transform: scale(.85);
+    animation: cardIn .45s var(--ease-pop) forwards;
+    box-shadow: 0 2px 8px rgba(33,31,26,0.12);
+  }
+
+  .thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+  .thumb .remove-x {
+    position: absolute;
+    top: 4px; right: 4px;
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(33,29,26,0.7);
+    color: #fff;
+    font-size: 10px;
+    line-height: 1;
+    cursor: pointer;
+    transition: background .25s var(--ease-soft), transform .25s var(--ease-spring);
+  }
+  .thumb .remove-x:hover { background: var(--danger); transform: scale(1.15); }
+
+  /* ==========================================
+     SECTION 6: SAVE BUTTON (stamp interaction)
+     ========================================== */
+  .save-btn {
+    width: 100%;
+    padding: 16px;
+    border-radius: 14px;
+    border: none;
+    background: var(--olive);
+    color: #fbf9f3;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    font-size: 14px;
+    letter-spacing: 0.02em;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition: transform .25s var(--ease-spring), background .3s var(--ease-soft), box-shadow .3s var(--ease-soft);
+    box-shadow: 0 14px 28px -14px rgba(86,90,63,0.55);
+  }
+
+  .save-btn:hover { background: var(--olive-deep); transform: translateY(-2px); box-shadow: 0 18px 32px -14px rgba(86,90,63,0.6); }
+  .save-btn:active { transform: scale(.98); }
+
+  .save-btn .ripple {
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(251,249,243,0.35);
+    transform: scale(0);
+    animation: rippleOut .6s var(--ease-soft) forwards;
+    pointer-events: none;
+  }
+
+  @keyframes rippleOut { to { transform: scale(3); opacity: 0; } }
+
+  .reset-link {
+    display: block;
+    text-align: center;
+    margin-top: 12px;
+    font-size: 12px;
+    color: var(--ink-soft);
+    background: none;
+    border: none;
+    cursor: pointer;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    transition: color .3s var(--ease-soft);
+  }
+  .reset-link:hover { color: var(--ink); }
+
+  /* ==========================================
+     SECTION 7: LIVE PREVIEW CARD (mirrors public gallery)
+     ========================================== */
+  .preview-frame {
+    background: var(--parchment);
+    border-radius: 16px;
+    padding: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 300px;
+  }
+
+  .preview-card {
+    position: relative;
+    width: 240px;
+    height: 280px;
+    border-radius: 16px;
+    overflow: hidden;
+    background: #ddd;
+    box-shadow: var(--shadow-deep);
+    transition: transform .5s var(--ease-spring);
+  }
+
+  .preview-card:hover { transform: translateY(-4px) scale(1.01); }
+
+  .preview-card img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform .8s var(--ease-spring);
+    filter: saturate(.92) contrast(1.02);
+  }
+
+  .preview-card:hover img { transform: scale(1.06); }
+
+  .preview-card::before {
+    content: "";
+    position: absolute; inset: 0;
+    background: linear-gradient(180deg, rgba(0,0,0,0) 45%, rgba(20,18,12,0.68) 100%);
+  }
+
+  .preview-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    color: var(--ink-soft);
+    text-align: center;
+  }
+
+  .preview-empty svg { opacity: .5; animation: floatSlow 4s ease-in-out infinite; }
+  @keyframes floatSlow { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+  .preview-empty p { font-size: 12.5px; max-width: 180px; }
+
+  .preview-stamp {
+    position: absolute;
+    top: 12px; right: 12px;
+    padding: 5px 10px;
+    border-radius: 999px;
+    background: rgba(241,237,228,0.92);
+    color: var(--brass-deep);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    font-weight: 600;
+  }
+
+  .preview-tag {
+    position: absolute;
+    left: 14px; bottom: 14px; right: 14px;
+    color: #fbf9f3;
+    font-size: 14px;
+    font-weight: 500;
+  }
+
+  .preview-note {
+    margin-top: 18px;
+    font-size: 11.5px;
+    color: var(--ink-soft);
+    text-align: center;
+    line-height: 1.6;
+  }
+
+  /* ==========================================
+     SECTION 8: LEDGER TABLE
+     ========================================== */
+  .ledger-panel {
+    margin-top: 26px;
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fadeUp .75s var(--ease-spring) forwards .34s;
+  }
+
+  .ledger-list { display: flex; flex-direction: column; gap: 10px; }
+
+  .ledger-empty {
+    padding: 46px 20px;
+    text-align: center;
+    color: var(--ink-soft);
+    font-size: 13px;
+  }
+
+  .ledger-row {
+    display: grid;
+    grid-template-columns: 56px 1fr auto auto auto;
+    align-items: center;
+    gap: 16px;
+    padding: 12px 14px;
+    border-radius: 14px;
+    background: var(--parchment);
+    border: 1px solid transparent;
+    opacity: 0;
+    transform: translateX(-14px);
+    animation: rowIn .5s var(--ease-spring) forwards;
+    transition: border-color .3s var(--ease-soft), box-shadow .3s var(--ease-soft), transform .3s var(--ease-soft);
+  }
+
+  @keyframes rowIn { to { opacity: 1; transform: translateX(0); } }
+
+  .ledger-row:hover {
+    border-color: var(--line);
+    box-shadow: 0 10px 22px -14px rgba(33,31,26,0.25);
+    transform: translateX(2px);
+  }
+
+  .ledger-row.leaving {
+    opacity: 0 !important;
+    transform: translateX(30px) scale(.96) !important;
+  }
+
+  .ledger-thumb {
+    width: 56px; height: 56px;
+    border-radius: 10px;
+    overflow: hidden;
+    background: #ddd;
+  }
+  .ledger-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+  .ledger-info .l-title {
+    font-family: 'Fraunces', serif;
+    font-size: 15px;
+    font-weight: 500;
+  }
+  .ledger-info .l-meta {
+    font-size: 11.5px;
+    color: var(--ink-soft);
+    margin-top: 2px;
+    font-family: 'IBM Plex Mono', monospace;
+  }
+
+  .l-badge {
+    padding: 5px 12px;
+    border-radius: 999px;
+    background: var(--pill);
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--olive);
+    white-space: nowrap;
+  }
+
+  .icon-btn {
+    width: 34px; height: 34px;
+    border-radius: 9px;
+    border: 1px solid var(--line);
+    background: var(--card);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    transition: background .25s var(--ease-soft), transform .25s var(--ease-spring), border-color .25s var(--ease-soft);
+  }
+  .icon-btn:hover { transform: translateY(-2px); }
+  .icon-btn.edit:hover { background: var(--olive); border-color: var(--olive); }
+  .icon-btn.edit:hover svg path { stroke: #fff; }
+  .icon-btn.del:hover { background: var(--danger); border-color: var(--danger); }
+  .icon-btn.del:hover svg path { stroke: #fff; }
+  .icon-btn svg path { transition: stroke .25s var(--ease-soft); }
+
+  /* ==========================================
+     SECTION 9: TOAST
+     ========================================== */
+  .toast-stack {
+    position: fixed;
+    bottom: 26px; left: 50%;
+    transform: translateX(-50%);
+    z-index: 400;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: center;
+  }
+
+  .toast {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 13px 20px;
+    border-radius: 999px;
+    background: var(--ink);
+    color: #fbf9f3;
+    font-size: 13px;
+    font-weight: 500;
+    box-shadow: var(--shadow-deep);
+    opacity: 0;
+    transform: translateY(16px) scale(.9);
+    animation: toastIn .5s var(--ease-pop) forwards, toastOut .4s var(--ease-soft) forwards 2.6s;
+  }
+
+  @keyframes toastIn { to { opacity: 1; transform: translateY(0) scale(1); } }
+  @keyframes toastOut { to { opacity: 0; transform: translateY(10px) scale(.92); } }
+
+  .toast .t-stamp {
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    border: 1.5px solid var(--brass-soft);
+    display: flex; align-items: center; justify-content: center;
+    flex: none;
+  }
+
+  /* ==========================================
+     RESPONSIVE
+     ========================================== */
+  @media (max-width: 980px) {
+    .workspace { grid-template-columns: 1fr; }
+    .panel.preview-panel { position: relative; top: 0; }
+  }
+
+  @media (max-width: 640px) {
+    .field-row { grid-template-columns: 1fr; }
+    .ledger-row { grid-template-columns: 44px 1fr; grid-template-areas: "thumb info" "actions actions"; }
+    .ledger-row .l-badge { display: none; }
+    .admin-shell { padding: 24px 16px 80px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { animation-duration: .001ms !important; transition-duration: .001ms !important; }
+  }
+</style>
+</head>
+<body>
+
+  <!-- ================= VAULT / PASSCODE GATE ================= -->
+  <div class="vault" id="vault">
+    <div class="vault-card" id="vaultCard">
+      <div class="vault-dial"></div>
+      <span class="vault-eyebrow">Restricted Access</span>
+      <h1>Archive Desk</h1>
+      <form class="vault-form" id="vaultForm">
+        <input class="vault-input" id="vaultInput" type="password" placeholder="• • • • PASSCODE" autocomplete="off">
+        <button class="vault-submit" type="submit">Unlock Desk</button>
+      </form>
+      <p class="vault-hint">Demo passcode: <b>1902</b></p>
+    </div>
+  </div>
+
+  <!-- ================= ADMIN SHELL ================= -->
+  <div class="admin-shell">
+
+    <div class="topbar">
+      <div class="brand-block">
+        <div class="brand-mark">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M3 4.5C3 3.67 3.67 3 4.5 3H13.5C14.33 3 15 3.67 15 4.5V15L9 12.5L3 15V4.5Z" stroke="#fbf9f3" stroke-width="1.3" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="brand-text">
+          <span class="eyebrow-sm">The Library</span>
+          <h1>Archive Desk</h1>
+        </div>
+      </div>
+      <div class="topbar-actions">
+        <div class="stat-chip">Entries <b id="entryCount">0</b></div>
+        <button class="ghost-btn" id="exportBtn">
+          <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M6.5 1v7.5M3.5 6l3 3 3-3M2 11.5h9" stroke="#211d1a" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Export JSON
+        </button>
+      </div>
+    </div>
+
+    <p class="sync-note" id="syncNote">Photos upload to Cloudinary; entries save live to this browser and appear on the public gallery automatically — as long as both pages are served from the same origin.</p>
+
+    <div class="workspace">
+
+      <!-- ================= FORM PANEL ================= -->
+      <div class="panel form-panel">
+        <div class="panel-head"><span class="dash">—</span><h2 id="formHeading">New Entry</h2></div>
+        <p class="panel-sub">Add a card to the public gallery archive</p>
+
+        <form id="entryForm">
+          <div class="field">
+            <input type="text" id="fTitle" required>
+            <label for="fTitle">Entry title</label>
+          </div>
+
+          <div class="field">
+            <input type="text" id="fTag" required>
+            <label for="fTag">Tag / short caption</label>
+          </div>
+
+          <div class="field-row">
+            <div class="field">
+              <input type="number" id="fYear" min="1900" max="2100" required>
+              <label for="fYear">Year</label>
+            </div>
+            <div class="field">
+              <input type="text" id="fAccent" placeholder=" ">
+              <label for="fAccent">Accent note (optional)</label>
+            </div>
+          </div>
+
+          <span class="size-label">Card size in grid</span>
+          <div class="size-picker" id="sizePicker">
+            <div class="size-indicator" id="sizeIndicator"></div>
+            <button type="button" class="size-opt active" data-size="size-small"><span class="shape"></span><span>Small</span></button>
+            <button type="button" class="size-opt" data-size="size-wide"><span class="shape"></span><span>Wide</span></button>
+            <button type="button" class="size-opt" data-size="size-tall"><span class="shape"></span><span>Tall</span></button>
+            <button type="button" class="size-opt" data-size="size-big"><span class="shape"></span><span>Big</span></button>
+          </div>
+
+          <span class="drop-label size-label">Cover photo</span>
+          <div class="cover-preview" id="coverPreview">
+            <img id="coverImg" alt="Cover preview">
+            <button type="button" class="remove-x" id="removeCover">✕</button>
+          </div>
+          <div class="dropzone" id="coverDrop">
+            <svg width="26" height="26" viewBox="0 0 26 26" fill="none"><rect x="3" y="5" width="20" height="16" rx="2.5" stroke="#6b645d" stroke-width="1.3"/><circle cx="9" cy="11" r="1.6" fill="#6b645d"/><path d="M3 17l5.5-5 4 3.5L18 10l5 6" stroke="#6b645d" stroke-width="1.3" stroke-linejoin="round"/></svg>
+            <div class="dz-title">Drop cover image here</div>
+            <div class="dz-sub">or click to browse — used as the grid thumbnail</div>
+            <input type="file" id="coverInput" accept="image/*">
+          </div>
+
+          <span class="drop-label size-label">Gallery photos</span>
+          <div class="thumb-grid" id="thumbGrid"></div>
+          <div class="dropzone" id="galleryDrop">
+            <svg width="26" height="26" viewBox="0 0 26 26" fill="none"><path d="M13 4v14M6 11l7-7 7 7" stroke="#6b645d" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 20h18" stroke="#6b645d" stroke-width="1.3" stroke-linecap="round"/></svg>
+            <div class="dz-title">Drop multiple photos here</div>
+            <div class="dz-sub">or click to browse — shown in the entry's detail view</div>
+            <input type="file" id="galleryInput" accept="image/*" multiple>
+          </div>
+
+          <button type="submit" class="save-btn" id="saveBtn">Archive Entry</button>
+          <button type="button" class="reset-link" id="resetLink">Clear form</button>
+        </form>
+      </div>
+
+      <!-- ================= PREVIEW PANEL ================= -->
+      <div class="panel preview-panel">
+        <div class="panel-head"><span class="dash">—</span><h2>Live Preview</h2></div>
+        <p class="panel-sub">Exactly how this card appears in the gallery</p>
+
+        <div class="preview-frame" id="previewFrame">
+          <div class="preview-empty" id="previewEmpty">
+            <svg width="40" height="40" viewBox="0 0 40 40" fill="none"><rect x="5" y="9" width="30" height="24" rx="4" stroke="#6b645d" stroke-width="1.4"/><circle cx="14" cy="17" r="2.4" stroke="#6b645d" stroke-width="1.4"/><path d="M5 27l8-7.5 6 5 8-7 8 9" stroke="#6b645d" stroke-width="1.4" stroke-linejoin="round"/></svg>
+            <p>Fill in the form to see your card come to life here</p>
+          </div>
+          <div class="preview-card" id="previewCard" style="display:none;">
+            <img id="previewImg" alt="Preview">
+            <span class="preview-stamp" id="previewYear">2026</span>
+            <span class="preview-tag" id="previewTag">Entry title</span>
+          </div>
+        </div>
+        <p class="preview-note">Cover photo, title and year update live as you type.</p>
+      </div>
+    </div>
+
+    <!-- ================= LEDGER ================= -->
+    <div class="panel ledger-panel">
+      <div class="panel-head"><span class="dash">—</span><h2>Archive Ledger</h2></div>
+      <p class="panel-sub">All entries currently saved to this browser</p>
+      <div class="ledger-list" id="ledgerList"></div>
+    </div>
+
+  </div>
+
+  <div class="toast-stack" id="toastStack"></div>
+
+  <script>
+    // ==========================================
+    // SECTION A: VAULT GATE
+    // ==========================================
+    (function(){
+      const PASSCODE = '1902';
+      const vault = document.getElementById('vault');
+      const vaultCard = document.getElementById('vaultCard');
+      const form = document.getElementById('vaultForm');
+      const input = document.getElementById('vaultInput');
+
+      form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        if (input.value.trim() === PASSCODE){
+          vault.classList.add('unlocked');
+        } else {
+          vaultCard.classList.remove('shake');
+          void vaultCard.offsetWidth;
+          vaultCard.classList.add('shake');
+          input.value = '';
+          input.focus();
+        }
+      });
+    })();
+
+    // ==========================================
+    // SECTION B: STATE + STORAGE
+    // ==========================================
+    const STORE_KEY = 'archive_desk_entries';
+    let entries = [];
+    try { entries = JSON.parse(localStorage.getItem(STORE_KEY)) || []; } catch(e) { entries = []; }
+
+    let draft = { size: 'size-small', cover: '', gallery: [] };
+    let editingId = null;
+
+    // --- Cloudinary config ---
+    // Images are uploaded to Cloudinary and only the returned URL (a short
+    // string) is saved to localStorage. This avoids the localStorage size
+    // limit (~5-10MB per origin) that base64-embedded photos would blow past.
+    const CLOUDINARY_CLOUD_NAME = 'danjlladp';
+    const CLOUDINARY_UPLOAD_PRESET = 'EventHub';
+
+    async function uploadToCloudinary(file){
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
+
+      const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`, {
+        method: 'POST',
+        body: formData
+      });
+
+      if (!res.ok){
+        const errText = await res.text().catch(() => '');
+        throw new Error('Cloudinary upload failed: ' + res.status + ' ' + errText);
+      }
+
+      const data = await res.json();
+      return data.secure_url;
+    }
+
+    function persist(){
+      try {
+        localStorage.setItem(STORE_KEY, JSON.stringify(entries));
+        return true;
+      } catch(e){
+        showToast('Storage save failed — try removing an entry or a photo');
+        return false;
+      }
+    }
+
+    function uid(){
+      return 'e_' + Date.now().toString(36) + Math.random().toString(36).slice(2,7);
+    }
+
+    // ==========================================
+    // SECTION C: FLOATING LABEL BINDING
+    // ==========================================
+    document.querySelectorAll('.field input, .field textarea').forEach(el => {
+      el.addEventListener('input', () => el.classList.toggle('has-value', el.value.trim() !== ''));
+    });
+
+    // ==========================================
+    // SECTION D: SIZE PICKER
+    // ==========================================
+    const sizePicker = document.getElementById('sizePicker');
+    const sizeIndicator = document.getElementById('sizeIndicator');
+    const sizeOpts = Array.from(document.querySelectorAll('.size-opt'));
+
+    function moveSizeIndicator(btn){
+      const railRect = sizePicker.getBoundingClientRect();
+      const btnRect = btn.getBoundingClientRect();
+      sizeIndicator.style.left = (btnRect.left - railRect.left) + 'px';
+    }
+
+    sizeOpts.forEach(btn => {
+      btn.addEventListener('click', () => {
+        sizeOpts.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        moveSizeIndicator(btn);
+        draft.size = btn.dataset.size;
+        updatePreview();
+      });
+    });
+
+    window.addEventListener('resize', () => {
+      const active = sizePicker.querySelector('.size-opt.active');
+      if (active) moveSizeIndicator(active);
+    });
+    requestAnimationFrame(() => moveSizeIndicator(sizeOpts[0]));
+
+    // ==========================================
+    // SECTION E: DROPZONES (cover + gallery)
+    // ==========================================
+    function fileToDataURL(file){
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+    }
+
+    function setDropzoneBusy(zoneEl, busy, label){
+      const titleEl = zoneEl.querySelector('.dz-title');
+      if (!titleEl) return;
+      if (busy){
+        if (!titleEl.dataset.original) titleEl.dataset.original = titleEl.textContent;
+        titleEl.textContent = label || 'Uploading…';
+        zoneEl.style.opacity = '0.6';
+        zoneEl.style.pointerEvents = 'none';
+      } else {
+        if (titleEl.dataset.original) titleEl.textContent = titleEl.dataset.original;
+        zoneEl.style.opacity = '';
+        zoneEl.style.pointerEvents = '';
+      }
+    }
+
+    function wireDropzone(zoneEl, inputEl, onFiles){
+      zoneEl.addEventListener('click', () => inputEl.click());
+      inputEl.addEventListener('change', () => { onFiles(inputEl.files); inputEl.value = ''; });
+
+      ['dragenter','dragover'].forEach(evt => zoneEl.addEventListener(evt, (e) => {
+        e.preventDefault(); zoneEl.classList.add('drag-over');
+      }));
+      ['dragleave','drop'].forEach(evt => zoneEl.addEventListener(evt, (e) => {
+        e.preventDefault(); zoneEl.classList.remove('drag-over');
+      }));
+      zoneEl.addEventListener('drop', (e) => {
+        if (e.dataTransfer.files.length) onFiles(e.dataTransfer.files);
+      });
+    }
+
+    const coverDrop = document.getElementById('coverDrop');
+    const coverInput = document.getElementById('coverInput');
+    const coverPreview = document.getElementById('coverPreview');
+    const coverImg = document.getElementById('coverImg');
+    const removeCover = document.getElementById('removeCover');
+
+    wireDropzone(coverDrop, coverInput, async (files) => {
+      const file = files[0];
+      if (!file) return;
+
+      setDropzoneBusy(coverDrop, true, 'Uploading cover…');
+      try {
+        const url = await uploadToCloudinary(file);
+        draft.cover = url;
+        coverImg.src = url;
+        coverPreview.classList.add('show');
+        updatePreview();
+      } catch(err){
+        console.error(err);
+        showToast('Cover upload failed — check Cloudinary settings');
+      } finally {
+        setDropzoneBusy(coverDrop, false);
+      }
+    });
+
+    removeCover.addEventListener('click', () => {
+      draft.cover = '';
+      coverPreview.classList.remove('show');
+      updatePreview();
+    });
+
+    const galleryDrop = document.getElementById('galleryDrop');
+    const galleryInput = document.getElementById('galleryInput');
+    const thumbGrid = document.getElementById('thumbGrid');
+
+    function renderThumbs(){
+      thumbGrid.innerHTML = '';
+      draft.gallery.forEach((src, i) => {
+        const t = document.createElement('div');
+        t.className = 'thumb';
+        t.style.animationDelay = (i * 0.05) + 's';
+        t.innerHTML = `<img src="${src}" alt="Gallery photo ${i+1}"><button type="button" class="remove-x">✕</button>`;
+        t.querySelector('.remove-x').addEventListener('click', () => {
+          draft.gallery.splice(i, 1);
+          renderThumbs();
+        });
+        thumbGrid.appendChild(t);
+      });
+    }
+
+    wireDropzone(galleryDrop, galleryInput, async (files) => {
+      const arr = Array.from(files);
+      if (!arr.length) return;
+
+      setDropzoneBusy(galleryDrop, true, `Uploading ${arr.length} photo${arr.length > 1 ? 's' : ''}…`);
+      let failCount = 0;
+
+      for (const file of arr){
+        try {
+          const url = await uploadToCloudinary(file);
+          draft.gallery.push(url);
+          renderThumbs();
+        } catch(err){
+          console.error(err);
+          failCount++;
+        }
+      }
+
+      setDropzoneBusy(galleryDrop, false);
+      if (failCount) showToast(`${failCount} photo${failCount > 1 ? 's' : ''} failed to upload`);
+    });
+
+    // ==========================================
+    // SECTION F: LIVE PREVIEW
+    // ==========================================
+    const previewEmpty = document.getElementById('previewEmpty');
+    const previewCard = document.getElementById('previewCard');
+    const previewImg = document.getElementById('previewImg');
+    const previewYear = document.getElementById('previewYear');
+    const previewTag = document.getElementById('previewTag');
+
+    const fTitle = document.getElementById('fTitle');
+    const fTag = document.getElementById('fTag');
+    const fYear = document.getElementById('fYear');
+
+    function updatePreview(){
+      const hasContent = draft.cover || fTitle.value.trim();
+      previewEmpty.style.display = hasContent ? 'none' : 'flex';
+      previewCard.style.display = hasContent ? 'block' : 'none';
+      if (!hasContent) return;
+
+      previewImg.src = draft.cover || '';
+      previewImg.style.background = draft.cover ? '' : '#ddd';
+      previewTag.textContent = fTag.value.trim() || fTitle.value.trim() || 'Untitled entry';
+      previewYear.textContent = fYear.value.trim() || '—';
+    }
+
+    [fTitle, fTag, fYear].forEach(el => el.addEventListener('input', updatePreview));
+
+    // ==========================================
+    // SECTION G: TOASTS
+    // ==========================================
+    const toastStack = document.getElementById('toastStack');
+    function showToast(msg){
+      const t = document.createElement('div');
+      t.className = 'toast';
+      t.innerHTML = `<span class="t-stamp"><svg width="9" height="9" viewBox="0 0 9 9" fill="none"><path d="M1.5 4.5L3.5 6.5L7.5 2" stroke="#b98a4f" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>${msg}`;
+      toastStack.appendChild(t);
+      setTimeout(() => t.remove(), 3100);
+    }
+
+    // ==========================================
+    // SECTION H: LEDGER RENDER
+    // ==========================================
+    const ledgerList = document.getElementById('ledgerList');
+    const entryCount = document.getElementById('entryCount');
+    const sizeNames = { 'size-small':'Small', 'size-wide':'Wide', 'size-tall':'Tall', 'size-big':'Big' };
+
+    function renderLedger(){
+      entryCount.textContent = entries.length;
+      ledgerList.innerHTML = '';
+
+      if (!entries.length){
+        ledgerList.innerHTML = '<div class="ledger-empty">No entries archived yet — create your first card above.</div>';
+        return;
+      }
+
+      entries.slice().reverse().forEach((ev, i) => {
+        const row = document.createElement('div');
+        row.className = 'ledger-row';
+        row.style.animationDelay = (i * 0.05) + 's';
+        row.innerHTML = `
+          <div class="ledger-thumb"><img src="${ev.cover}" alt="${ev.title}"></div>
+          <div class="ledger-info">
+            <div class="l-title">${ev.title}</div>
+            <div class="l-meta">${ev.tag} · ${ev.year}</div>
+          </div>
+          <span class="l-badge">${sizeNames[ev.size] || 'Small'}</span>
+          <button type="button" class="icon-btn edit" title="Edit">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M9.5 1.5l3 3L5 12H2v-3l7.5-7.5z" stroke="#211d1a" stroke-width="1.3" stroke-linejoin="round"/></svg>
+          </button>
+          <button type="button" class="icon-btn del" title="Delete">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2.5 3.5h9M5.5 3.5V2h3v1.5M3.5 3.5l.6 8.5h5.8l.6-8.5" stroke="#211d1a" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+        `;
+        row.querySelector('.edit').addEventListener('click', () => loadForEdit(ev.id));
+        row.querySelector('.del').addEventListener('click', () => deleteEntry(ev.id, row));
+        ledgerList.appendChild(row);
+      });
+    }
+
+    function deleteEntry(id, row){
+      row.classList.add('leaving');
+      setTimeout(() => {
+        entries = entries.filter(e => e.id !== id);
+        persist();
+        renderLedger();
+        showToast('Entry removed from the archive');
+      }, 320);
+    }
+
+    function loadForEdit(id){
+      const ev = entries.find(e => e.id === id);
+      if (!ev) return;
+      editingId = id;
+      document.getElementById('formHeading').textContent = 'Editing Entry';
+
+      fTitle.value = ev.title; fTitle.classList.add('has-value');
+      fTag.value = ev.tag; fTag.classList.add('has-value');
+      fYear.value = ev.year; fYear.classList.add('has-value');
+      document.getElementById('fAccent').value = ev.accent || '';
+      if (ev.accent) document.getElementById('fAccent').classList.add('has-value');
+
+      draft.size = ev.size;
+      draft.cover = ev.cover;
+      draft.gallery = [...ev.gallery];
+
+      sizeOpts.forEach(b => b.classList.toggle('active', b.dataset.size === ev.size));
+      moveSizeIndicator(sizePicker.querySelector('.size-opt.active'));
+
+      coverImg.src = ev.cover;
+      coverPreview.classList.add('show');
+      renderThumbs();
+      updatePreview();
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // ==========================================
+    // SECTION I: FORM SUBMIT / RESET
+    // ==========================================
+    const entryForm = document.getElementById('entryForm');
+    const saveBtn = document.getElementById('saveBtn');
+
+    entryForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+
+      if (!draft.cover){
+        showToast('Add a cover photo before archiving');
+        return;
+      }
+
+      const payload = {
+        id: editingId || uid(),
+        title: fTitle.value.trim(),
+        tag: fTag.value.trim(),
+        accent: document.getElementById('fAccent').value.trim(),
+        year: Number(fYear.value) || new Date().getFullYear(),
+        size: draft.size,
+        cover: draft.cover,
+        gallery: draft.gallery.length ? [...draft.gallery] : [draft.cover]
+      };
+
+      if (editingId){
+        entries = entries.map(ev => ev.id === editingId ? payload : ev);
+        showToast('Entry updated');
+      } else {
+        entries.push(payload);
+        showToast('Entry archived to the gallery');
+      }
+
+      persist();
+      renderLedger();
+      spawnRipple(saveBtn);
+      resetForm();
+    });
+
+    function spawnRipple(btn){
+      const r = document.createElement('span');
+      r.className = 'ripple';
+      const size = Math.max(btn.offsetWidth, btn.offsetHeight);
+      r.style.width = r.style.height = size + 'px';
+      r.style.left = (btn.offsetWidth/2 - size/2) + 'px';
+      r.style.top = (btn.offsetHeight/2 - size/2) + 'px';
+      btn.appendChild(r);
+      setTimeout(() => r.remove(), 650);
+    }
+
+    function resetForm(){
+      editingId = null;
+      document.getElementById('formHeading').textContent = 'New Entry';
+      entryForm.reset();
+      document.querySelectorAll('.field input, .field textarea').forEach(el => el.classList.remove('has-value'));
+
+      draft = { size: 'size-small', cover: '', gallery: [] };
+      coverPreview.classList.remove('show');
+      sizeOpts.forEach(b => b.classList.toggle('active', b.dataset.size === 'size-small'));
+      moveSizeIndicator(sizeOpts[0]);
+      renderThumbs();
+      updatePreview();
+    }
+
+    document.getElementById('resetLink').addEventListener('click', resetForm);
+
+    // ==========================================
+    // SECTION J: EXPORT
+    // ==========================================
+    document.getElementById('exportBtn').addEventListener('click', () => {
+      if (!entries.length){ showToast('No entries to export yet'); return; }
+      const blob = new Blob([JSON.stringify(entries, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'archive-entries.json';
+      a.click();
+      URL.revokeObjectURL(url);
+      showToast('Exported ' + entries.length + ' entries as JSON');
+    });
+
+    // ==========================================
+    // INIT
+    // ==========================================
+    renderLedger();
+  </script>
+</body>
+</html>
