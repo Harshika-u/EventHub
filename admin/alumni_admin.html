@@ -37,6 +37,45 @@
       width:64px; height:64px; border-radius:50%; object-fit:cover;
       margin-top:8px; border:1px solid #e2e8f0; display:none;
     }
+
+    /* ── SECTION LAYOUT (banner + alumni list share the same scroll,
+       no separate sidebar tab) ── */
+    .section-block{ margin-bottom: 40px; }
+    .section-block .top-bar{ margin-bottom: 8px; }
+    .section-divider{
+      border:none; border-top:1px solid #e2e8f0; margin: 36px 0 32px;
+    }
+
+    /* ── HERO IMAGE CARD — same pattern as the Spotlight admin page's
+       single banner-image card ── */
+    .hero-admin-card {
+      background: white;
+      border: 1px solid #e2e8f0;
+      border-radius: 14px;
+      padding: 20px 22px;
+      display: flex;
+      gap: 18px;
+      align-items: flex-start;
+    }
+    .hero-admin-preview {
+      width: 140px; height: 78px; border-radius: 10px; flex-shrink: 0; overflow: hidden;
+      background: #0f172a; display: flex; align-items: center; justify-content: center;
+      font-size: 11px; color: #94a3b8; text-align: center;
+    }
+    .hero-admin-preview img { width: 100%; height: 100%; object-fit: cover; }
+    .hero-admin-fields { flex: 1; }
+    .hero-admin-fields label { display: block; font-size: 12.5px; font-weight: 700; color: #475569; margin-bottom: 8px; }
+    .hero-admin-fields .save-btn { margin-top: 10px; padding: 10px 20px; font-size: 13px; }
+
+    /* image URL + upload button, matches spotlight admin's .image-field */
+    .image-field { display:flex; gap:10px; align-items:center; }
+    .image-field input[type=url] { flex:1; }
+    .upload-btn {
+      background:#eff6ff; color:#3b82f6; border:1px solid #bfdbfe; border-radius:9px; padding:10px 14px;
+      font-size:13px; font-weight:700; cursor:pointer; white-space:nowrap; flex-shrink:0;
+    }
+    .upload-btn:hover { background:#dbeafe; }
+    .upload-status { font-size:12px; color:#64748b; margin-top:6px; display:block; min-height:16px; }
   </style>
 </head>
 <body>
@@ -53,7 +92,7 @@
         <li onclick="window.location.href='dashboard.html'">Event Participants</li>
         <li onclick="window.location.href='spot_admin.html'">Gallery</li>
         <li onclick="window.location.href='club_admin.html'">Clubs</li>
-        <li id="tab-alumni" class="active" onclick="showTab('alumni')">Alumni</li>
+        <li id="tab-alumni" class="active" onclick="window.location.href='alumni_admin.html'">Alumni</li>
         <li onclick="window.location.href='spotlight_admin.html'">Spotlight</li>
       </ul>
     </div>
@@ -63,7 +102,31 @@
   <!-- MAIN CONTENT -->
   <div class="dashboard-main">
 
-    <div id="panel-alumni">
+    <!-- BANNER — single image, embedded inline (same pattern as the
+         Spotlight page banner card) -->
+    <div class="section-block" id="section-hero">
+      <div class="top-bar">
+        <h1>Alumni Page Banner</h1>
+      </div>
+      <div class="hero-admin-card" id="heroCard">
+        <div class="hero-admin-preview" id="heroPreview">No image set</div>
+        <div class="hero-admin-fields">
+          <label>Banner image (shown at the top of the public Alumni page)</label>
+          <div class="image-field">
+            <input type="url" id="heroImageUrl" placeholder="https://... or click Upload">
+            <button type="button" class="upload-btn" onclick="document.getElementById('heroImageFile').click()">Upload</button>
+            <input type="file" id="heroImageFile" accept="image/*" style="display:none">
+          </div>
+          <span class="upload-status" id="heroImageStatus"></span>
+          <button class="save-btn" id="heroSaveBtn" onclick="saveHeroImage()">Save Banner Image</button>
+        </div>
+      </div>
+    </div>
+
+    <hr class="section-divider">
+
+    <!-- ALUMNI -->
+    <div class="section-block" id="section-alumni">
       <div class="top-bar">
         <h1>Manage Alumni</h1>
         <button class="add-btn" onclick="openAddAlumni()">Add Alumni</button>
@@ -137,7 +200,7 @@
 <!-- FIREBASE -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-  import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+  import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, updateDoc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyDMkDxml0p9zUp6gZuo1SeVhmQ3BZamy9o",
@@ -152,7 +215,79 @@
   const db = getFirestore(app);
 
   window.db = db;
-  window.firebaseFns = { collection, addDoc, getDocs, deleteDoc, doc, updateDoc };
+  window.firebaseFns = { collection, addDoc, getDocs, deleteDoc, doc, updateDoc, getDoc, setDoc };
+
+  /* ── BANNER IMAGE (site-wide setting, single image — same pattern as
+     Spotlight's page banner) — lives at alumniSettings/hero,
+     field "heroImage". ── */
+  function updateHeroPreview(url) {
+    const preview = document.getElementById("heroPreview");
+    preview.innerHTML = url ? `<img src="${url}" alt="banner preview">` : "No image set";
+  }
+
+  async function loadHeroImage() {
+    try {
+      const snap = await getDoc(doc(db, "alumniSettings", "hero"));
+      const url = snap.exists() ? (snap.data().heroImage || "") : "";
+      document.getElementById("heroImageUrl").value = url;
+      updateHeroPreview(url);
+    } catch (err) {
+      console.error("Failed to load banner image:", err);
+    }
+  }
+
+  window.saveHeroImage = async function () {
+    const btn = document.getElementById("heroSaveBtn");
+    const url = document.getElementById("heroImageUrl").value.trim();
+    btn.disabled = true;
+    btn.innerText = "Saving...";
+    try {
+      await setDoc(doc(db, "alumniSettings", "hero"), { heroImage: url }, { merge: true });
+      updateHeroPreview(url);
+      btn.innerText = "Saved ✓";
+      setTimeout(() => { btn.innerText = "Save Banner Image"; }, 1500);
+    } catch (err) {
+      console.error(err);
+      alert("Failed to save banner image: " + err.message);
+      btn.innerText = "Save Banner Image";
+    } finally {
+      btn.disabled = false;
+    }
+  };
+
+  /* ── IMAGE UPLOAD (Cloudinary — same account/preset used elsewhere) ── */
+  const CLOUDINARY_CLOUD  = "danjlladp";
+  const CLOUDINARY_PRESET = "EventHub";
+
+  async function uploadImageToCloudinary(file) {
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("upload_preset", CLOUDINARY_PRESET);
+    const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD}/image/upload`, {
+      method: "POST",
+      body: formData
+    });
+    const data = await res.json();
+    if (!data.secure_url) throw new Error("Upload failed");
+    return data.secure_url;
+  }
+
+  document.getElementById("heroImageFile").addEventListener("change", async () => {
+    const fileInput = document.getElementById("heroImageFile");
+    const urlInput  = document.getElementById("heroImageUrl");
+    const status    = document.getElementById("heroImageStatus");
+    const file = fileInput.files[0];
+    if (!file) return;
+    status.innerText = "Uploading...";
+    try {
+      urlInput.value = await uploadImageToCloudinary(file);
+      updateHeroPreview(urlInput.value);
+      status.innerText = "Uploaded ✓ — click Save Banner Image to publish.";
+    } catch (err) {
+      console.error(err);
+      status.innerText = "Upload failed — try again.";
+    }
+  });
 
   window.onload = () => {
     if (localStorage.getItem("admin") !== "true") {
@@ -160,6 +295,7 @@
       return;
     }
     loadAlumni();
+    loadHeroImage();
   };
 </script>
 

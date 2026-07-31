@@ -17,17 +17,18 @@
   }
 
   html{overflow-x:hidden;}
+
+  /* ── HERO BANNER — single image, admin-managed (alumniSettings/hero).
+     Background image is set via the --alumni-hero-image inline CSS
+     variable on #heroBanner by the script below. ── */
   .alumni-hero{
     position:relative;
     width:100%;
-    display:grid;
-    grid-template-columns:repeat(5,1fr);
-    grid-template-rows:repeat(3,1fr);
     min-height:100vh;
-  }
-  .alumni-hero img{
-    width:100%;height:100%;min-height:100%;object-fit:cover;object-position:center;display:block;
-    filter:saturate(.85);
+    background-color:#141414;
+    background-image:var(--alumni-hero-image, none);
+    background-size:cover;
+    background-position:center;
   }
   .alumni-hero::after{
     content:"";
@@ -298,7 +299,6 @@
   }
 
   @media (max-width:900px){
-    .alumni-hero{grid-template-columns:repeat(3,1fr);min-height:100vh;}
     .alumni-hero-copy{padding:210px 16px 40px;}
     .card-grid{ grid-template-columns:repeat(2, 1fr); gap:50px 36px; padding:0 36px; }
   }
@@ -325,26 +325,8 @@
   </div>
 </nav>
 
-<!-- HERO PHOTO COLLAGE -->
-<div class="alumni-hero hero-full">
-  <img src="https://placehold.co/500x500/1b2a4a/e4c95f?text=Photo" alt="">
-  <img src="https://placehold.co/500x500/7a1f2b/f8f6f0?text=Photo" alt="">
-  <img src="https://placehold.co/500x500/2e3f66/e4c95f?text=Photo" alt="">
-  <img src="https://placehold.co/500x500/c9a227/1b2a4a?text=Photo" alt="">
-  <img src="https://placehold.co/500x500/4a1a20/f8f6f0?text=Photo" alt="">
-
-  <img src="https://placehold.co/500x500/6b5b1f/f8f6f0?text=Photo" alt="">
-  <img src="https://placehold.co/500x500/1b2a4a/e4c95f?text=Photo" alt="">
-  <img src="https://placehold.co/500x500/7a1f2b/f8f6f0?text=Photo" alt="">
-  <img src="https://placehold.co/500x500/2e3f66/e4c95f?text=Photo" alt="">
-  <img src="https://placehold.co/500x500/c9a227/1b2a4a?text=Photo" alt="">
-
-  <img src="https://placehold.co/500x500/4a1a20/f8f6f0?text=Photo" alt="">
-  <img src="https://placehold.co/500x500/6b5b1f/f8f6f0?text=Photo" alt="">
-  <img src="https://placehold.co/500x500/1b2a4a/e4c95f?text=Photo" alt="">
-  <img src="https://placehold.co/500x500/7a1f2b/f8f6f0?text=Photo" alt="">
-  <img src="https://placehold.co/500x500/2e3f66/e4c95f?text=Photo" alt="">
-
+<!-- HERO BANNER (single image, set by the admin in Alumni Admin) -->
+<div class="alumni-hero hero-full" id="heroBanner">
   <div class="alumni-hero-copy">
     <div class="eyebrow-hero">JGS Alumni Directory</div>
     <h1>Who Will<br>You Discover?</h1>
@@ -434,10 +416,10 @@
 
 <script src="js/public.js"></script>
 
-<!-- FIREBASE — pulls alumni added from the admin dashboard -->
+<!-- FIREBASE — pulls alumni + the single admin-managed banner image -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-  import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+  import { getFirestore, collection, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyDMkDxml0p9zUp6gZuo1SeVhmQ3BZamy9o",
@@ -452,7 +434,21 @@
   const db = getFirestore(app);
 
   const grid = document.getElementById('cardGrid');
-  const tilts = [-4,3,-2,5,-3,2,4,-5,3,-2,4,-3];
+
+  // ── BANNER — single image, set by the admin on the Alumni Admin page ──
+  const FALLBACK_HERO_IMG = 'https://placehold.co/1600x900/1b2a4a/e4c95f?text=JGS+Alumni';
+
+  async function loadHeroImage() {
+    const heroEl = document.getElementById('heroBanner');
+    let url = '';
+    try {
+      const snap = await getDoc(doc(db, "alumniSettings", "hero"));
+      url = snap.exists() ? (snap.data().heroImage || '') : '';
+    } catch (err) {
+      console.error(err);
+    }
+    heroEl.style.setProperty('--alumni-hero-image', `url("${url || FALLBACK_HERO_IMG}")`);
+  }
 
   async function loadAlumni() {
     try {
@@ -511,6 +507,7 @@
     }
   }
 
+  loadHeroImage();
   loadAlumni();
 
   // modal logic
