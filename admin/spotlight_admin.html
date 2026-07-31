@@ -101,7 +101,7 @@
       <ul class="sidebar-menu">
         <li onclick="window.location.href='dashboard.html'">Events</li>
         <li onclick="window.location.href='dashboard.html'">Event Participants</li>
-        <li onclick="window.location.href='gallery_admin.html'">Gallery</li>
+        <li onclick="window.location.href='spot_admin.html'">Gallery</li>
         <li onclick="window.location.href='club_admin.html'">Clubs</li>
         <li onclick="window.location.href='alumni_admin.html'">Alumni</li>
         <li id="tab-spotlight" class="active" onclick="window.location.href='spotlight_admin.html'">Spotlight</li>
@@ -173,15 +173,12 @@
     </div>
     <span class="upload-status" id="entryImageStatus"></span>
 
-      <div>
-        <label>Category</label>
-        <select id="entryCategory">
-          <option>Academic Excellence</option>
-          <option>Sports</option>
-          <option>Cultural</option>
-        </select>
-      </div>
-    </div>
+    <label>Category</label>
+    <select id="entryCategory">
+      <option>Academic Excellence</option>
+      <option>Sports</option>
+      <option>Cultural</option>
+    </select>
 
     <div class="form-row">
       <div>
@@ -457,7 +454,6 @@ function openEditEntry(index) {
 
   document.getElementById("entryName").value = e.name || "";
   document.getElementById("entryInitials").value = e.initials || "";
-  document.getElementById("entryType").value = e.type || "student";
   document.getElementById("entryCategory").value = e.category || "Academic Excellence";
   document.getElementById("entryBadge").value = e.badge || "";
   document.getElementById("entryMeta").value = e.meta || "";
@@ -486,7 +482,6 @@ window.onclick = function(ev) {
 function clearForm() {
   ["entryName", "entryInitials", "entryBadge", "entryMeta", "entryLine", "entryDesc", "entryHighlights", "entryImage"]
     .forEach(id => { document.getElementById(id).value = ""; });
-  document.getElementById("entryType").value = "student";
   document.getElementById("entryCategory").value = "Academic Excellence";
   document.getElementById("entryFeatured").checked = false;
   document.getElementById("entryImageFile").value = "";
@@ -520,7 +515,7 @@ async function saveEntry() {
     const entryData = {
       name,
       initials: initials.toUpperCase(),
-      type: document.getElementById("entryType").value,
+      type: "student",
       category: document.getElementById("entryCategory").value,
       badge: document.getElementById("entryBadge").value.trim(),
       meta: document.getElementById("entryMeta").value.trim(),

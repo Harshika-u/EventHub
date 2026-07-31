@@ -616,10 +616,10 @@
     left: 14px; bottom: 14px;
     right: 14px;
     display: flex;
-    align-items: flex-end;
-    justify-content: space-between;
-    gap: 8px;
-    color: #fbf9f3;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+    color: #070707;
     transform: translateY(8px);
     opacity: 0;
     transition: transform .4s var(--ease-spring), opacity .4s var(--ease-soft);
@@ -627,7 +627,19 @@
 
 
   .g-card:hover .g-tag { transform: translateY(0); opacity: 1; }
-  .g-tag-label { font-size: 13.5px; font-weight: 500; letter-spacing: 0.01em; }
+  .g-tag-title {
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-size: 16px;
+    letter-spacing: 0.01em;
+    line-height: 1.25;
+  }
+  .g-tag-label {
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    color: rgba(15, 15, 15, 0.78);
+  }
 
 
   .g-stamp {
@@ -635,7 +647,7 @@
     top: 12px; right: 12px;
     padding: 5px 10px;
     border-radius: 999px;
-    background: rgba(241,237,228,0.92);
+    background: rgba(10, 10, 10, 0.92);
     color: var(--brass-deep);
     font-family: 'IBM Plex Mono', monospace;
     font-size: 11px;
@@ -1212,11 +1224,14 @@ const tornDivider = document.querySelector('.torn-divider');
           card.dataset.year = ev.year;
           card.style.animationDelay = (i * 0.07) + 's';
           card.innerHTML = `
-            <img src="${ev.cover}" alt="${ev.tag}">
+            <img src="${ev.cover}" alt="${ev.title}">
             <span class="corner-fold"></span>
             <span class="view-stamp">Open<br>Entry</span>
             <span class="g-stamp">${ev.year}</span>
-            <span class="g-tag"><span class="g-tag-label">${ev.tag}</span></span>
+            <span class="g-tag">
+              <span class="g-tag-title">${ev.title}</span>
+              <span class="g-tag-label">${ev.tag}</span>
+            </span>
           `;
           card.addEventListener('click', () => openEvent(ev.id));
           galleryGrid.appendChild(card);

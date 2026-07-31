@@ -7,6 +7,12 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500&family=IBM+Plex+Mono:wght@500;600&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/style.css">
+<link rel="stylesheet" href="../css/teacher.css">
+
+<!-- Firebase (compat SDK — simplest drop-in for storage uploads) -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-storage-compat.js"></script>
 
 <style>
   /* ==========================================
@@ -48,134 +54,7 @@
 
   ::selection { background: var(--olive); color: var(--cream); }
 
-  /* ==========================================
-     SECTION 0: VAULT / PASSCODE GATE
-     ========================================== */
-  .vault {
-    position: fixed;
-    inset: 0;
-    z-index: 500;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background:
-      radial-gradient(ellipse at 50% 20%, rgba(125,85,34,0.10), transparent 60%),
-      var(--ink);
-    transition: opacity .9s var(--ease-soft), visibility .9s;
-  }
-
-  .vault.unlocked {
-    opacity: 0;
-    visibility: hidden;
-    pointer-events: none;
-  }
-
-  .vault-card {
-    width: min(360px, 88vw);
-    text-align: center;
-    opacity: 0;
-    transform: translateY(18px);
-    animation: fadeUp .8s var(--ease-spring) forwards .15s;
-  }
-
   @keyframes fadeUp { to { opacity:1; transform:translateY(0); } }
-
-  .vault-dial {
-    width: 74px; height: 74px;
-    margin: 0 auto 22px;
-    border-radius: 50%;
-    border: 1.5px solid rgba(251,249,243,0.28);
-    display: flex; align-items: center; justify-content: center;
-    position: relative;
-    animation: dialFloat 5s ease-in-out infinite;
-  }
-
-  @keyframes dialFloat {
-    0%,100% { transform: translateY(0) rotate(0deg); }
-    50% { transform: translateY(-4px) rotate(4deg); }
-  }
-
-  .vault-dial::before,
-  .vault-dial::after {
-    content: "";
-    position: absolute;
-    background: var(--brass-soft);
-  }
-  .vault-dial::before { width: 1px; height: 14px; top: 6px; left: 50%; transform: translateX(-50%); }
-  .vault-dial::after { width: 4px; height: 4px; border-radius: 50%; top: 50%; left: 50%; transform: translate(-50%,-50%); }
-
-  .vault-eyebrow {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 11px;
-    letter-spacing: 0.32em;
-    text-transform: uppercase;
-    color: rgba(251,249,243,0.55);
-  }
-
-  .vault-card h1 {
-    font-family: 'Fraunces', serif;
-    font-weight: 500;
-    font-size: 26px;
-    color: #fbf9f3;
-    margin: 10px 0 26px;
-  }
-
-  .vault-form { position: relative; }
-
-  .vault-input {
-    width: 100%;
-    padding: 15px 18px;
-    border-radius: 12px;
-    border: 1px solid rgba(251,249,243,0.18);
-    background: rgba(251,249,243,0.06);
-    color: #fbf9f3;
-    font-family: 'IBM Plex Mono', monospace;
-    letter-spacing: 0.3em;
-    font-size: 14px;
-    text-align: center;
-    outline: none;
-    transition: border-color .35s var(--ease-soft), background .35s var(--ease-soft);
-  }
-
-  .vault-input:focus { border-color: var(--brass-soft); background: rgba(251,249,243,0.1); }
-  .vault-input::placeholder { color: rgba(251,249,243,0.28); letter-spacing: 0.2em; }
-
-  .vault-card.shake { animation: shakeX .5s var(--ease-soft); }
-  @keyframes shakeX {
-    0%,100% { transform: translateX(0); }
-    20% { transform: translateX(-9px); }
-    40% { transform: translateX(7px); }
-    60% { transform: translateX(-5px); }
-    80% { transform: translateX(3px); }
-  }
-
-  .vault-submit {
-    margin-top: 14px;
-    width: 100%;
-    padding: 13px;
-    border-radius: 12px;
-    border: none;
-    background: var(--brass-soft);
-    color: var(--ink);
-    font-family: 'Poppins', sans-serif;
-    font-weight: 600;
-    font-size: 13px;
-    letter-spacing: 0.04em;
-    cursor: pointer;
-    transition: transform .3s var(--ease-spring), background .3s var(--ease-soft);
-  }
-
-  .vault-submit:hover { transform: translateY(-2px); background: #c99a5f; }
-  .vault-submit:active { transform: scale(.97); }
-
-  .vault-hint {
-    margin-top: 16px;
-    font-size: 11.5px;
-    color: rgba(251,249,243,0.4);
-    letter-spacing: 0.02em;
-  }
-
-  .vault-hint b { color: rgba(251,249,243,0.65); font-weight: 600; }
 
   /* ==========================================
      SECTION 1: TOPBAR
@@ -833,19 +712,27 @@
 </head>
 <body>
 
-  <!-- ================= VAULT / PASSCODE GATE ================= -->
-  <div class="vault" id="vault">
-    <div class="vault-card" id="vaultCard">
-      <div class="vault-dial"></div>
-      <span class="vault-eyebrow">Restricted Access</span>
-      <h1>Archive Desk</h1>
-      <form class="vault-form" id="vaultForm">
-        <input class="vault-input" id="vaultInput" type="password" placeholder="• • • • PASSCODE" autocomplete="off">
-        <button class="vault-submit" type="submit">Unlock Desk</button>
-      </form>
-      <p class="vault-hint">Demo passcode: <b>1902</b></p>
+<div class="dashboard">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div>
+      <h2>EventHub Admin</h2>
+      <p class="admin-email">admin@schoolhub.local</p>
+      <ul class="sidebar-menu">
+        <li onclick="window.location.href='dashboard.html'">Events</li>
+        <li onclick="window.location.href='dashboard.html'">Event Participants</li>
+        <li id="tab-gallery" class="active" onclick="window.location.href='spot_admin.html'">Gallery</li>
+        <li onclick="window.location.href='club_admin.html'">Clubs</li>
+        <li onclick="window.location.href='alumni_admin.html'">Alumni</li>
+        <li onclick="window.location.href='spotlight_admin.html'">Spotlight</li>
+      </ul>
     </div>
+    <button class="logout-btn" onclick="logout()">Logout</button>
   </div>
+
+  <!-- MAIN CONTENT -->
+  <div class="dashboard-main">
 
   <!-- ================= ADMIN SHELL ================= -->
   <div class="admin-shell">
@@ -869,7 +756,7 @@
       </div>
     </div>
 
-    <p class="sync-note" id="syncNote">Photos upload to Cloudinary; entries save live to this browser and appear on the public gallery automatically — as long as both pages are served from the same origin.</p>
+    <p class="sync-note" id="syncNote">Photos upload to Firebase Storage; entries save live to this browser and appear on the public gallery automatically — as long as both pages are served from the same origin.</p>
 
     <div class="workspace">
 
@@ -962,34 +849,35 @@
       <div class="ledger-list" id="ledgerList"></div>
     </div>
 
-  </div>
+  </div><!-- /admin-shell -->
+
+  </div><!-- /dashboard-main -->
+</div><!-- /dashboard -->
 
   <div class="toast-stack" id="toastStack"></div>
 
   <script>
-    // ==========================================
-    // SECTION A: VAULT GATE
-    // ==========================================
-    (function(){
-      const PASSCODE = '1902';
-      const vault = document.getElementById('vault');
-      const vaultCard = document.getElementById('vaultCard');
-      const form = document.getElementById('vaultForm');
-      const input = document.getElementById('vaultInput');
+    function logout() {
+      localStorage.removeItem("admin");
+      window.location.href = "../login.html";
+    }
 
-      form.addEventListener('submit', (e) => {
-        e.preventDefault();
-        if (input.value.trim() === PASSCODE){
-          vault.classList.add('unlocked');
-        } else {
-          vaultCard.classList.remove('shake');
-          void vaultCard.offsetWidth;
-          vaultCard.classList.add('shake');
-          input.value = '';
-          input.focus();
-        }
-      });
-    })();
+    // ==========================================
+    // SECTION A: FIREBASE CONFIG + INIT
+    // ==========================================
+    // Replace these with your actual Firebase project settings
+    // (Firebase console → Project settings → General → Your apps → SDK setup).
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_PROJECT_ID.appspot.com",
+      messagingSenderId: "YOUR_SENDER_ID",
+      appId: "YOUR_APP_ID"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const storage = firebase.storage();
 
     // ==========================================
     // SECTION B: STATE + STORAGE
@@ -1001,30 +889,21 @@
     let draft = { size: 'size-small', cover: '', gallery: [] };
     let editingId = null;
 
-    // --- Cloudinary config ---
-    // Images are uploaded to Cloudinary and only the returned URL (a short
-    // string) is saved to localStorage. This avoids the localStorage size
-    // limit (~5-10MB per origin) that base64-embedded photos would blow past.
-    const CLOUDINARY_CLOUD_NAME = 'danjlladp';
-    const CLOUDINARY_UPLOAD_PRESET = 'EventHub';
+    // --- Firebase Storage upload ---
+    // Images are uploaded to Firebase Storage and only the returned download
+    // URL (a short string) is saved to localStorage. This avoids the
+    // localStorage size limit (~5-10MB per origin) that base64-embedded
+    // photos would blow past.
+    function uid(){
+      return 'e_' + Date.now().toString(36) + Math.random().toString(36).slice(2,7);
+    }
 
-    async function uploadToCloudinary(file){
-      const formData = new FormData();
-      formData.append('file', file);
-      formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
-
-      const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`, {
-        method: 'POST',
-        body: formData
-      });
-
-      if (!res.ok){
-        const errText = await res.text().catch(() => '');
-        throw new Error('Cloudinary upload failed: ' + res.status + ' ' + errText);
-      }
-
-      const data = await res.json();
-      return data.secure_url;
+    async function uploadToFirebase(file){
+      const path = `archive-desk/${Date.now()}_${Math.random().toString(36).slice(2,8)}_${file.name}`;
+      const ref = storage.ref().child(path);
+      const snapshot = await ref.put(file);
+      const url = await snapshot.ref.getDownloadURL();
+      return url;
     }
 
     function persist(){
@@ -1035,10 +914,6 @@
         showToast('Storage save failed — try removing an entry or a photo');
         return false;
       }
-    }
-
-    function uid(){
-      return 'e_' + Date.now().toString(36) + Math.random().toString(36).slice(2,7);
     }
 
     // ==========================================
@@ -1080,15 +955,6 @@
     // ==========================================
     // SECTION E: DROPZONES (cover + gallery)
     // ==========================================
-    function fileToDataURL(file){
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => resolve(reader.result);
-        reader.onerror = reject;
-        reader.readAsDataURL(file);
-      });
-    }
-
     function setDropzoneBusy(zoneEl, busy, label){
       const titleEl = zoneEl.querySelector('.dz-title');
       if (!titleEl) return;
@@ -1131,14 +997,14 @@
 
       setDropzoneBusy(coverDrop, true, 'Uploading cover…');
       try {
-        const url = await uploadToCloudinary(file);
+        const url = await uploadToFirebase(file);
         draft.cover = url;
         coverImg.src = url;
         coverPreview.classList.add('show');
         updatePreview();
       } catch(err){
         console.error(err);
-        showToast('Cover upload failed — check Cloudinary settings');
+        showToast('Cover upload failed — check Firebase settings');
       } finally {
         setDropzoneBusy(coverDrop, false);
       }
@@ -1178,7 +1044,7 @@
 
       for (const file of arr){
         try {
-          const url = await uploadToCloudinary(file);
+          const url = await uploadToFirebase(file);
           draft.gallery.push(url);
           renderThumbs();
         } catch(err){
