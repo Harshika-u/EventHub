@@ -23,6 +23,11 @@
     background: linear-gradient(135deg,#7c3aed,#6366f1);
     color: white; font-size: 20px; font-weight: 800;
     display: flex; align-items: center; justify-content: center;
+    overflow: hidden;
+  }
+  .spot-admin-featured-avatar img,
+  .spot-admin-card-avatar img {
+    width: 100%; height: 100%; object-fit: cover; border-radius: inherit;
   }
   .spot-admin-featured-body { flex: 1; }
   .spot-admin-featured-eyebrow {
@@ -38,6 +43,7 @@
     background: linear-gradient(135deg,#6366f1,#8b5cf6);
     color: white; font-size: 16px; font-weight: 800;
     display: flex; align-items: center; justify-content: center;
+    overflow: hidden;
   }
   .spot-admin-pill {
     display: inline-block; font-size: 11px; font-weight: 700; padding: 3px 9px;
@@ -48,15 +54,39 @@
   .spot-admin-pill.featured-on { background: #fef3c7; color: #92400e; }
 
   .spot-admin-highlights-hint { font-size: 12px; color: #94a3b8; margin-top: 4px; }
-  .spot-admin-filters { display: flex; gap: 8px; margin-bottom: 18px; flex-wrap: wrap; }
-  .spot-admin-filter {
-    padding: 7px 16px; border-radius: 999px; border: 1px solid #e2e8f0; background: white;
-    font-size: 13px; font-weight: 600; color: #64748b; cursor: pointer; transition: all .2s;
-  }
-  .spot-admin-filter:hover { background: #f1f5f9; }
-  .spot-admin-filter.active { background: #1e293b; border-color: #1e293b; color: white; }
 
   .modal-content textarea#entryHighlights { height: 100px; }
+
+  /* ── HERO IMAGE CARD ── */
+  .spot-admin-hero-card {
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    padding: 20px 22px;
+    display: flex;
+    gap: 18px;
+    align-items: flex-start;
+    margin-bottom: 20px;
+  }
+  .spot-admin-hero-preview {
+    width: 140px; height: 78px; border-radius: 10px; flex-shrink: 0; overflow: hidden;
+    background: #0f172a; display: flex; align-items: center; justify-content: center;
+    font-size: 11px; color: #94a3b8; text-align: center;
+  }
+  .spot-admin-hero-preview img { width: 100%; height: 100%; object-fit: cover; }
+  .spot-admin-hero-fields { flex: 1; }
+  .spot-admin-hero-fields label { display: block; font-size: 12.5px; font-weight: 700; color: #475569; margin-bottom: 8px; }
+  .spot-admin-hero-fields .save-btn { margin-top: 10px; padding: 10px 20px; font-size: 13px; }
+
+  /* ── IMAGE UPLOAD (student photo — Cloudinary, same account/preset as Clubs) ── */
+  .image-field { display:flex; gap:10px; align-items:center; }
+  .image-field input[type=url] { flex:1; }
+  .upload-btn {
+    background:#eff6ff; color:#3b82f6; border:1px solid #bfdbfe; border-radius:9px; padding:10px 14px;
+    font-size:13px; font-weight:700; cursor:pointer; white-space:nowrap; flex-shrink:0;
+  }
+  .upload-btn:hover { background:#dbeafe; }
+  .upload-status { font-size:12px; color:#64748b; margin-top:6px; display:block; min-height:16px; }
 </style>
 </head>
 <body>
@@ -88,17 +118,24 @@
       <button class="add-btn" onclick="openAddEntry()">Add Entry</button>
     </div>
 
+    <!-- HERO BACKGROUND IMAGE (Spotlight page banner) -->
+    <div class="spot-admin-hero-card" id="heroCard">
+      <div class="spot-admin-hero-preview" id="heroPreview">No image set</div>
+      <div class="spot-admin-hero-fields">
+        <label>Spotlight page banner</label>
+        <div class="image-field">
+          <input type="url" id="heroImageUrl" placeholder="https://... or click Upload">
+          <button type="button" class="upload-btn" onclick="document.getElementById('heroImageFile').click()">Upload</button>
+          <input type="file" id="heroImageFile" accept="image/*" style="display:none">
+        </div>
+        <span class="upload-status" id="heroImageStatus"></span>
+        <button class="save-btn" id="heroSaveBtn" onclick="saveHeroImage()">Save Hero Image</button>
+      </div>
+    </div>
+
     <!-- CURRENT FEATURED PREVIEW -->
     <div class="spot-admin-featured" id="featuredPreview">
       <p class="spot-admin-featured-empty">No featured entry set yet — mark one entry "Featured" below.</p>
-    </div>
-
-    <!-- TYPE FILTERS -->
-    <div class="spot-admin-filters" id="spotFilters">
-      <button class="spot-admin-filter active" data-filter="all">All</button>
-      <button class="spot-admin-filter" data-filter="student">Current Students</button>
-      <button class="spot-admin-filter" data-filter="alumni">Alumni</button>
-      <button class="spot-admin-filter" data-filter="faculty">Faculty</button>
     </div>
 
     <div class="events-container" id="entriesContainer">
@@ -123,20 +160,19 @@
         <input id="entryName" type="text" placeholder="e.g. Aarav Sharma">
       </div>
       <div>
-        <label>Initials (shown on avatar)</label>
+        <label>Initials (shown on image if no photo)</label>
         <input id="entryInitials" type="text" maxlength="3" placeholder="e.g. AS">
       </div>
     </div>
 
-    <div class="form-row">
-      <div>
-        <label>Type</label>
-        <select id="entryType">
-          <option value="student">Current Student</option>
-          <option value="alumni">Alumni</option>
-          <option value="faculty">Faculty</option>
-        </select>
-      </div>
+    <label>Student Photo (optional — falls back to initials if left blank)</label>
+    <div class="image-field">
+      <input type="url" id="entryImage" placeholder="https://... or click Upload">
+      <button type="button" class="upload-btn" onclick="document.getElementById('entryImageFile').click()">Upload</button>
+      <input type="file" id="entryImageFile" accept="image/*" style="display:none">
+    </div>
+    <span class="upload-status" id="entryImageStatus"></span>
+
       <div>
         <label>Category</label>
         <select id="entryCategory">
@@ -149,11 +185,11 @@
 
     <div class="form-row">
       <div>
-        <label>Badge (avatar tag)</label>
+        <label>Batch</label>
         <input id="entryBadge" type="text" placeholder="e.g. Class of 2027">
       </div>
       <div>
-        <label>Meta (modal subtitle, optional)</label>
+        <label>Grade(optional)</label>
         <input id="entryMeta" type="text" placeholder="e.g. Class 10 - A">
       </div>
     </div>
@@ -164,9 +200,9 @@
     <label>Story</label>
     <textarea id="entryDesc" placeholder="Full write-up shown in the modal / featured banner..."></textarea>
 
-    <label>Achievement Highlights</label>
+    <label>Achievement Highlights (optional)</label>
     <textarea id="entryHighlights" placeholder="One highlight per line, e.g.&#10;Gold Medal - National Science Olympiad 2026&#10;Selected for national research mentorship program"></textarea>
-    <p class="spot-admin-highlights-hint">One achievement per line — each becomes a bullet under "🏅 Achievement Highlights".</p>
+    <p class="spot-admin-highlights-hint">Optional — one achievement per line. Leave blank to hide the "🏅 Achievement Highlights" block entirely on the public page.</p>
 
     <div style="display:flex; align-items:center; gap:8px; margin-top:16px;">
       <input type="checkbox" id="entryFeatured" style="width:auto;">
@@ -180,7 +216,7 @@
 <!-- FIREBASE -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-  import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, updateDoc, query, where } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+  import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, updateDoc, getDoc, setDoc, query, where } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyDMkDxml0p9zUp6gZuo1SeVhmQ3BZamy9o",
@@ -195,7 +231,95 @@
   const db = getFirestore(app);
 
   window.db = db;
-  window.firebaseFns = { collection, addDoc, getDocs, deleteDoc, doc, updateDoc, query, where };
+  window.firebaseFns = { collection, addDoc, getDocs, deleteDoc, doc, updateDoc, getDoc, setDoc, query, where };
+
+  /* ── HERO IMAGE (site-wide setting, stored separately from the Hall of
+     Fame entries so it doesn't show up in the entries list) — lives at
+     spotlightSettings/hero, field "heroImage". ── */
+  function updateHeroPreview(url) {
+    const preview = document.getElementById("heroPreview");
+    preview.innerHTML = url ? `<img src="${url}" alt="hero preview">` : "No image set";
+  }
+
+  async function loadHeroImage() {
+    try {
+      const snap = await getDoc(doc(db, "spotlightSettings", "hero"));
+      const url = snap.exists() ? (snap.data().heroImage || "") : "";
+      document.getElementById("heroImageUrl").value = url;
+      updateHeroPreview(url);
+    } catch (err) {
+      console.error("Failed to load hero image:", err);
+    }
+  }
+
+  window.saveHeroImage = async function () {
+    const btn = document.getElementById("heroSaveBtn");
+    const url = document.getElementById("heroImageUrl").value.trim();
+    btn.disabled = true;
+    btn.innerText = "Saving...";
+    try {
+      await setDoc(doc(db, "spotlightSettings", "hero"), { heroImage: url }, { merge: true });
+      updateHeroPreview(url);
+      btn.innerText = "Saved ✓";
+      setTimeout(() => { btn.innerText = "Save Hero Image"; }, 1500);
+    } catch (err) {
+      console.error(err);
+      alert("Failed to save hero image: " + err.message);
+      btn.innerText = "Save Hero Image";
+    } finally {
+      btn.disabled = false;
+    }
+  };
+
+  /* ── IMAGE UPLOAD (Cloudinary — same account/preset used for Clubs) ── */
+  const CLOUDINARY_CLOUD  = "danjlladp";
+  const CLOUDINARY_PRESET = "EventHub";
+
+  async function uploadImageToCloudinary(file) {
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("upload_preset", CLOUDINARY_PRESET);
+    const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD}/image/upload`, {
+      method: "POST",
+      body: formData
+    });
+    const data = await res.json();
+    if (!data.secure_url) throw new Error("Upload failed");
+    return data.secure_url;
+  }
+
+  document.getElementById("entryImageFile").addEventListener("change", async () => {
+    const fileInput = document.getElementById("entryImageFile");
+    const urlInput  = document.getElementById("entryImage");
+    const status    = document.getElementById("entryImageStatus");
+    const file = fileInput.files[0];
+    if (!file) return;
+    status.innerText = "Uploading...";
+    try {
+      urlInput.value = await uploadImageToCloudinary(file);
+      status.innerText = "Uploaded ✓";
+    } catch (err) {
+      console.error(err);
+      status.innerText = "Upload failed — try again.";
+    }
+  });
+
+  document.getElementById("heroImageFile").addEventListener("change", async () => {
+    const fileInput = document.getElementById("heroImageFile");
+    const urlInput  = document.getElementById("heroImageUrl");
+    const status    = document.getElementById("heroImageStatus");
+    const file = fileInput.files[0];
+    if (!file) return;
+    status.innerText = "Uploading...";
+    try {
+      urlInput.value = await uploadImageToCloudinary(file);
+      updateHeroPreview(urlInput.value);
+      status.innerText = "Uploaded ✓ — click Save Hero Image to publish.";
+    } catch (err) {
+      console.error(err);
+      status.innerText = "Upload failed — try again.";
+    }
+  });
 
   window.onload = () => {
     if (localStorage.getItem("admin") !== "true") {
@@ -203,6 +327,7 @@
       return;
     }
     loadEntries();
+    loadHeroImage();
   };
 </script>
 
@@ -210,23 +335,12 @@
 let entries = [];
 let entryIds = [];
 let editIndex = -1;
-let activeFilter = "all";
 
 /* ── LOGOUT ── */
 function logout() {
   localStorage.removeItem("admin");
   window.location.href = "../login.html";
 }
-
-/* ── FILTER TABS ── */
-document.getElementById("spotFilters").addEventListener("click", (e) => {
-  const btn = e.target.closest(".spot-admin-filter");
-  if (!btn) return;
-  document.querySelectorAll(".spot-admin-filter").forEach(b => b.classList.remove("active"));
-  btn.classList.add("active");
-  activeFilter = btn.dataset.filter;
-  renderEntries();
-});
 
 /* ── LOAD ENTRIES FROM FIREBASE ── */
 async function loadEntries() {
@@ -258,6 +372,14 @@ async function loadEntries() {
   }
 }
 
+/* ── AVATAR HELPER (photo if present, else initials) ── */
+function avatarInnerHtml(e) {
+  if (e.image) {
+    return `<img src="${escapeHtml(e.image)}" alt="${escapeHtml(e.name || "")}">`;
+  }
+  return escapeHtml(e.initials || "");
+}
+
 /* ── FEATURED PREVIEW ── */
 function renderFeaturedPreview() {
   const box = document.getElementById("featuredPreview");
@@ -269,7 +391,7 @@ function renderFeaturedPreview() {
   }
 
   box.innerHTML = `
-    <div class="spot-admin-featured-avatar">${escapeHtml(featured.initials || "")}</div>
+    <div class="spot-admin-featured-avatar">${avatarInnerHtml(featured)}</div>
     <div class="spot-admin-featured-body">
       <div class="spot-admin-featured-eyebrow">Currently Featured &middot; ${escapeHtml(featured.category || "")}</div>
       <div class="spot-admin-featured-name">${escapeHtml(featured.name || "")}</div>
@@ -281,20 +403,17 @@ function renderFeaturedPreview() {
 /* ── RENDER ENTRY CARDS ── */
 function renderEntries() {
   const container = document.getElementById("entriesContainer");
-  const visible = entries
-    .map((e, i) => ({ e, i }))
-    .filter(({ e }) => activeFilter === "all" || e.type === activeFilter);
 
-  if (visible.length === 0) {
+  if (entries.length === 0) {
     container.innerHTML = '<p class="loading-text">No entries yet. Click "Add Entry" to create one.</p>';
     return;
   }
 
-  container.innerHTML = visible.map(({ e, i }) => {
+  container.innerHTML = entries.map((e, i) => {
     const typeLabel = e.type === "alumni" ? "Alumni" : e.type === "faculty" ? "Faculty" : "Current Student";
     return `
     <div class="admin-event-card">
-      <div class="spot-admin-card-avatar">${escapeHtml(e.initials || "")}</div>
+      <div class="spot-admin-card-avatar">${avatarInnerHtml(e)}</div>
       <div class="event-info">
         <h3>${escapeHtml(e.name || "")}</h3>
         <span>
@@ -347,6 +466,10 @@ function openEditEntry(index) {
   document.getElementById("entryHighlights").value = (e.highlights || []).join("\n");
   document.getElementById("entryFeatured").checked = !!e.featured;
 
+  document.getElementById("entryImageFile").value = "";
+  document.getElementById("entryImage").value = e.image || "";
+  document.getElementById("entryImageStatus").innerText = "";
+
   editIndex = index;
 }
 
@@ -361,11 +484,13 @@ window.onclick = function(ev) {
 
 /* ── CLEAR FORM ── */
 function clearForm() {
-  ["entryName", "entryInitials", "entryBadge", "entryMeta", "entryLine", "entryDesc", "entryHighlights"]
+  ["entryName", "entryInitials", "entryBadge", "entryMeta", "entryLine", "entryDesc", "entryHighlights", "entryImage"]
     .forEach(id => { document.getElementById(id).value = ""; });
   document.getElementById("entryType").value = "student";
   document.getElementById("entryCategory").value = "Academic Excellence";
   document.getElementById("entryFeatured").checked = false;
+  document.getElementById("entryImageFile").value = "";
+  document.getElementById("entryImageStatus").innerText = "";
 }
 
 /* ── SAVE ENTRY ── */
@@ -387,6 +512,11 @@ async function saveEntry() {
 
     const featured = document.getElementById("entryFeatured").checked;
 
+    // The photo (if any) was already uploaded to Cloudinary the moment the
+    // file was picked — entryImage just holds the resulting URL (or a
+    // manually pasted one). Nothing left to upload here.
+    const imageUrl = document.getElementById("entryImage").value.trim();
+
     const entryData = {
       name,
       initials: initials.toUpperCase(),
@@ -397,6 +527,7 @@ async function saveEntry() {
       line: document.getElementById("entryLine").value.trim(),
       desc: document.getElementById("entryDesc").value.trim(),
       highlights,
+      image: imageUrl,
       featured,
       createdAt: editIndex === -1 ? Date.now() : (entries[editIndex].createdAt || Date.now())
     };

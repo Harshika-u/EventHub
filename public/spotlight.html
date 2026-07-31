@@ -5,6 +5,150 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Spotlight — Johnson Grammar School - ISC</title>
 <link rel="stylesheet" href="css/public.css">
+<style>
+  /* ── Hero marquee sizing bump (kept local so public.css stays untouched) ──
+     Enlarges both the scrolling word text and the band height/padding for
+     the top and bottom marquee strips on the hero. Scoped under .spot-hero
+     so it wins over any base .spot-marquee rules already in public.css. */
+  .spot-hero .spot-marquee-top,
+  .spot-hero .spot-marquee-bottom {
+    padding: 26px 0;
+  }
+  .spot-hero .spot-marquee-track {
+    display: flex;
+    align-items: center;
+    gap: 44px;
+  }
+  .spot-hero .spot-marquee-track span {
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: .14em;
+    white-space: nowrap;
+  }
+
+  /* ── Hall of Fame card redesign (kept local so public.css stays untouched) ──
+     Large photo-forward card: photo fills the card, a bottom gradient carries
+     the name/meta/"Read More", with badge + category as floating pills over
+     the photo. Scoped under #hall-of-fame so it wins over any base .hof-card
+     rules already in public.css without needing !important. */
+  #hall-of-fame .hof-card {
+    position: relative;
+    width: 280px;
+    flex-shrink: 0;
+    border-radius: 20px;
+    overflow: hidden;
+    cursor: pointer;
+    background: #0f172a;
+    box-shadow: 0 14px 34px rgba(15, 23, 42, 0.16);
+    transition: transform .25s ease, box-shadow .25s ease;
+  }
+  #hall-of-fame .hof-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 44px rgba(15, 23, 42, 0.22);
+  }
+  #hall-of-fame .hof-card-photo {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 3 / 4;
+    overflow: hidden;
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  }
+  #hall-of-fame .hof-card-photo > img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  #hall-of-fame .hof-card-initials {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 56px;
+    font-weight: 800;
+    letter-spacing: .02em;
+  }
+  #hall-of-fame .hof-card-photo-gradient {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      to top,
+      rgba(15, 23, 42, 0.94) 0%,
+      rgba(15, 23, 42, 0.62) 32%,
+      rgba(15, 23, 42, 0.05) 62%,
+      rgba(15, 23, 42, 0) 75%
+    );
+    pointer-events: none;
+  }
+  #hall-of-fame .hof-card-badge {
+    position: absolute;
+    top: 14px;
+    left: 14px;
+    background: rgba(255, 255, 255, 0.94);
+    color: #0f172a;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 999px;
+    max-width: calc(100% - 90px);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  #hall-of-fame .hof-card-category {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    background: rgba(15, 23, 42, 0.55);
+    color: #fff;
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    font-size: 10.5px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    padding: 4px 10px;
+    border-radius: 999px;
+    max-width: 46%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  #hall-of-fame .hof-card-text {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    padding: 18px 18px 16px;
+    color: #fff;
+  }
+  #hall-of-fame .hof-card-name {
+    font-size: 18px;
+    font-weight: 800;
+    color: #fff;
+    margin: 0 0 3px;
+    line-height: 1.25;
+  }
+  #hall-of-fame .hof-card-meta {
+    display: block;
+    font-size: 12.5px;
+    color: rgba(255, 255, 255, 0.78);
+    margin-bottom: 10px;
+  }
+  #hall-of-fame .hof-card-readmore {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12.5px;
+    font-weight: 700;
+    color: #fff;
+  }
+  #hall-of-fame .hof-card:hover .hof-card-readmore {
+    text-decoration: underline;
+  }
+</style>
 </head>
 <body class="jgs-public">
 
@@ -42,11 +186,11 @@
   </div>
 </section>
 
-<!-- FEATURED SPOTLIGHT (populated live from Firestore by public.js) -->
-<section class="spot-featured reveal">
+<!-- FEATURED SPOTLIGHT (populated from Firestore — hidden until a featured entry exists) -->
+<section class="spot-featured reveal" id="featuredSection">
   <div class="spot-featured-inner">
     <div class="spot-featured-avatar zoom-hover" id="featuredAvatar">
-      <img id="featuredImage" src="" alt="" style="display:none;">
+      <span id="featuredInitials">—</span>
       <div class="spot-featured-badge" id="featuredBadge"></div>
     </div>
     <div class="spot-featured-content">
@@ -81,7 +225,7 @@
     <div class="hof-carousel">
       <button class="hof-arrow prev" id="hofPrev" aria-label="Previous">‹</button>
       <div class="hof-viewport" id="hofViewport">
-        <div class="hof-track" id="hofTrack"><!-- injected by public.js from Firestore --></div>
+        <div class="hof-track" id="hofTrack"><p class="loading-text">Loading Hall of Fame…</p></div>
       </div>
       <button class="hof-arrow next" id="hofNext" aria-label="Next">›</button>
     </div>
@@ -105,7 +249,7 @@
       <p id="modalLine"></p>
     </div>
     <div class="hof-modal-body" id="modalBody"></div>
-    <div class="hof-modal-highlights" id="modalHighlightsBlock">
+    <div class="hof-modal-highlights">
       <div class="hof-modal-highlights-label">🏅 Achievement Highlights</div>
       <ul id="modalHighlights"></ul>
     </div>
@@ -157,5 +301,67 @@
 </footer>
 
 <script src="js/public.js"></script>
+
+<!-- FIREBASE (read-only fetch — pulls live Spotlight / Hall of Fame data from the
+     same "spotlight" collection the admin dashboard writes to) -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+  import { getFirestore, collection, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyDMkDxml0p9zUp6gZuo1SeVhmQ3BZamy9o",
+    authDomain: "eventhub-8a8dc.firebaseapp.com",
+    projectId: "eventhub-8a8dc",
+    storageBucket: "eventhub-8a8dc.firebasestorage.app",
+    messagingSenderId: "450946542344",
+    appId: "1:450946542344:web:e54c332ca5bf2358d01abd"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  // Admin-set hero background (Spotlight admin → Hero Background Image).
+  // Falls back to whatever's already in the --spot-hero-image inline style
+  // (or the plain navy background) if no admin image has been set yet.
+  async function loadHeroImage() {
+    try {
+      const snap = await getDoc(doc(db, "spotlightSettings", "hero"));
+      const url = snap.exists() ? snap.data().heroImage : "";
+      if (url) {
+        const heroSection = document.querySelector(".spot-hero");
+        if (heroSection) heroSection.style.setProperty("--spot-hero-image", `url('${url}')`);
+      }
+    } catch (err) {
+      console.error("Failed to load hero image:", err);
+    }
+  }
+
+  async function loadSpotlightData() {
+    try {
+      const snapshot = await getDocs(collection(db, "spotlight"));
+      const entries = [];
+      snapshot.forEach(docSnap => entries.push({ id: docSnap.id, ...docSnap.data() }));
+
+      // newest first
+      entries.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+
+      window.__jgsHallOfFame = entries;
+      window.__jgsFeatured = entries.find(e => e.featured) || null;
+    } catch (err) {
+      console.error("Failed to load Spotlight data:", err);
+      window.__jgsHallOfFame = [];
+      window.__jgsFeatured = null;
+    } finally {
+      // public.js exposes these once the DOM is ready
+      window.renderFeaturedSpotlight && window.renderFeaturedSpotlight();
+      window.initHallOfFame && window.initHallOfFame();
+    }
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    loadSpotlightData();
+    loadHeroImage();
+  });
+</script>
 </body>
 </html>

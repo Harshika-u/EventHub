@@ -613,7 +613,7 @@
     overflow: hidden;
     background: #ddd;
     box-shadow: var(--shadow-deep);
-    transition: transform .5s var(--ease-spring);
+    transition: transform .5s var(--ease-spring), width .4s var(--ease-spring), height .4s var(--ease-spring);
   }
 
   .preview-card:hover { transform: translateY(-4px) scale(1.01); }
@@ -1204,11 +1204,25 @@
     const fTag = document.getElementById('fTag');
     const fYear = document.getElementById('fYear');
 
+    // Approximate on-screen proportions for each grid size, so the preview
+    // card's shape actually changes when Small/Wide/Tall/Big is picked
+    // (mirrors the column/row spans used in the public gallery-grid).
+    const PREVIEW_SIZE_DIMENSIONS = {
+      'size-small': { width: 220, height: 220 },
+      'size-wide':  { width: 320, height: 200 },
+      'size-tall':  { width: 190, height: 320 },
+      'size-big':   { width: 320, height: 300 }
+    };
+
     function updatePreview(){
       const hasContent = draft.cover || fTitle.value.trim();
       previewEmpty.style.display = hasContent ? 'none' : 'flex';
       previewCard.style.display = hasContent ? 'block' : 'none';
       if (!hasContent) return;
+
+      const dims = PREVIEW_SIZE_DIMENSIONS[draft.size] || PREVIEW_SIZE_DIMENSIONS['size-small'];
+      previewCard.style.width = dims.width + 'px';
+      previewCard.style.height = dims.height + 'px';
 
       previewImg.src = draft.cover || '';
       previewImg.style.background = draft.cover ? '' : '#ddd';

@@ -151,68 +151,38 @@ document.addEventListener('DOMContentLoaded', () => {
 
 /* ══════════════════════════════════════════
    SPOTLIGHT / HALL OF FAME
-   Dummy data for now — wire to Firestore "spotlight" or
-   "achievements" collection later, same as home.html's
-   spotlight strip and countdown.
+   Live data — populated from the Firestore "spotlight" collection by the
+   module script in spotlight.html, which sets window.__jgsHallOfFame and
+   window.__jgsFeatured once the fetch resolves, then calls
+   window.renderFeaturedSpotlight() and window.initHallOfFame() again.
    Categories are limited to: Academic Excellence, Sports, Cultural.
    ══════════════════════════════════════════ */
-window.__jgsHallOfFame = [
-  { id: 1, initials: "PM", name: "Priya Menon", type: "student", meta: "Batch of 2023", line: "National Debate Champion",
-    category: "Cultural",
-    body: "Priya represented Ashford Hall at the National Inter-School Debate Championship, where she spoke on the ethics of artificial intelligence before a panel of sitting judges. Her final address was described by the moderating adjudicator as \u201cthe finest piece of student oratory in the competition's thirty-year history.\u201d\n\nShe now studies Law and returns each summer to coach the school's debate society.",
-    highlights: ["National Debate Champion", "Best Speaker, 3 consecutive years"] },
+window.__jgsHallOfFame = window.__jgsHallOfFame || [];
 
-  { id: 2, initials: "RK", name: "Rohan Kapoor", type: "student", meta: "Grade 12", line: "State Swimming Gold — 200m Freestyle",
-    category: "Sports",
-    body: "Rohan trains before dawn six days a week. His state gold in the 200m freestyle came with a new meet record, breaking a mark that had stood for eleven years.\n\nHe has been shortlisted for the national junior squad and balances his training with a place on the school's academic honour roll.",
-    highlights: ["State record, 200m freestyle", "National junior squad shortlist"] },
+/* Small helper — every piece of text below ultimately comes from admin-entered
+   data, so anything going into innerHTML gets escaped. */
+function escapeHtml(str) {
+  return String(str == null ? '' : str).replace(/[&<>"']/g, m => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+  }[m]));
+}
 
-  { id: 3, initials: "MK", name: "Dr. Meera Krishnan", type: "faculty", meta: "Faculty, Department of Physics", line: "National Award for Excellence in Teaching",
-    category: "Academic Excellence",
-    body: "Dr. Krishnan redesigned the senior physics lab around student-led inquiry, replacing prescribed experiments with open research questions. The approach has since been adopted by two neighbouring schools.\n\nShe was recognised with the National Award for Excellence in Teaching for her contribution to science pedagogy.",
-    highlights: ["National Award for Excellence in Teaching", "Lab curriculum adopted by 2 partner schools"] },
+/* Builds the avatar markup for a Hall of Fame item — a photo if one was
+   uploaded, otherwise the initials. */
+function hofAvatarHTML(item, extra) {
+  if (item && item.image) {
+    return `<img src="${escapeHtml(item.image)}" alt="${escapeHtml(item.name || '')}" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;display:block;">`;
+  }
+  return `<span>${escapeHtml((item && item.initials) || '')}</span>${extra || ''}`;
+}
 
-  { id: 4, initials: "IV", name: "Ishaan Verma", type: "alumni", meta: "Batch of 2021", line: "Founder, EdTech Startup — $2M Seed Round",
-    category: "Academic Excellence",
-    body: "Ishaan founded his EdTech startup in his final year at Ashford Hall, building the first prototype in the school's computer lab. The company closed a $2M seed round and now serves classrooms across three states.\n\nHe credits the school's entrepreneurship elective for the original idea.",
-    highlights: ["Founder & CEO, EdTech startup", "$2M seed round closed 2025"] },
-
-  { id: 5, initials: "ST", name: "Sara Thomas", type: "alumni", meta: "Batch of 2020", line: "Rhodes Scholar, University of Oxford",
-    category: "Academic Excellence",
-    body: "Sara was named a Rhodes Scholar and is currently reading for a master's degree at the University of Oxford, focusing on international development economics.\n\nShe remains active in the school's alumni mentorship programme, advising current students on university applications.",
-    highlights: ["Rhodes Scholarship, 2023", "MSc candidate, University of Oxford"] },
-
-  { id: 6, initials: "KM", name: "Kabir Malhotra", type: "student", meta: "Grade 12", line: "Head Boy — Model UN Secretary-General",
-    category: "Cultural",
-    body: "As Head Boy, Kabir has led the student council through a full year of campus initiatives, and served as Secretary-General at the school's largest-ever Model UN conference, hosting delegates from twelve schools.\n\nHe plans to study international relations.",
-    highlights: ["Head Boy, 2025\u201326", "Secretary-General, Ashford MUN"] },
-
-  { id: 7, initials: "ED", name: "Mrs. Elena D'Souza", type: "faculty", meta: "Faculty, Department of English", line: "Published Novelist — National Book Prize Shortlist",
-    category: "Cultural",
-    body: "Mrs. D'Souza's debut novel was shortlisted for the National Book Prize this year, praised by critics for its portrayal of small-town adolescence.\n\nShe runs the school's creative writing circle, which has placed students in three national anthologies.",
-    highlights: ["National Book Prize shortlist", "Creative writing circle: 3 national anthology placements"] },
-
-  { id: 8, initials: "TM", name: "Mr. Thomas Mathew", type: "faculty", meta: "Faculty, Department of Mathematics", line: "30 Years of Distinguished Service",
-    category: "Cultural",
-    body: "Mr. Mathew marks three decades on the mathematics faculty this year, having taught nearly every student to pass through the senior wing since the school's early days.\n\nHis annual \u201cmath circle\u201d elective remains one of the most oversubscribed on campus.",
-    highlights: ["30 years of service", "Math Circle: oversubscribed every year since 2011"] },
-];
-
-const JGS_FEATURED_SPOTLIGHT = {
-  initials: "AS", name: "Aarav Sharma", meta: "Class of 2027", line: "National Science Olympiad Gold Medalist",
-  category: "Academic Excellence",
-  body: "From late nights in the school laboratory to the national podium, Aarav's journey is testament to curiosity disciplined by perseverance. His gold medal at the National Science Olympiad places him among the country's finest \u2014 and marks the latest in a growing line of school achievements earned through original, self-directed research.\n\nWhat distinguishes Aarav's achievement is not the medal itself, but what followed. He returned to Ashford Hall and founded the Junior Research Circle, a student-led society that now mentors dozens of younger students in scientific method and independent inquiry.",
-  highlights: ["National Science Olympiad Gold Medalist", "Founder, Junior Research Circle"]
-};
-
-/* ── HALL OF FAME: horizontal carousel with filters, category select,
+/* ── HALL OF FAME: horizontal carousel with category select,
    arrow navigation, autoplay, and pause-on-hover/touch ── */
 function initHallOfFame() {
   const viewport = document.getElementById('hofViewport');
   const track = document.getElementById('hofTrack');
   if (!track) return;
 
-  const filterBtns = Array.from(document.querySelectorAll('.hof-filter'));
   const categorySelect = document.getElementById('hofCategorySelect');
   const prevBtn = document.getElementById('hofPrev');
   const nextBtn = document.getElementById('hofNext');
@@ -220,8 +190,7 @@ function initHallOfFame() {
   const CLONE_COUNT = 4;     // leading cards cloned onto the end for a seamless loop
   const AUTOPLAY_MS = 3200;  // time between auto-advances
 
-  let activeFilter = 'all';
-  let activeCategory = 'all';
+  let activeCategory = categorySelect ? categorySelect.value : 'all';
   let items = [];
   let index = 0;
   let cardStep = 0;
@@ -229,28 +198,36 @@ function initHallOfFame() {
   let isPaused = false;
 
   function getFiltered() {
-    return window.__jgsHallOfFame.filter(item => {
-      const typeMatch = activeFilter === 'all' || item.type === activeFilter;
-      const catMatch = activeCategory === 'all' || item.category === activeCategory;
-      return typeMatch && catMatch;
+    return (window.__jgsHallOfFame || []).filter(item => {
+      return activeCategory === 'all' || item.category === activeCategory;
     });
   }
 
   function cardHTML(item) {
+    const photoInner = item.image
+      ? `<img src="${escapeHtml(item.image)}" alt="${escapeHtml(item.name || '')}">`
+      : `<div class="hof-card-initials">${escapeHtml(item.initials || '')}</div>`;
+
     return `
-      <div class="hof-card" data-id="${item.id}">
-        <div class="hof-card-avatar"><span>${item.initials}</span></div>
-        <h3 class="hof-card-name">${item.name}</h3>
-        <span class="hof-card-meta">${item.meta}</span>
-        <p class="hof-card-line">${item.line}</p>
-        <span class="hof-tag">${item.category}</span>
+      <div class="hof-card" data-id="${escapeHtml(item.id)}">
+        <div class="hof-card-photo">
+          ${photoInner}
+          <div class="hof-card-photo-gradient"></div>
+          ${item.badge ? `<span class="hof-card-badge">${escapeHtml(item.badge)}</span>` : ""}
+          ${item.category ? `<span class="hof-card-category">${escapeHtml(item.category)}</span>` : ""}
+          <div class="hof-card-text">
+            <h3 class="hof-card-name">${escapeHtml(item.name)}</h3>
+            ${item.meta ? `<span class="hof-card-meta">${escapeHtml(item.meta)}</span>` : ""}
+            <span class="hof-card-readmore">Read More →</span>
+          </div>
+        </div>
       </div>`;
   }
 
   function attachCardEvents() {
     track.querySelectorAll('.hof-card').forEach(card => {
       card.addEventListener('click', () => {
-        const item = window.__jgsHallOfFame.find(i => i.id === Number(card.dataset.id));
+        const item = (window.__jgsHallOfFame || []).find(i => String(i.id) === card.dataset.id);
         if (item) openHofModal(item);
       });
     });
@@ -281,8 +258,8 @@ function initHallOfFame() {
     if (!items.length) {
       track.innerHTML = `<p style="color:var(--slate-light);font-size:14px;">No achievements in this category yet.</p>`;
       track.style.transform = 'translateX(0)';
-      prevBtn.disabled = true;
-      nextBtn.disabled = true;
+      if (prevBtn) prevBtn.disabled = true;
+      if (nextBtn) nextBtn.disabled = true;
       return;
     }
 
@@ -290,8 +267,8 @@ function initHallOfFame() {
     track.innerHTML = items.map(cardHTML).join('') + clones.map(cardHTML).join('');
     attachCardEvents();
 
-    prevBtn.disabled = items.length <= 1;
-    nextBtn.disabled = items.length <= 1;
+    if (prevBtn) prevBtn.disabled = items.length <= 1;
+    if (nextBtn) nextBtn.disabled = items.length <= 1;
 
     requestAnimationFrame(() => {
       measureStep();
@@ -325,15 +302,6 @@ function initHallOfFame() {
     if (autoplayTimer) clearInterval(autoplayTimer);
   }
 
-  filterBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-      filterBtns.forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      activeFilter = btn.dataset.filter;
-      render();
-    });
-  });
-
   categorySelect && categorySelect.addEventListener('change', () => {
     activeCategory = categorySelect.value;
     render();
@@ -359,21 +327,36 @@ function initHallOfFame() {
   render();
   startAutoplay();
 }
+window.initHallOfFame = initHallOfFame;
 
 /* ── SHARED MODAL: used by both the Featured Spotlight "Read Story" button
    and Hall of Fame cards ── */
 function openHofModal(item) {
   const overlay = document.getElementById('hofModalOverlay');
-  if (!overlay) return;
-  document.getElementById('modalAvatar').textContent = item.initials;
-  document.getElementById('modalTag').textContent = item.category;
-  document.getElementById('modalName').textContent = item.name;
-  document.getElementById('modalMeta').textContent = item.meta;
-  document.getElementById('modalLine').textContent = item.line;
-  document.getElementById('modalBody').innerHTML = item.body
-    .split('\n\n').map(p => `<p>${p}</p>`).join('');
-  document.getElementById('modalHighlights').innerHTML = item.highlights
-    .map(h => `<li>${h}</li>`).join('');
+  if (!overlay || !item) return;
+
+  document.getElementById('modalAvatar').innerHTML = hofAvatarHTML(item);
+  document.getElementById('modalTag').textContent = item.category || '';
+  document.getElementById('modalName').textContent = item.name || '';
+  document.getElementById('modalMeta').textContent = item.meta || '';
+  document.getElementById('modalLine').textContent = item.line || '';
+
+  const bodyText = item.desc || item.body || '';
+  document.getElementById('modalBody').innerHTML = bodyText
+    .split('\n\n').filter(Boolean).map(p => `<p>${escapeHtml(p)}</p>`).join('');
+
+  // Achievement Highlights are optional — hide the whole block if there are none.
+  const highlightsWrap = document.querySelector('.hof-modal-highlights');
+  const highlightsList = document.getElementById('modalHighlights');
+  const highlights = item.highlights || [];
+  if (highlights.length) {
+    highlightsList.innerHTML = highlights.map(h => `<li>${escapeHtml(h)}</li>`).join('');
+    if (highlightsWrap) highlightsWrap.style.display = '';
+  } else {
+    highlightsList.innerHTML = '';
+    if (highlightsWrap) highlightsWrap.style.display = 'none';
+  }
+
   overlay.classList.add('open');
 }
 
@@ -386,22 +369,65 @@ function initHofModal() {
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape') overlay.classList.remove('open'); });
 }
 
-function initFeaturedSpotlight() {
+/* ── FEATURED SPOTLIGHT (hero banner) — populated from window.__jgsFeatured.
+   The section stays hidden until a featured entry actually exists. ── */
+function renderFeaturedSpotlight() {
+  const section = document.getElementById('featuredSection');
+  if (!section) return;
+
+  const featured = window.__jgsFeatured;
+  if (!featured) {
+    section.style.display = 'none';
+    return;
+  }
+  section.style.display = '';
+
+  const avatarEl = document.getElementById('featuredAvatar');
+  const initialsEl = document.getElementById('featuredInitials');
+  const existingImg = avatarEl.querySelector('img');
+
+  if (featured.image) {
+    if (existingImg) {
+      existingImg.src = featured.image;
+      existingImg.alt = featured.name || '';
+    } else {
+      const img = document.createElement('img');
+      img.src = featured.image;
+      img.alt = featured.name || '';
+      img.style.cssText = 'width:100%;height:100%;object-fit:cover;border-radius:inherit;display:block;';
+      avatarEl.insertBefore(img, initialsEl);
+    }
+    if (initialsEl) initialsEl.style.display = 'none';
+  } else {
+    if (existingImg) existingImg.remove();
+    if (initialsEl) {
+      initialsEl.style.display = '';
+      initialsEl.textContent = featured.initials || '';
+    }
+  }
+
+  const badgeEl = document.getElementById('featuredBadge');
+  if (badgeEl) badgeEl.textContent = featured.badge || '';
+
+  document.getElementById('featuredTag').textContent = featured.category || '';
+  document.getElementById('featuredName').textContent = featured.name || '';
+  document.getElementById('featuredLine').textContent = featured.line || '';
+  document.getElementById('featuredDesc').textContent = featured.desc || featured.body || '';
+
   const btn = document.getElementById('featuredReadStory');
-  if (!btn) return;
-  btn.addEventListener('click', () => openHofModal({
-    initials: JGS_FEATURED_SPOTLIGHT.initials,
-    name: JGS_FEATURED_SPOTLIGHT.name,
-    meta: JGS_FEATURED_SPOTLIGHT.meta,
-    line: JGS_FEATURED_SPOTLIGHT.line,
-    category: JGS_FEATURED_SPOTLIGHT.category,
-    body: JGS_FEATURED_SPOTLIGHT.body,
-    highlights: JGS_FEATURED_SPOTLIGHT.highlights
-  }));
+  if (btn) {
+    btn.onclick = () => openHofModal(featured);
+  }
 }
+window.renderFeaturedSpotlight = renderFeaturedSpotlight;
 
 document.addEventListener('DOMContentLoaded', () => {
+  // Hide the featured banner until spotlight.html's Firestore fetch resolves
+  // and calls renderFeaturedSpotlight() again with real data (or nothing, if
+  // no entry is marked Featured).
+  const section = document.getElementById('featuredSection');
+  if (section) section.style.display = 'none';
+
   initHallOfFame();
   initHofModal();
-  initFeaturedSpotlight();
 });

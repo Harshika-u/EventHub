@@ -5,8 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Visual Diary & Library Gallery</title>
 
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500&family=IBM+Plex+Mono:wght@500;600&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+
 
 <style>
   /* ==========================================
@@ -29,9 +31,12 @@
     --ease-soft: cubic-bezier(.4,0,.2,1);
   }
 
+
   * { margin:0; padding:0; box-sizing:border-box; }
 
+
   html { scroll-behavior: smooth; }
+
 
   body {
     background: var(--parchment);
@@ -43,6 +48,7 @@
     overflow-x: hidden;
     position: relative;
   }
+
 
   /* ==========================================
      AMBIENT TEXTURE + VIGNETTE
@@ -58,6 +64,7 @@
     animation: grainShift 8s steps(6) infinite;
   }
 
+
   @keyframes grainShift {
     0%,100% { transform: translate(0,0); }
     20% { transform: translate(-2%,-3%); }
@@ -66,6 +73,7 @@
     80% { transform: translate(-1%,3%); }
   }
 
+
   .vignette {
     position: fixed;
     inset: 0;
@@ -73,6 +81,7 @@
     pointer-events: none;
     background: radial-gradient(ellipse at 50% 0%, rgba(33,29,26,0) 55%, rgba(33,29,26,0.05) 100%);
   }
+
 
   /* ==========================================
      DRIFTING DIARY EPHEMERA (decorative)
@@ -85,10 +94,12 @@
     z-index: 0;
   }
 
+
   .ephemera svg {
     position: absolute;
     opacity: 0.5;
   }
+
 
   .ephemera .plane {
     top: 18%;
@@ -96,6 +107,7 @@
     width: 34px;
     animation: driftPlane 22s ease-in-out infinite;
   }
+
 
   .ephemera .leaf-a {
     top: 62%;
@@ -105,6 +117,7 @@
     animation-delay: -3s;
   }
 
+
   .ephemera .compass {
     top: 8%;
     right: 5%;
@@ -113,11 +126,13 @@
     animation: compassSpin 60s linear infinite;
   }
 
+
   @keyframes driftPlane {
     0%   { transform: translate(0,0) rotate(0deg); }
     50%  { transform: translate(40px,-26px) rotate(6deg); }
     100% { transform: translate(0,0) rotate(0deg); }
   }
+
 
   @keyframes driftLeaf {
     0%   { transform: translate(0,0) rotate(0deg); }
@@ -125,9 +140,11 @@
     100% { transform: translate(0,0) rotate(0deg); }
   }
 
+
   @keyframes compassSpin {
     to { transform: rotate(360deg); }
   }
+
 
   /* ==========================================
      SCROLL REVEAL
@@ -142,6 +159,7 @@
     transform: translateY(0);
   }
 
+
   /* ==========================================
      TORN PAPER DIVIDER
      ========================================== */
@@ -153,6 +171,7 @@
   }
   .torn-divider svg { width: 100%; height: 100%; display: block; }
 
+
   /* ==========================================
      SECTION 1: HERO CAROUSEL STYLES
      ========================================== */
@@ -161,6 +180,7 @@
     position: relative;
     overflow: hidden;
   }
+
 
   .stage {
     position: relative;
@@ -171,6 +191,7 @@
     flex-direction: column;
     align-items: center;
   }
+
 
   .eyebrow {
     font-size: 11px;
@@ -184,6 +205,7 @@
     animation-delay: .05s;
   }
 
+
   .hero-section h1 {
     font-family: 'Fraunces', serif;
     font-weight: 500;
@@ -195,6 +217,7 @@
     animation: fadeUp .8s var(--ease-spring) forwards;
     animation-delay: .14s;
   }
+
 
   .sub {
     margin-top: 10px;
@@ -209,7 +232,9 @@
     animation-delay: .22s;
   }
 
+
   @keyframes fadeUp { to { opacity:1; transform:translateY(0); } }
+
 
   .carousel-wrap {
     position: relative;
@@ -222,11 +247,13 @@
     perspective: 1600px;
   }
 
+
   .track {
     position: relative;
     width: 100%;
     height: 100%;
   }
+
 
   .flight-path {
     position: absolute;
@@ -239,9 +266,11 @@
     animation: dashTravel 6s linear infinite;
   }
 
+
   @keyframes dashTravel {
     to { stroke-dashoffset: -120; }
   }
+
 
   .card {
     position: absolute;
@@ -264,6 +293,7 @@
     will-change: transform, filter, opacity;
   }
 
+
   .card img {
     width: 100%;
     height: 100%;
@@ -271,6 +301,7 @@
     display: block;
     pointer-events: none;
   }
+
 
   .card::after {
     content: "";
@@ -281,7 +312,9 @@
     transition: opacity .6s var(--ease-soft);
   }
 
+
   .card.center::after { opacity: 0; }
+
 
   .card .play {
     position: absolute;
@@ -299,14 +332,17 @@
     transition: opacity .5s var(--ease-spring) .15s, transform .5s var(--ease-spring) .15s;
   }
 
+
   .card.center .play { opacity: 1; transform: scale(1); }
   .card .play svg { width: 14px; height: 14px; margin-left: 2px; }
+
 
   .nav {
     display: flex;
     gap: 14px;
     margin-top: 40px;
   }
+
 
   .nav button {
     width: 42px;
@@ -321,15 +357,18 @@
     transition: background .3s var(--ease-soft), transform .3s var(--ease-spring), border-color .3s var(--ease-soft);
   }
 
+
   .nav button:hover {
     background: var(--ink);
     border-color: var(--ink);
     transform: translateY(-2px);
   }
 
+
   .nav button:hover svg path { stroke: var(--cream); }
   .nav button:active { transform: scale(.92) translateY(0); }
   .nav svg path { transition: stroke .3s var(--ease-soft); }
+
 
   /* ==========================================
      SECTION 2: LIBRARY GALLERY STYLES
@@ -340,12 +379,14 @@
     padding: 40px 32px 100px;
   }
 
+
   .topbar {
     display: flex;
     align-items: center;
     justify-content: space-between;
     padding-bottom: 30px;
   }
+
 
   .brand {
     position: relative;
@@ -357,6 +398,7 @@
     padding-bottom: 4px;
     cursor: default;
   }
+
 
   .brand::after {
     content: "";
@@ -370,7 +412,9 @@
     transition: transform .5s var(--ease-spring);
   }
 
+
   .brand:hover::after { transform: scaleX(1); }
+
 
   .menu-btn {
     width: 38px; height: 38px;
@@ -385,6 +429,7 @@
   .menu-btn:hover svg rect { fill: #fff; }
   .menu-btn svg rect { transition: fill .3s var(--ease-soft); }
 
+
   .section-head {
     display: flex;
     align-items: baseline;
@@ -392,7 +437,9 @@
     margin-bottom: 6px;
   }
 
+
   .section-head .dash { color: var(--ink-soft); font-size: 18px; }
+
 
   .section-head h2 {
     font-family: 'Fraunces', serif;
@@ -402,11 +449,13 @@
     text-transform: uppercase;
   }
 
+
   .section-sub {
     font-size: 13px;
     color: var(--ink-soft);
     margin: 0 0 26px 28px;
   }
+
 
   .count-live {
     font-family: 'IBM Plex Mono', monospace;
@@ -414,12 +463,14 @@
     color: var(--brass-deep);
   }
 
+
   .year-rail-wrap {
     position: sticky;
     top: 16px;
     z-index: 20;
     margin-bottom: 34px;
   }
+
 
   .year-rail {
     position: relative;
@@ -432,6 +483,7 @@
     overflow-x: auto;
     box-shadow: 0 8px 24px -14px rgba(33,31,26,0.18);
   }
+
 
   .year-pill {
     position: relative;
@@ -451,7 +503,9 @@
     white-space: nowrap;
   }
 
+
   .year-pill.active { color: #fbf9f3; }
+
 
   .year-indicator {
     position: absolute;
@@ -463,6 +517,7 @@
     transition: left .5s var(--ease-spring), width .5s var(--ease-spring);
   }
 
+
   .view {
     opacity: 0;
     transform: translateY(14px);
@@ -472,6 +527,7 @@
     transition: opacity .55s var(--ease-soft), transform .6s var(--ease-spring);
   }
 
+
   .view.active {
     opacity: 1;
     transform: translateY(0);
@@ -479,7 +535,9 @@
     position: relative;
   }
 
+
   .view-stack { position: relative; }
+
 
   .gallery-grid {
     display: grid;
@@ -488,6 +546,7 @@
     grid-auto-flow: dense;
     gap: 16px;
   }
+
 
   .g-card {
     grid-column: span 3;
@@ -504,7 +563,9 @@
     transition: box-shadow .4s var(--ease-soft), transform .5s var(--ease-spring), opacity .4s var(--ease-soft), grid-column .3s, grid-row .3s;
   }
 
+
   .g-card.hide { display: none; }
+
 
   .g-card.leaving {
     opacity: 0 !important;
@@ -512,12 +573,15 @@
     pointer-events: none;
   }
 
+
   .g-card.size-wide { grid-column: span 4; grid-row: span 2; }
   .g-card.size-tall { grid-column: span 2; grid-row: span 3; }
   .g-card.size-big { grid-column: span 4; grid-row: span 3; }
   .g-card.size-small { grid-column: span 2; grid-row: span 2; }
 
+
   @keyframes cardIn { to { opacity: 1; transform: translateY(0) scale(1); } }
+
 
   .g-card img {
     width: 100%; height: 100%;
@@ -527,11 +591,13 @@
     filter: saturate(.92) contrast(1.02);
   }
 
+
   .g-card:hover {
     box-shadow: 0 20px 36px -16px rgba(33,31,26,0.28);
     transform: translateY(-4px);
   }
   .g-card:hover img { transform: scale(1.06); filter: saturate(1.05) contrast(1.03); }
+
 
   .g-card::before {
     content: "";
@@ -541,7 +607,9 @@
     transition: opacity .4s var(--ease-soft);
   }
 
+
   .g-card:hover::before { opacity: 1; }
+
 
   .g-tag {
     position: absolute;
@@ -557,8 +625,10 @@
     transition: transform .4s var(--ease-spring), opacity .4s var(--ease-soft);
   }
 
+
   .g-card:hover .g-tag { transform: translateY(0); opacity: 1; }
   .g-tag-label { font-size: 13.5px; font-weight: 500; letter-spacing: 0.01em; }
+
 
   .g-stamp {
     position: absolute;
@@ -576,7 +646,9 @@
     transition: transform .4s var(--ease-spring);
   }
 
+
   .g-card:hover .g-stamp { transform: rotate(-4deg) scale(1.04); }
+
 
   .corner-fold {
     position: absolute;
@@ -589,7 +661,9 @@
     z-index: 3;
   }
 
+
   .g-card:hover .corner-fold { transform: translate(0,0); }
+
 
   .view-stamp {
     position: absolute;
@@ -614,16 +688,19 @@
     z-index: 3;
   }
 
+
   .g-card:hover .view-stamp {
     opacity: 1;
     transform: scale(1) rotate(-10deg);
     transition: opacity .3s var(--ease-soft), transform .4s cubic-bezier(.34,1.56,.64,1);
   }
 
+
   .detail-head {
     text-align: center;
     margin: 6px 0 40px;
   }
+
 
   .back-btn {
     display: inline-flex;
@@ -639,13 +716,16 @@
     transition: color .3s var(--ease-soft), gap .3s var(--ease-soft);
   }
 
+
   .back-btn:hover { color: var(--ink); gap: 12px; }
+
 
   .detail-head h3 {
     font-family: 'Fraunces', serif;
     font-weight: 500;
     font-size: clamp(26px, 4vw, 36px);
   }
+
 
   .detail-head .accent {
     display: block;
@@ -655,10 +735,12 @@
     margin-top: 2px;
   }
 
+
   .masonry {
     column-count: 3;
     column-gap: 16px;
   }
+
 
   .m-item {
     position: relative;
@@ -673,12 +755,15 @@
     transition: transform .5s var(--ease-spring), box-shadow .5s var(--ease-soft);
   }
 
+
   .m-item:hover {
     transform: translateY(-3px);
     box-shadow: 0 18px 30px -16px rgba(33,31,26,0.25);
   }
 
+
   .m-item:hover img { transform: scale(1.04); }
+
 
   .m-item img {
     width: 100%;
@@ -686,6 +771,7 @@
     display: block;
     transition: transform .7s var(--ease-spring);
   }
+
 
   .m-item::before {
     content: "";
@@ -699,9 +785,11 @@
     box-shadow: 0 2px 4px rgba(33,31,26,0.1);
   }
 
+
   .m-item:nth-child(3n)::before { --tape-rot: 3deg; }
   .m-item:nth-child(3n+1)::before { --tape-rot: -2deg; left: 22%; }
   .m-item:nth-child(3n+2)::before { display: none; }
+
 
   /* Responsive Rules */
   @media (max-width:900px) {
@@ -712,10 +800,12 @@
     .masonry { column-count: 2; }
   }
 
+
   @media (max-width:640px) {
     .card { width: 210px; height: 280px; }
     .carousel-wrap { height: 320px; }
   }
+
 
   @media (max-width:560px) {
     .gallery-grid { grid-template-columns: 1fr; }
@@ -726,6 +816,7 @@
     .shell { padding: 28px 18px 80px; }
   }
 
+
   @media (prefers-reduced-motion: reduce) {
     * { animation-duration: .001ms !important; transition-duration: .001ms !important; }
   }
@@ -733,8 +824,10 @@
 </head>
 <body>
 
+
   <div class="grain"></div>
   <div class="vignette"></div>
+
 
   <section class="hero-section">
     <div class="ephemera">
@@ -754,12 +847,14 @@
       <h1>Featured Highlights</h1>
       <p class="sub">Explore recent highlights and stories from around the world.</p>
 
+
       <div class="carousel-wrap">
         <svg class="flight-path" viewBox="0 0 900 420" preserveAspectRatio="none" aria-hidden="true">
           <path d="M40 380 Q 450 40 860 380" fill="none" stroke="#6b645d" stroke-width="1.4" stroke-dasharray="2 10" stroke-linecap="round"/>
         </svg>
         <div class="track" id="track"></div>
       </div>
+
 
       <div class="nav">
         <button id="prev" aria-label="Previous">
@@ -772,12 +867,14 @@
     </div>
   </section>
 
+
   <div class="torn-divider" aria-hidden="true">
     <svg viewBox="0 0 1220 22" preserveAspectRatio="none">
       <path d="M0 11 L20 6 L40 14 L60 4 L80 12 L100 7 L120 15 L140 5 L160 11 L180 8 L200 13 L220 6 L240 12 L260 9 L280 14 L300 5 L320 11 L340 8 L360 13 L380 6 L400 12 L420 9 L440 14 L460 5 L480 11 L500 8 L520 13 L540 6 L560 12 L580 9 L600 14 L620 5 L640 11 L660 8 L680 13 L700 6 L720 12 L740 9 L760 14 L780 5 L800 11 L820 8 L840 13 L860 6 L880 12 L900 9 L920 14 L940 5 L960 11 L980 8 L1000 13 L1020 6 L1040 12 L1060 9 L1080 14 L1100 5 L1120 11 L1140 8 L1160 13 L1180 6 L1200 12 L1220 9"
         fill="none" stroke="#e8e3db" stroke-width="1.4"/>
     </svg>
   </div>
+
 
   <section class="shell">
     <div class="topbar">
@@ -791,6 +888,7 @@
       </button>
     </div>
 
+
     <div class="view-stack">
       <div class="view active" id="view-home">
         <div class="section-head reveal">
@@ -799,14 +897,17 @@
         </div>
         <p class="section-sub reveal">Browsing <span class="count-live" id="countLive">6</span> entries from the archive</p>
 
+
         <div class="year-rail-wrap reveal">
           <div class="year-rail" id="yearRail">
             <div class="year-indicator" id="yearIndicator"></div>
           </div>
         </div>
 
+
         <div class="gallery-grid" id="galleryGrid"></div>
       </div>
+
 
       <div class="view" id="view-detail">
         <button class="back-btn" id="backBtn">
@@ -814,15 +915,18 @@
           Back to gallery
         </button>
 
+
         <div class="detail-head">
           <h3 id="detailTitle">Title</h3>
           <span class="accent" id="detailAccent">in customer photos</span>
         </div>
 
+
         <div class="masonry" id="detailMasonry"></div>
       </div>
     </div>
   </section>
+
 
   <script>
     // --- 1. CAROUSEL SCRIPT ---
@@ -837,8 +941,10 @@
         "https://images.unsplash.com/photo-1519046904884-53103b34b206?q=80&w=800&auto=format&fit=crop",
       ];
 
+
       const track = document.getElementById('track');
       let current = 2;
+
 
       const cards = images.map((src) => {
         const el = document.createElement('div');
@@ -850,6 +956,7 @@
         return el;
       });
 
+
       cards.forEach((card, i) => {
         card.addEventListener('click', () => {
           if (i === current) return;
@@ -858,9 +965,11 @@
         });
       });
 
+
       function layoutFor(offset){
         const abs = Math.abs(offset);
         if (abs > 2) return null;
+
 
         const spacing = 195;
         const x = offset * spacing;
@@ -871,8 +980,10 @@
         const blur = offset === 0 ? 0 : abs === 1 ? 0.5 : 2.5;
         const zIndex = 10 - abs;
 
+
         return { x, scale, rotateY, z, opacity, blur, zIndex };
       }
+
 
       function render(){
         cards.forEach((card, i) => {
@@ -880,12 +991,14 @@
           const layout = layoutFor(offset);
           card.classList.toggle('center', offset === 0);
 
+
           if (!layout){
             card.style.opacity = '0';
             card.style.pointerEvents = 'none';
             card.style.transform = `translate(-50%,-50%) translateX(${offset * 195}px) scale(.6)`;
             return;
           }
+
 
           card.style.pointerEvents = 'auto';
           card.style.zIndex = layout.zIndex;
@@ -896,32 +1009,39 @@
         });
       }
 
+
       function goNext(){
         current = current >= cards.length - 1 ? 0 : current + 1;
         render();
       }
+
 
       function goPrev(){
         current = current <= 0 ? cards.length - 1 : current - 1;
         render();
       }
 
+
       document.getElementById('next').addEventListener('click', () => { goNext(); restartAutoplay(); });
       document.getElementById('prev').addEventListener('click', () => { goPrev(); restartAutoplay(); });
+
 
       const AUTOPLAY_DELAY = 3500;
       const RESUME_DELAY = 4500;
       let autoplayTimer = null;
       let resumeTimer = null;
 
+
       function startAutoplay(){
         stopAutoplay();
         autoplayTimer = setInterval(goNext, AUTOPLAY_DELAY);
       }
 
+
       function stopAutoplay(){
         if (autoplayTimer){ clearInterval(autoplayTimer); autoplayTimer = null; }
       }
+
 
       function restartAutoplay(){
         stopAutoplay();
@@ -929,15 +1049,19 @@
         resumeTimer = setTimeout(startAutoplay, RESUME_DELAY);
       }
 
+
       const wrap = document.querySelector('.carousel-wrap');
       wrap.addEventListener('mouseenter', stopAutoplay);
       wrap.addEventListener('mouseleave', startAutoplay);
       wrap.addEventListener('touchstart', () => stopAutoplay(), {passive:true});
       wrap.addEventListener('touchend', () => restartAutoplay(), {passive:true});
 
+
       cards.forEach(card => card.addEventListener('click', restartAutoplay));
 
+
       startAutoplay();
+
 
       let startX = 0;
       wrap.addEventListener('touchstart', e => startX = e.touches[0].clientX, {passive:true});
@@ -946,6 +1070,7 @@
         if (dx > 40){ goPrev(); restartAutoplay(); }
         else if (dx < -40){ goNext(); restartAutoplay(); }
       }, {passive:true});
+
 
       render();
     })();
@@ -957,18 +1082,22 @@ const tornDivider = document.querySelector('.torn-divider');
       // so entries created, edited, or deleted there appear here automatically.
       const STORAGE_KEY = 'archive_desk_entries';
 
+
       // Used to seed localStorage the very first time this page runs
       // (before any admin entries exist), so both this page AND the admin
       // ledger start from the same shared list of entries.
-    
+   
+
 
       function loadEntries(){
         let stored = null;
         try { stored = JSON.parse(localStorage.getItem(STORAGE_KEY)); } catch(e) { stored = null; }
 
+
         if (Array.isArray(stored) && stored.length){
           return stored;
         }
+
 
         // First run on this browser / origin: nothing archived yet, so seed
         // localStorage with the starter events. This also makes them show up
@@ -977,7 +1106,9 @@ const tornDivider = document.querySelector('.torn-divider');
         return seedEvents;
       }
 
+
       let events = loadEntries();
+
 
       const galleryGrid = document.getElementById('galleryGrid');
       const viewHome = document.getElementById('view-home');
@@ -990,12 +1121,15 @@ const tornDivider = document.querySelector('.torn-divider');
       const yearIndicator = document.getElementById('yearIndicator');
       const countLive = document.getElementById('countLive');
 
+
       let activeYear = 'All';
+
 
       function buildYearRail(){
         yearRail.querySelectorAll('.year-pill').forEach(p => p.remove());
         const years = ['All', ...Array.from(new Set(events.map(e => e.year))).sort((a,b) => b - a)];
         if (!years.includes(activeYear)) activeYear = 'All';
+
 
         years.forEach((y) => {
           const btn = document.createElement('button');
@@ -1006,11 +1140,13 @@ const tornDivider = document.querySelector('.torn-divider');
           yearRail.appendChild(btn);
         });
 
+
         requestAnimationFrame(() => {
           const activeBtn = yearRail.querySelector('.year-pill.active');
           if (activeBtn) moveIndicator(activeBtn);
         });
       }
+
 
       function moveIndicator(btn){
         const railRect = yearRail.getBoundingClientRect();
@@ -1018,6 +1154,7 @@ const tornDivider = document.querySelector('.torn-divider');
         yearIndicator.style.left = (btnRect.left - railRect.left) + 'px';
         yearIndicator.style.width = btnRect.width + 'px';
       }
+
 
       function setYear(y, btn){
         activeYear = y;
@@ -1027,17 +1164,21 @@ const tornDivider = document.querySelector('.torn-divider');
         applyFilter();
       }
 
+
       function applyFilter(){
         const cards = Array.from(document.querySelectorAll('.g-card'));
         const toShow = [];
         const toHide = [];
+
 
         cards.forEach(card => {
           const match = activeYear === 'All' || String(card.dataset.year) === String(activeYear);
           (match ? toShow : toHide).push(card);
         });
 
+
         cards.forEach(card => card.classList.add('leaving'));
+
 
         window.setTimeout(() => {
           toHide.forEach(card => card.classList.add('hide'));
@@ -1045,6 +1186,7 @@ const tornDivider = document.querySelector('.torn-divider');
             card.classList.remove('hide');
             galleryGrid.appendChild(card);
           });
+
 
           requestAnimationFrame(() => {
             toShow.forEach((card, i) => {
@@ -1056,9 +1198,11 @@ const tornDivider = document.querySelector('.torn-divider');
             });
           });
 
+
           countLive.textContent = toShow.length;
         }, 220);
       }
+
 
       function renderCards(){
         galleryGrid.innerHTML = '';
@@ -1080,20 +1224,24 @@ const tornDivider = document.querySelector('.torn-divider');
         countLive.textContent = events.length;
       }
 
+
       window.addEventListener('resize', () => {
         const activeBtn = yearRail.querySelector('.year-pill.active');
         if (activeBtn) moveIndicator(activeBtn);
       });
 
+
       function openEvent(id){
         const ev = events.find(e => e.id === id);
         if (!ev) return;
+
 
         detailTitle.textContent = ev.title;
         detailAccent.textContent = ev.accent && ev.accent.trim()
           ? ev.accent
           : 'archived ' + ev.year + ' · ' + ev.tag.toLowerCase();
         detailMasonry.innerHTML = '';
+
 
         ev.gallery.forEach((src, i) => {
           const item = document.createElement('div');
@@ -1106,12 +1254,14 @@ const tornDivider = document.querySelector('.torn-divider');
           detailMasonry.appendChild(item);
         });
 
+
         viewHome.classList.remove('active');
         viewDetail.classList.add('active');
        heroSection.style.display = 'none';   // ADD THIS
 tornDivider.style.display = 'none';   // ADD THIS
 window.scrollTo({ top: viewDetail.offsetTop - 20, behavior:'smooth' });
       }
+
 
     backBtn.addEventListener('click', () => {
   viewDetail.classList.remove('active');
@@ -1120,17 +1270,21 @@ window.scrollTo({ top: viewDetail.offsetTop - 20, behavior:'smooth' });
   tornDivider.style.display = '';   // ADD THIS
 });
 
+
       function renderAll(){
         buildYearRail();
         renderCards();
       }
 
+
       renderAll();
+
 
       // --- Live sync with the Archive Desk admin portal ---
       // Cross-tab: the native 'storage' event fires in every other tab on the
       // same origin the instant admin.html writes to localStorage.
       let lastSnapshot = JSON.stringify(events);
+
 
       function syncFromStorage(){
         const raw = localStorage.getItem(STORAGE_KEY);
@@ -1152,15 +1306,19 @@ window.scrollTo({ top: viewDetail.offsetTop - 20, behavior:'smooth' });
         }
       }
 
+
       window.addEventListener('storage', (e) => {
         if (e.key === STORAGE_KEY) syncFromStorage();
       });
+
 
       // Same-tab fallback (e.g. admin opened via window.open from this page,
       // or browsers that don't fire 'storage' reliably on file:// origins).
       setInterval(syncFromStorage, 2500);
 
+
     })();
+
 
     // --- 3. SCROLL REVEAL ---
     (function(){
@@ -1173,8 +1331,10 @@ window.scrollTo({ top: viewDetail.offsetTop - 20, behavior:'smooth' });
         });
       }, { threshold: 0.2, rootMargin: '0px 0px -40px 0px' });
 
+
       document.querySelectorAll('.reveal').forEach(el => io.observe(el));
     })();
+
 
     // --- 4. MAGNETIC BUTTONS ---
     (function(){
