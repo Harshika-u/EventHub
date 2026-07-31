@@ -273,3 +273,17 @@ form { width: 100%; }
 rect, circle, line {
   transition: stroke 0.2s;
 }
+
+/* ── BACK TO HOME LINK (inside toggle panels) ── */
+.back-home-link {
+  margin-top: 16px;
+  font-size: 13.5px;
+  color: #d6e0ff;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.back-home-link:hover {
+  color: #fff;
+  text-decoration: underline;
+}

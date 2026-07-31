@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Visual Diary & Library Gallery</title>
 
+<link rel="stylesheet" href="css/style.css">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500&family=IBM+Plex+Mono:wght@500;600&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
@@ -39,9 +40,11 @@
 
 
   body {
-    background: var(--parchment);
-    background-image: radial-gradient(rgba(33,31,26,0.025) 1px, transparent 1px);
-    background-size: 3px 3px;
+    background-image: url("css/background.png");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
     font-family: 'Poppins', sans-serif;
     color: var(--ink);
     min-height: 100vh;
@@ -803,6 +806,16 @@
   .m-item:nth-child(3n+2)::before { display: none; }
 
 
+  /* Empty state (no entries yet) */
+  .empty-note {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--ink-soft);
+    font-size: 14px;
+  }
+
+
   /* Responsive Rules */
   @media (max-width:900px) {
     .gallery-grid { grid-template-columns: repeat(2,1fr); }
@@ -836,24 +849,24 @@
 </head>
 <body>
 
+<!-- NAVBAR -->
+<div class="navbar">
+  <div class="nav-inner">
+    <div class="logo">School <span>EventHub</span></div>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="events.html">Events</a></li>
+      <li><a href="spot.html" class="active">Gallery</a></li>
+    </ul>
+    <a href="#" class="nav-cta" onclick="logout()">Logout</a>
+  </div>
+</div>
 
   <div class="grain"></div>
   <div class="vignette"></div>
 
 
   <section class="hero-section">
-    <div class="ephemera">
-      <svg class="plane" viewBox="0 0 24 24" fill="none"><path d="M21 12L3 5l3 7-3 7 18-7z" stroke="#6b645d" stroke-width="1.2" stroke-linejoin="round"/></svg>
-      <svg class="leaf-a" viewBox="0 0 24 24" fill="none"><path d="M4 20c8 0 16-8 16-16-8 0-16 8-16 16z" stroke="#565a3f" stroke-width="1.2" stroke-linejoin="round"/><path d="M4 20c4-6 8-10 16-16" stroke="#565a3f" stroke-width="1"/></svg>
-      <svg class="compass" viewBox="0 0 48 48" fill="none">
-        <circle cx="24" cy="24" r="20" stroke="#6b645d" stroke-width="1"/>
-        <circle cx="24" cy="24" r="1.6" fill="#7d5522"/>
-        <path d="M24 6L28 22L24 26L20 22Z" fill="#7d5522"/>
-        <path d="M24 42L20 26L24 22L28 26Z" fill="#6b645d" fill-opacity=".5"/>
-        <path d="M6 24L22 20L26 24L22 28Z" fill="#6b645d" fill-opacity=".5"/>
-        <path d="M42 24L26 28L22 24L26 20Z" fill="#6b645d" fill-opacity=".5"/>
-      </svg>
-    </div>
     <div class="stage">
       <span class="eyebrow">Visual Diary</span>
       <h1>Featured Highlights</h1>
@@ -907,7 +920,7 @@
           <span class="dash">—</span>
           <h2>Gallery</h2>
         </div>
-        <p class="section-sub reveal">Browsing <span class="count-live" id="countLive">6</span> entries from the archive</p>
+        <p class="section-sub reveal">Browsing <span class="count-live" id="countLive">0</span> entries from the archive</p>
 
 
         <div class="year-rail-wrap reveal">
@@ -939,8 +952,35 @@
     </div>
   </section>
 
-
+  <!-- LOGOUT (same behavior as events.html) -->
   <script>
+    window.logout = function () {
+        localStorage.removeItem("student");
+        localStorage.removeItem("studentEmail");
+        sessionStorage.clear();
+        window.location.replace("login.html");
+    };
+  </script>
+
+  <!-- Firebase (modular SDK — Firestore only; images live on Cloudinary) -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getFirestore, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    // Same Firebase project used across the EventHub admin pages.
+    const firebaseConfig = {
+      apiKey: "AIzaSyDMkDxml0p9zUp6gZuo1SeVhmQ3BZamy9o",
+      authDomain: "eventhub-8a8dc.firebaseapp.com",
+      projectId: "eventhub-8a8dc",
+      storageBucket: "eventhub-8a8dc.firebasestorage.app",
+      messagingSenderId: "450946542344",
+      appId: "1:450946542344:web:e54c332ca5bf2358d01abd"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const COLLECTION_NAME = "galleryEntries";
+
     // --- 1. CAROUSEL SCRIPT ---
     (function(){
       const images = [
@@ -1090,36 +1130,11 @@ const heroSection = document.querySelector('.hero-section');
 const tornDivider = document.querySelector('.torn-divider');
     // --- 2. GALLERY GRID & DETAIL SCRIPT ---
     (function(){
-      // Shared with the Archive Desk admin portal — both read/write this key,
-      // so entries created, edited, or deleted there appear here automatically.
-      const STORAGE_KEY = 'archive_desk_entries';
-
-
-      // Used to seed localStorage the very first time this page runs
-      // (before any admin entries exist), so both this page AND the admin
-      // ledger start from the same shared list of entries.
-   
-
-
-      function loadEntries(){
-        let stored = null;
-        try { stored = JSON.parse(localStorage.getItem(STORAGE_KEY)); } catch(e) { stored = null; }
-
-
-        if (Array.isArray(stored) && stored.length){
-          return stored;
-        }
-
-
-        // First run on this browser / origin: nothing archived yet, so seed
-        // localStorage with the starter events. This also makes them show up
-        // (and be editable/deletable) in the Archive Desk admin ledger.
-        try { localStorage.setItem(STORAGE_KEY, JSON.stringify(seedEvents)); } catch(e) { /* storage unavailable */ }
-        return seedEvents;
-      }
-
-
-      let events = loadEntries();
+      // Entries now live in Firestore (collection "galleryEntries"), shared
+      // across every browser/device — no more localStorage, no more
+      // per-browser copies. Cover/gallery photos themselves are Cloudinary
+      // URLs stored on each entry document.
+      let events = [];
 
 
       const galleryGrid = document.getElementById('galleryGrid');
@@ -1218,6 +1233,16 @@ const tornDivider = document.querySelector('.torn-divider');
 
       function renderCards(){
         galleryGrid.innerHTML = '';
+
+        if (!events.length){
+          const empty = document.createElement('div');
+          empty.className = 'empty-note';
+          empty.textContent = 'No entries archived yet.';
+          galleryGrid.appendChild(empty);
+          countLive.textContent = 0;
+          return;
+        }
+
         events.forEach((ev, i) => {
           const card = document.createElement('div');
           card.className = 'g-card ' + (ev.size || '');
@@ -1258,7 +1283,7 @@ const tornDivider = document.querySelector('.torn-divider');
         detailMasonry.innerHTML = '';
 
 
-        ev.gallery.forEach((src, i) => {
+        (ev.gallery || []).forEach((src, i) => {
           const item = document.createElement('div');
           item.className = 'm-item';
           item.style.animationDelay = (i * 0.06) + 's';
@@ -1272,8 +1297,8 @@ const tornDivider = document.querySelector('.torn-divider');
 
         viewHome.classList.remove('active');
         viewDetail.classList.add('active');
-       heroSection.style.display = 'none';   // ADD THIS
-tornDivider.style.display = 'none';   // ADD THIS
+       heroSection.style.display = 'none';
+tornDivider.style.display = 'none';
 window.scrollTo({ top: viewDetail.offsetTop - 20, behavior:'smooth' });
       }
 
@@ -1281,8 +1306,8 @@ window.scrollTo({ top: viewDetail.offsetTop - 20, behavior:'smooth' });
     backBtn.addEventListener('click', () => {
   viewDetail.classList.remove('active');
   viewHome.classList.add('active');
-  heroSection.style.display = '';   // ADD THIS
-  tornDivider.style.display = '';   // ADD THIS
+  heroSection.style.display = '';
+  tornDivider.style.display = '';
 });
 
 
@@ -1292,44 +1317,24 @@ window.scrollTo({ top: viewDetail.offsetTop - 20, behavior:'smooth' });
       }
 
 
-      renderAll();
+      // --- Live sync straight from Firestore ---
+      // Fires immediately with the current data, then again in real time
+      // whenever any entry is added, edited, or deleted from Archive Desk —
+      // in this tab, another tab, or another browser entirely.
+      onSnapshot(collection(db, COLLECTION_NAME), (snapshot) => {
+        events = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
 
-
-      // --- Live sync with the Archive Desk admin portal ---
-      // Cross-tab: the native 'storage' event fires in every other tab on the
-      // same origin the instant admin.html writes to localStorage.
-      let lastSnapshot = JSON.stringify(events);
-
-
-      function syncFromStorage(){
-        const raw = localStorage.getItem(STORAGE_KEY);
-        if (raw && raw !== lastSnapshot){
-          lastSnapshot = raw;
-          try {
-            const parsed = JSON.parse(raw);
-            if (Array.isArray(parsed)){
-              events = parsed;
-              if (viewDetail.classList.contains('active')) {
-  viewDetail.classList.remove('active');
-  viewHome.classList.add('active');
-  heroSection.style.display = '';
-  tornDivider.style.display = '';
-}
-              renderAll();
-            }
-          } catch(e) { /* ignore malformed data */ }
+        if (viewDetail.classList.contains('active')) {
+          viewDetail.classList.remove('active');
+          viewHome.classList.add('active');
+          heroSection.style.display = '';
+          tornDivider.style.display = '';
         }
-      }
 
-
-      window.addEventListener('storage', (e) => {
-        if (e.key === STORAGE_KEY) syncFromStorage();
+        renderAll();
+      }, (err) => {
+        console.error('Gallery sync failed:', err);
       });
-
-
-      // Same-tab fallback (e.g. admin opened via window.open from this page,
-      // or browsers that don't fire 'storage' reliably on file:// origins).
-      setInterval(syncFromStorage, 2500);
 
 
     })();
