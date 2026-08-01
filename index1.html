@@ -3,73 +3,108 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>School Events | EventHub</title>
+  <title>Event Hub</title>
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/student.css">
-  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
-<script>
-(function(){
-emailjs.init("YOUR_PUBLIC_KEY");
-})();
-</script>
 </head>
 <body>
+
 
 <!-- NAVBAR -->
 <div class="navbar">
   <div class="nav-inner">
     <div class="logo">School <span>EventHub</span></div>
     <ul class="nav-links">
-      <li><a href="index1.html">Home</a></li>
-      <li><a href="events.html" class="active">Events</a></li>
+      <li><a href="index1.html" class="active">Home</a></li>
+      <li><a href="events.html">Events</a></li>
       <li><a href="spot.html">Gallery</a></li>
     </ul>
     <a href="#" class="nav-cta" onclick="logout()">Logout</a>
   </div>
 </div>
 
+
+<!-- MAIN -->
 <div class="main">
-  <div class="events-page-header">
-    <h1>School Events</h1>
-    <p>Browse upcoming, ongoing, and completed events. Use filters to quickly find what matters.</p>
+
+
+  <!-- HERO -->
+  <div class="hero">
+
+
+    <div class="card hero-left">
+      <p class="small-title">SCHOOL EVENTHUB</p>
+      <h1>Smart event registration for every student activity.</h1>
+      <p class="desc">
+        Discover upcoming events, enroll in seconds, and help teachers manage participation without classroom-by-classroom collection.
+      </p>
+      <div class="buttons">
+        <button class="primary" onclick="window.location.href='events.html'">Explore Events</button>
+        <button class="secondary" onclick="window.location.href='spotlight.html'">Discover More</button>
+      </div>
+
+
+      <div class="next-event-box">
+        <p class="mini">NEAREST EVENT COUNTDOWN</p>
+        <p id="countdownText">Loading...</p>
+      </div>
+    </div>
+
+
+    <div class="card hero-right">
+      <img src="https://d3bat55ebwjhsf.cloudfront.net/schools/logos/None/user_root_user%40ezy.com/Screenshot_2025-05-01_150320.png" alt="Students">
+    </div>
+
+
   </div>
 
-  <div class="filters-row">
-    <input type="text" id="searchInput" placeholder="Search by event or organizer" class="search-input" oninput="filterEvents()">
-    <select id="statusFilter" onchange="filterEvents()" class="filter-select">
-      <option value="">All Statuses</option>
-      <option value="Upcoming">Upcoming</option>
-      <option value="Ongoing">Ongoing</option>
-      <option value="Completed">Completed</option>
-    </select>
-    <select id="categoryFilter" onchange="filterEvents()" class="filter-select">
-      <option value="">All Categories</option>
-      <option value="Sports">Sports</option>
-      <option value="Cultural">Cultural</option>
-      <option value="Academic">Academic</option>
-     
-    </select>
+<!-- ANNOUNCEMENTS -->
+<div class="announcement-box">
+  <div class="announcement-header">
+    <h2>Latest Announcements</h2>
+    <span class="live-dot"></span>
   </div>
 
-  <div class="events-grid" id="eventsGrid">
-    <p class="loading-text">Loading events...</p>
+  <div class="announcement-list" id="announcementList">
+    <div class="announcement-item">
+      <div class="announcement-tag">NEW EVENT</div>
+      <div class="announcement-content">
+        <h4>Loading announcements...</h4>
+        <p>Please wait while events are loading.</p>
+      </div>
+    </div>
   </div>
 </div>
+  <!-- Ongoing EVENTS SECTION -->
+  <div class="events-section">
+    <div class="section-header">
+      <h2> Whats's live   </h2>
+      <a href="events.html" class="see-all">See all</a>
+    </div>
+    <div class="events-grid" id="homeEventsGrid">
+      <p class="loading-text">Loading events...</p>
+    </div>
+  </div>
 
+
+</div>
 <!-- ═══ VIEW DETAILS MODAL ═══ -->
 <div class="modal" id="detailsModal">
   <div class="modal-content details-modal-content">
     <button class="details-close-btn" onclick="closeDetailsModal()">X</button>
+
 
     <div class="details-img-wrap">
       <img id="detailImg" src="" alt="">
       <span class="badge" id="detailBadge"></span>
     </div>
 
+
     <div class="details-body">
       <h2 id="detailName"></h2>
       <p id="detailShortDesc" class="details-short-desc"></p>
       <p id="detailDesc" class="details-long-desc"></p>
+
 
       <div class="details-meta-grid">
         <div class="details-meta-item">
@@ -98,6 +133,7 @@ emailjs.init("YOUR_PUBLIC_KEY");
         </div>
       </div>
 
+
       <div class="details-reg-box">
         <h3>Registration</h3>
         <div class="reg-info-row">
@@ -120,6 +156,7 @@ emailjs.init("YOUR_PUBLIC_KEY");
   </div>
 </div>
 
+
 <!-- ═══ REGISTER MODAL ═══ -->
 <div class="modal" id="registerModal">
   <div class="modal-content register-modal-content">
@@ -129,6 +166,7 @@ emailjs.init("YOUR_PUBLIC_KEY");
     </div>
     <p class="modal-sub">Fill your details below. Roll number is required, email is optional.</p>
 
+
     <div id="individualFields">
     <div class="form-row">
       <div>
@@ -137,24 +175,27 @@ emailjs.init("YOUR_PUBLIC_KEY");
       </div>
       <div>
         <label>Class</label>
-        <input id="regClass" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="4" placeholder="e.g. 12" oninput="onlyDigits(this)">
+        <input id="regClass" type="text" placeholder="e.g. 12">
       </div>
     </div>
+
 
     <div class="form-row">
       <div>
         <label>Section</label>
-        <input id="regSection" type="text" inputmode="text" pattern="[A-Za-z]*" maxlength="4" placeholder="e.g. A" oninput="onlyLetters(this)">
+        <input id="regSection" type="text" placeholder="e.g. A">
       </div>
       <div>
         <label>Roll Number</label>
-        <input id="regRoll" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="6" placeholder="e.g. 24" oninput="onlyDigits(this)">
+        <input id="regRoll" type="text" placeholder="e.g. 24">
       </div>
     </div>
+
 
     <label>Email (Optional)</label>
     <input id="regEmail" type="email" placeholder="your@email.com">
   </div>
+
 
     <!-- GROUP SECTION -->
     <div id="groupSection" style="display:none; margin-top:16px;">
@@ -170,37 +211,18 @@ emailjs.init("YOUR_PUBLIC_KEY");
           </div>
           <div>
             <label>Number of Participants</label>
-            <input id="groupCount" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="2" value="2" oninput="onlyDigits(this)" onchange="updateGroupMembers()">
+            <input id="groupCount" type="number" min="2" value="2" onchange="updateGroupMembers()">
           </div>
         </div>
         <div id="groupMembersList"></div>
       </div>
     </div>
 
+
     <button class="save-btn" id="submitRegBtn" onclick="submitRegistration()" style="margin-top:20px;">Submit</button>
     <p id="regError" style="color:#ef4444; font-size:13px; margin-top:8px; display:none;"></p>
   </div>
 </div>
-
-<!-- ═══ INPUT FORMAT HELPERS ═══ -->
-<script>
-  // Strip anything that isn't 0-9 as the user types (also catches paste, since
-  // the 'input' event fires after paste too).
-  function onlyDigits(el) {
-    const cleaned = el.value.replace(/[^0-9]/g, '');
-    if (cleaned !== el.value) el.value = cleaned;
-  }
-
-  // Strip anything that isn't a letter as the user types.
-  function onlyLetters(el) {
-    const cleaned = el.value.replace(/[^A-Za-z]/g, '');
-    if (cleaned !== el.value) el.value = cleaned;
-  }
-
-  const DIGITS_ONLY  = /^[0-9]+$/;
-  const LETTERS_ONLY = /^[A-Za-z]+$/;
-</script>
-
 <!-- FIREBASE -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
@@ -208,6 +230,7 @@ emailjs.init("YOUR_PUBLIC_KEY");
     getFirestore, collection, getDocs, addDoc,
     query, where, updateDoc, doc, increment
   } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
 
   const firebaseConfig = {
     apiKey: "AIzaSyDMkDxml0p9zUp6gZuo1SeVhmQ3BZamy9o",
@@ -218,101 +241,257 @@ emailjs.init("YOUR_PUBLIC_KEY");
     appId: "1:450946542344:web:e54c332ca5bf2358d01abd"
   };
 
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
 
-  // Make Firebase functions globally available
-  window._db = db;
-  window._fb = { collection, getDocs, addDoc, query, where, updateDoc, doc, increment };
-  window._allEvents = [];
+  const app = initializeApp(firebaseConfig);
+  const db  = getFirestore(app);
+
+
+  window._db  = db;
+  window._fb  = { collection, getDocs, addDoc, query, where, updateDoc, doc, increment };
+  window._allEvents    = [];
   window._currentEvent = null;
 
+
+  /* ── STATUS HELPERS ── */
+  function getEventStatus(e) {
+    const now      = new Date();
+    const regStart = e.regStart    ? new Date(e.regStart)    : null;
+    const regEnd   = e.regDeadline ? new Date(e.regDeadline) : null;
+    if (regEnd   && now > regEnd)   return "Completed";
+    if (regStart && now < regStart) return "Upcoming";
+    if ((!regStart || now >= regStart) && (!regEnd || now <= regEnd)) return "Ongoing";
+    return "Upcoming";
+  }
+
+
+  function getRegStatus(e) {
+    const now    = new Date();
+    const regStart = e.regStart    ? new Date(e.regStart)    : null;
+    const regEnd   = e.regDeadline ? new Date(e.regDeadline) : null;
+    const seats  = e.seats  ? parseInt(e.seats) : 0;
+    const joined = e.joined || 0;
+    if (seats > 0 && joined >= seats)    return { open: false, reason: "Full" };
+    if (regStart && now < regStart)      return { open: false, reason: "Not open yet" };
+    if (regEnd   && now > regEnd)        return { open: false, reason: "Closed" };
+    return { open: true };
+  }
+
+
   /* ── LOAD EVENTS ── */
-  async function loadEvents() {
-    const grid = document.getElementById("eventsGrid");
+  async function loadHomeEvents() {
+    const grid = document.getElementById("homeEventsGrid");
     try {
       const snapshot = await getDocs(collection(db, "events"));
       window._allEvents = [];
       snapshot.forEach(d => window._allEvents.push({ id: d.id, ...d.data() }));
-      renderEvents(window._allEvents);
+renderAnnouncements();
+
+      const now = new Date();
+
+
+      // ── COUNTDOWN: nearest reg deadline among ongoing events ──
+      const ongoingWithDeadline = window._allEvents
+        .filter(e => {
+          const regStart = e.regStart    ? new Date(e.regStart)    : null;
+          const regEnd   = e.regDeadline ? new Date(e.regDeadline) : null;
+          return (!regStart || now >= regStart) && regEnd && now <= regEnd;
+        })
+        .sort((a, b) => new Date(a.regDeadline) - new Date(b.regDeadline));
+
+
+      if (ongoingWithDeadline.length > 0) {
+        const nearest    = ongoingWithDeadline[0];
+        const targetDate = new Date(nearest.regDeadline).getTime();
+        const timer = setInterval(() => {
+          const diff = targetDate - new Date().getTime();
+          if (diff <= 0) {
+            document.getElementById("countdownText").innerText = `${nearest.name} — Registration Closed!`;
+            clearInterval(timer);
+            return;
+          }
+          const d = Math.floor(diff / 86400000);
+          const h = Math.floor((diff % 86400000) / 3600000);
+          const m = Math.floor((diff % 3600000)  / 60000);
+          const s = Math.floor((diff % 60000)    / 1000);
+          document.getElementById("countdownText").innerText =
+            `${nearest.name}: ${d}d ${h}h ${m}m ${s}s left for registration`;
+        }, 1000);
+      } else {
+        document.getElementById("countdownText").innerText = "No ongoing events right now";
+      }
+
+
+      // ── GRID: ongoing events only ──
+      const ongoingOnly = window._allEvents.filter(e => getEventStatus(e) === "Ongoing").slice(0, 6);
+
+
+      if (ongoingOnly.length === 0) {
+        grid.innerHTML = '<p class="loading-text">No ongoing events right now.</p>';
+        return;
+      }
+
+
+      grid.innerHTML = ongoingOnly.map(e => {
+        const eventDate   = e.eventDate   ? new Date(e.eventDate).toLocaleDateString('en-IN',   { day:'numeric', month:'short', year:'numeric' }) : "TBA";
+        const regDeadline = e.regDeadline ? new Date(e.regDeadline).toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' }) : "TBA";
+        const current = e.joined || 0;
+        const max     = e.seats  || "Unlimited";
+        const reg     = getRegStatus(e);
+        const status  = getEventStatus(e);
+        const statusClass = status === "Ongoing" ? "badge-ongoing" : status === "Completed" ? "badge-completed" : "badge-upcoming";
+
+
+        return `
+        <div class="event-card">
+          <div class="event-card-img">
+            <img src="${e.image || 'https://via.placeholder.com/400x200'}" alt="${e.name}">
+            <span class="badge ${statusClass}">${status.toLowerCase()}</span>
+          </div>
+          <div class="event-card-body">
+            <h3>${e.name}</h3>
+            <div class="event-meta">
+              <span>Date: ${eventDate}</span>
+              <span>Reg. deadline: ${regDeadline}</span>
+              <span>Participants: ${current} / ${max}</span>
+              ${e.venue ? `<span>Venue: ${e.venue}</span>` : ""}
+            </div>
+            <div class="event-card-actions">
+              ${reg.open
+                ? `<button class="register-btn" onclick="openRegisterModal('${e.id}')">Register</button>`
+                : `<button class="register-btn closed" disabled>Registration ${reg.reason}</button>`
+              }
+              <button class="details-btn" onclick="openDetailsModal('${e.id}')">View Details</button>
+            </div>
+          </div>
+        </div>`;
+      }).join("");
+
+
     } catch (err) {
       console.error(err);
       grid.innerHTML = '<p class="loading-text">Failed to load events.</p>';
     }
   }
+/* ── ANNOUNCEMENTS ── */
+function renderAnnouncements() {
 
-  /* ── REGISTRATION STATUS ── */
-  function getRegStatus(e) {
-    const now      = new Date();
-    const regStart = e.regStart    ? new Date(e.regStart)    : null;
-    const regEnd   = e.regDeadline ? new Date(e.regDeadline) : null;
-    const seats    = e.seats ? parseInt(e.seats) : 0;
-    const joined   = e.joined || 0;
-    if (e.status === "Completed")     return { open: false, reason: "Completed" };
-    if (seats > 0 && joined >= seats) return { open: false, reason: "Full" };
-    if (regStart && now < regStart)   return { open: false, reason: "Not open yet" };
-    if (regEnd   && now > regEnd)     return { open: false, reason: "Closed" };
-    return { open: true };
+  const container = document.getElementById("announcementList");
+
+  if (!container) return;
+
+  if (window._allEvents.length === 0) {
+
+    container.innerHTML = `
+      <div class="announcement-item">
+        <div class="announcement-tag">INFO</div>
+
+        <div class="announcement-content">
+          <h4>No announcements available</h4>
+          <p>No events found right now.</p>
+        </div>
+      </div>
+    `;
+
+    return;
   }
-function getEventStatus(e) {
-  const now      = new Date();
-  const regStart = e.regStart    ? new Date(e.regStart)    : null;
-  const regEnd   = e.regDeadline ? new Date(e.regDeadline) : null;
 
-  if (regEnd && now > regEnd)            return "Completed";
-  if (regStart && now < regStart)        return "Upcoming";
-  if ((!regStart || now >= regStart) &&
-      (!regEnd   || now <= regEnd))      return "Ongoing";
-  return "Upcoming"; // fallback
+  let announcements = [];
+
+  // LIVE EVENTS
+  const liveEvents = window._allEvents.filter(e =>
+    getRegStatus(e).open
+  );
+
+  liveEvents.forEach(event => {
+
+    announcements.push(`
+      <div class="announcement-item">
+
+        <div class="announcement-tag">
+          LIVE
+        </div>
+
+        <div class="announcement-content">
+          <h4>${event.name || "Untitled Event"}</h4>
+
+          <p>
+            ${event.shortDesc || "Registrations are currently open."}
+          </p>
+        </div>
+
+      </div>
+    `);
+
+  });
+
+
+  // RECENTLY ENDED EVENT
+const now = new Date();
+
+const endedEvents = window._allEvents.filter(event => {
+  return event.regDeadline &&
+         new Date(event.regDeadline) < now;
+});
+
+const latestEndedEvent = endedEvents
+  .sort((a, b) => 
+    new Date(b.regDeadline) - new Date(a.regDeadline)
+  )[0];
+
+if (latestEndedEvent) {
+
+  announcements.push(`
+    <div class="announcement-item">
+
+      <div class="announcement-tag">
+        ENDED
+      </div>
+
+      <div class="announcement-content">
+        <h4>${latestEndedEvent.name || "Untitled Event"}</h4>
+
+        <p>
+          Registrations for this event have officially closed.
+        </p>
+      </div>
+
+    </div>
+  `);
+
 }
-  /* ── RENDER EVENT CARDS ── */
-  function renderEvents(list) {
-    const grid = document.getElementById("eventsGrid");
-    if (list.length === 0) {
-      grid.innerHTML = '<p class="loading-text">No events found.</p>';
-      return;
-    }
-    grid.innerHTML = list.map(e => {
-      const eventDate = e.eventDate
-        ? new Date(e.eventDate).toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' })
-        : "TBA";
-      const regEnd = e.regDeadline
-        ? new Date(e.regDeadline).toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' })
-        : "TBA";
-      const current     = e.joined || 0;
-      const max         = e.seats  || "Unlimited";
-    
-const status      = getEventStatus(e);
-const statusClass = status === "Ongoing"   ? "badge-ongoing"
-                  : status === "Completed" ? "badge-completed"
-                  : "badge-upcoming";
-      const reg = getRegStatus(e);
 
-      return `
-      <div class="event-card">
-        <div class="event-card-img">
-          <img src="${e.image || 'https://via.placeholder.com/400x200'}" alt="${e.name}">
-       <span class="badge ${statusClass}">${status.toLowerCase()}</span>
-        </div>
-        <div class="event-card-body">
-          <h3>${e.name}</h3>
-          <div class="event-meta">
-            <span>Date: ${eventDate}</span>
-            <span>Reg. deadline: ${regEnd}</span>
-            <span>Participants: ${current} / ${max}</span>
-            ${e.venue ? `<span>Venue: ${e.venue}</span>` : ""}
-          </div>
-          <div class="event-card-actions">
-            ${reg.open
-              ? `<button class="register-btn" onclick="openRegisterModal('${e.id}')">Register</button>`
-              : `<button class="register-btn closed" disabled>Registration ${reg.reason}</button>`
-            }
-            <button class="details-btn" onclick="openDetailsModal('${e.id}')">View Details</button>
-          </div>
-        </div>
-      </div>`;
-    }).join("");
+  // NEWLY ADDED EVENT
+const newestEvent = [...window._allEvents]
+  .filter(event => event.createdAt)
+  .sort((a, b) => b.createdAt - a.createdAt)[0];
+
+if (newestEvent) {
+
+  announcements.push(`
+    <div class="announcement-item">
+
+      <div class="announcement-tag">
+        NEW
+      </div>
+
+      <div class="announcement-content">
+        <h4>${newestEvent.name || "Untitled Event"}</h4>
+
+        <p>
+          ${newestEvent.shortDesc || "A newly uploaded event is now available."}
+        </p>
+      </div>
+
+    </div>
+  `);
+
+
+
+
   }
+
+  container.innerHTML = announcements.join("");
+}
 
   /* ── DETAILS MODAL ── */
   window.openDetailsModal = function(eventId) {
@@ -320,18 +499,18 @@ const statusClass = status === "Ongoing"   ? "badge-ongoing"
     if (!e) return;
     window._currentEvent = e;
 
-    document.getElementById("detailImg").src = e.image || "https://via.placeholder.com/800x400";
-    document.getElementById("detailName").innerText = e.name || "";
 
-    const badge = document.getElementById("detailBadge");
-   const status = getEventStatus(e);
-badge.innerText = status.toUpperCase();
-badge.className = "badge " + (status === "Ongoing"   ? "badge-ongoing"
-      : status === "Completed" ? "badge-completed"
-    : "badge-upcoming");
-
+    document.getElementById("detailImg").src            = e.image || "https://via.placeholder.com/800x400";
+    document.getElementById("detailName").innerText     = e.name  || "";
     document.getElementById("detailShortDesc").innerText = e.shortDesc || "";
     document.getElementById("detailDesc").innerText      = e.desc      || "";
+
+
+    const status = getEventStatus(e);
+    const badge  = document.getElementById("detailBadge");
+    badge.innerText  = status.toUpperCase();
+    badge.className  = "badge " + (status === "Ongoing" ? "badge-ongoing" : status === "Completed" ? "badge-completed" : "badge-upcoming");
+
 
     if (e.eventDate) {
       const d = new Date(e.eventDate);
@@ -341,6 +520,7 @@ badge.className = "badge " + (status === "Ongoing"   ? "badge-ongoing"
       document.getElementById("detailDate").innerText = "TBA";
       document.getElementById("detailTime").innerText = "TBA";
     }
+
 
     document.getElementById("detailVenue").innerText     = e.venue     || "TBA";
     document.getElementById("detailOrganizer").innerText = e.organizer || "TBA";
@@ -352,29 +532,28 @@ badge.className = "badge " + (status === "Ongoing"   ? "badge-ongoing"
       ? new Date(e.regDeadline).toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' }) : "TBA";
     document.getElementById("detailGroup").innerText     = e.allowGroup ? "Allowed" : "Not allowed";
 
+
     const reg = getRegStatus(e);
     const btn = document.getElementById("detailRegBtn");
-    if (reg.open) {
-      btn.disabled = false;
-      btn.className = "register-btn";
-      btn.innerText = "Enroll";
-    } else {
-      btn.disabled = true;
-      btn.className = "register-btn closed";
-      btn.innerText = "Registration " + reg.reason;
-    }
+    btn.disabled  = !reg.open;
+    btn.className = reg.open ? "register-btn" : "register-btn closed";
+    btn.innerText = reg.open ? "Enroll" : "Registration " + reg.reason;
+
 
     document.getElementById("detailsModal").style.display = "flex";
   };
+
 
   window.closeDetailsModal = function() {
     document.getElementById("detailsModal").style.display = "none";
   };
 
+
   window.openRegisterFromDetails = function() {
     closeDetailsModal();
-    if (window._currentEvent) window.openRegisterModal(window._currentEvent.id);
+    if (window._currentEvent) openRegisterModal(window._currentEvent.id);
   };
+
 
   /* ── REGISTER MODAL ── */
   window.openRegisterModal = function(eventId) {
@@ -382,158 +561,109 @@ badge.className = "badge " + (status === "Ongoing"   ? "badge-ongoing"
     if (!e) return;
     window._currentEvent = e;
 
-    document.getElementById("regEventName").innerText  = e.name;
-    document.getElementById("regName").value           = "";
-    document.getElementById("regClass").value          = "";
-    document.getElementById("regSection").value        = "";
-    document.getElementById("regRoll").value           = "";
-    document.getElementById("regEmail").value          = "";
-    document.getElementById("isGroup").checked         = false;
-    document.getElementById("groupMembersSection").style.display = "none";
-    document.getElementById("groupMembersList").innerHTML = "";
-    document.getElementById("regError").style.display = "none";
 
-    // Show group checkbox only if event allows group
-    document.getElementById("groupSection").style.display = e.allowGroup ? "block" : "none";
+    document.getElementById("regEventName").innerText           = e.name;
+    document.getElementById("regName").value                    = "";
+    document.getElementById("regClass").value                   = "";
+    document.getElementById("regSection").value                 = "";
+    document.getElementById("regRoll").value                    = "";
+    document.getElementById("regEmail").value                   = "";
+    document.getElementById("isGroup").checked                  = false;
+    document.getElementById("groupMembersSection").style.display = "none";
+    document.getElementById("groupMembersList").innerHTML       = "";
+    document.getElementById("regError").style.display           = "none";
+    document.getElementById("groupSection").style.display       = e.allowGroup ? "block" : "none";
+
 
     document.getElementById("registerModal").style.display = "flex";
   };
+
 
   window.closeRegisterModal = function() {
     document.getElementById("registerModal").style.display = "none";
   };
 
-   window.toggleGroupMembers = function() {
+
+  window.toggleGroupMembers = function() {
     const checked = document.getElementById("isGroup").checked;
     document.getElementById("groupMembersSection").style.display = checked ? "block" : "none";
-    document.getElementById("individualFields").style.display = checked ? "none" : "block";
+    document.getElementById("individualFields").style.display    = checked ? "none"  : "block";
     if (checked) updateGroupMembers();
   };
 
+
   window.updateGroupMembers = function() {
     const count = parseInt(document.getElementById("groupCount").value) || 2;
-    const list = document.getElementById("groupMembersList");
+    const list  = document.getElementById("groupMembersList");
     list.innerHTML = "";
     for (let i = 1; i <= count; i++) {
       const row = document.createElement("div");
       row.className = "group-member-row";
-    row.innerHTML = `
+      row.innerHTML = `
         <div class="group-member-header">
-          <span style="font-weight:600; font-size:13px;">Participant ${i}</span>
+          <span style="font-weight:600;font-size:13px;">Participant ${i}</span>
         </div>
         <div class="form-row">
           <div><input type="text" placeholder="Participant ${i} Name" class="member-name"></div>
-          <div><input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="4" placeholder="Class" class="member-class" oninput="onlyDigits(this)"></div>
-          <div><input type="text" inputmode="text" pattern="[A-Za-z]*" maxlength="4" placeholder="Section" class="member-section" oninput="onlyLetters(this)"></div>
-          <div><input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="6" placeholder="Roll Number" class="member-roll" oninput="onlyDigits(this)"></div>
-        </div>
-      `;
+          <div><input type="text" placeholder="Class" class="member-class"></div>
+          <div><input type="text" placeholder="Section" class="member-section"></div>
+          <div><input type="text" placeholder="Roll Number" class="member-roll"></div>
+        </div>`;
       list.appendChild(row);
     }
   };
-async function sendConfirmationEmail(studentEmail, studentName, eventName) {
-  console.log("Function started");
-  try {
-    const res = await emailjs.send("YOUR_SERVICE_ID", "YOUR_TEMPLATE_ID", {
-      to_email: studentEmail,
-      student_name: studentName,
-      event_name: eventName,
-      confirm_link: "https://yourwebsite.com/confirmation.html"
-    });
-    await emailjs.send("YOUR_SERVICE_ID", "YOUR_TEMPLATE_ID", {
-      to_email: studentEmail,
-      student_name: studentName,
-      event_name: eventName,
-      confirm_link: "https://yourwebsite.com/confirmation.html"
-    });
 
-     console.log("Mail success:", res);
-   }catch(err){
-      console.error("Mail failed:", err);
-   }
-}
+
   /* ── SUBMIT REGISTRATION ── */
   window.submitRegistration = async function() {
-    const e             = window._currentEvent;
-    const name          = document.getElementById("regName").value.trim();
-    const regClass      = document.getElementById("regClass").value.trim();
-    const regSection    = document.getElementById("regSection").value.trim();
-    const rollNumber    = document.getElementById("regRoll").value.trim();
-    const email         = document.getElementById("regEmail").value.trim();
-    const errEl         = document.getElementById("regError");
-  errEl.style.display = "none";
+    const e          = window._currentEvent;
+    const name       = document.getElementById("regName").value.trim();
+    const regClass   = document.getElementById("regClass").value.trim();
+    const regSection = document.getElementById("regSection").value.trim();
+    const rollNumber = document.getElementById("regRoll").value.trim();
+    const email      = document.getElementById("regEmail").value.trim();
+    const errEl      = document.getElementById("regError");
+    errEl.style.display = "none";
 
-    const isGroup = document.getElementById("isGroup").checked && e.allowGroup;
+
+    const isGroup   = document.getElementById("isGroup").checked && e.allowGroup;
     const groupName = isGroup ? document.getElementById("groupName").value.trim() : "";
 
+
     if (!isGroup && (!name || !regClass || !regSection || !rollNumber)) {
-      errEl.innerText = "Please fill in all required fields (Name, Class, Section, Roll Number).";
-      errEl.style.display = "block";
-      return;
+      errEl.innerText = "Please fill in all required fields.";
+      errEl.style.display = "block"; return;
     }
-
-    // Format checks (backstop in case something bypassed the live filtering,
-    // e.g. a paste on a browser that doesn't fire 'input' the same way).
-    if (!isGroup && !DIGITS_ONLY.test(regClass)) {
-      errEl.innerText = "Class must contain numbers only.";
-      errEl.style.display = "block";
-      return;
-    }
-    if (!isGroup && !LETTERS_ONLY.test(regSection)) {
-      errEl.innerText = "Section must contain letters only.";
-      errEl.style.display = "block";
-      return;
-    }
-    if (!isGroup && !DIGITS_ONLY.test(rollNumber)) {
-      errEl.innerText = "Roll number must contain numbers only.";
-      errEl.style.display = "block";
-      return;
-    }
-
     if (isGroup && !groupName) {
       errEl.innerText = "Please enter a group name.";
-      errEl.style.display = "block";
-      return;
+      errEl.style.display = "block"; return;
     }
-    let members = [];
 
+
+    let members = [];
     if (isGroup) {
       const rows = document.getElementById("groupMembersList").querySelectorAll(".group-member-row");
       for (let row of rows) {
         const mName    = row.querySelector(".member-name").value.trim();
         const mClass   = row.querySelector(".member-class").value.trim();
         const mSection = row.querySelector(".member-section").value.trim();
-        const mRoll = row.querySelector(".member-roll").value.trim();
+        const mRoll    = row.querySelector(".member-roll").value.trim();
         if (!mName || !mClass || !mSection || !mRoll) {
           errEl.innerText = "Please fill in all participant details.";
-          errEl.style.display = "block";
-          return;
-        }
-        if (!DIGITS_ONLY.test(mClass)) {
-          errEl.innerText = "Each participant's class must contain numbers only.";
-          errEl.style.display = "block";
-          return;
-        }
-        if (!LETTERS_ONLY.test(mSection)) {
-          errEl.innerText = "Each participant's section must contain letters only.";
-          errEl.style.display = "block";
-          return;
-        }
-        if (!DIGITS_ONLY.test(mRoll)) {
-          errEl.innerText = "Each participant's roll number must contain numbers only.";
-          errEl.style.display = "block";
-          return;
+          errEl.style.display = "block"; return;
         }
         members.push({ name: mName, class: mClass, section: mSection, rollNumber: mRoll });
       }
     }
 
+
     try {
       const btn = document.getElementById("submitRegBtn");
-      btn.disabled = true;
-      btn.innerText = "Submitting...";
+      btn.disabled = true; btn.innerText = "Submitting...";
+
 
       const { collection, addDoc, updateDoc, doc, increment, query, where, getDocs } = window._fb;
+
 
    
      if (!isGroup) {
@@ -544,10 +674,12 @@ async function sendConfirmationEmail(studentEmail, studentName, eventName) {
   const alreadyRegistered = [];
   allRegsSnap.forEach(d => alreadyRegistered.push(d.data()));
 
+
   const duplicate = alreadyRegistered.find(r =>
     r.rollNumber === rollNumber &&
     (r.section || "").toLowerCase() === regSection.toLowerCase()
   );
+
 
   if (duplicate) {
     errEl.innerText = "You have already registered for this event with this roll number.";
@@ -559,54 +691,38 @@ async function sendConfirmationEmail(studentEmail, studentName, eventName) {
 }
 
 
-      // Check participant limit
       if (e.seats && parseInt(e.seats) > 0) {
         const allRegsSnap = await getDocs(query(
-          collection(window._db, "registrations"),
-          where("eventId", "==", e.id)
+          collection(window._db, "registrations"), where("eventId", "==", e.id)
         ));
         if (allRegsSnap.size >= parseInt(e.seats)) {
           errEl.innerText = "Sorry, this event is now full.";
           errEl.style.display = "block";
-          btn.disabled = false;
-          btn.innerText = "Submit";
-          return;
+          btn.disabled = false; btn.innerText = "Submit"; return;
         }
       }
 
-      // Save to Firebase
-    await addDoc(collection(window._db, "registrations"), {
-      
-        eventId: e.id,
-        eventName: e.name,
+
+      await addDoc(collection(window._db, "registrations"), {
+        eventId: e.id, eventName: e.name,
         name: isGroup ? groupName : name,
         class: isGroup ? "" : regClass,
         section: isGroup ? "" : regSection,
         classSection: isGroup ? "" : regClass + "-" + regSection,
         rollNumber: isGroup ? "" : rollNumber,
-       email: localStorage.getItem("studentEmail") || "",
+        email: localStorage.getItem("studentEmail") || "",
         type: isGroup ? "group" : "individual",
-        groupName: groupName,
-        members: isGroup ? members : [],
+        groupName, members: isGroup ? members : [],
         registeredAt: new Date().toISOString()
       });
-const studentMail = localStorage.getItem("studentEmail");
 
-if(studentMail){
-   await sendConfirmationEmail(
-      studentMail,
-      isGroup ? groupName : name,
-      e.name
-   );
-}
-      // Increment participant count
+
       await updateDoc(doc(window._db, "events", e.id), { joined: increment(1) });
-
-      // Update local data
       const ev = window._allEvents.find(ev => ev.id === e.id);
       if (ev) ev.joined = (ev.joined || 0) + 1;
 
-    window.closeRegisterModal();
+
+window.closeRegisterModal();
 const successOverlay = document.createElement("div");
 successOverlay.style.cssText = "position:fixed;inset:0;background:rgba(15,10,30,0.6);backdrop-filter:blur(4px);z-index:9999;display:flex;align-items:center;justify-content:center;animation:fadeIn 0.2s ease";
 successOverlay.innerHTML = `
@@ -633,31 +749,19 @@ document.body.appendChild(successOverlay);
 successOverlay.addEventListener("click", (ev) => {
   if (ev.target === successOverlay) document.body.removeChild(successOverlay);
 });
-renderEvents(window._allEvents);
+loadHomeEvents();
+
+
     } catch (err) {
       console.error(err);
-      errEl.innerText = "Registration failed. Please try again.";
-      errEl.style.display = "block";
+      document.getElementById("regError").innerText = "Registration failed. Please try again.";
+      document.getElementById("regError").style.display = "block";
       document.getElementById("submitRegBtn").disabled = false;
       document.getElementById("submitRegBtn").innerText = "Submit";
     }
   };
 
-  /* ── FILTER ── */
-  window.filterEvents = function() {
-    const search   = document.getElementById("searchInput").value.toLowerCase();
-    const status   = document.getElementById("statusFilter").value;
-    const category = document.getElementById("categoryFilter").value;
-    const filtered = window._allEvents.filter(e => {
-      const matchSearch   = e.name?.toLowerCase().includes(search) || e.organizer?.toLowerCase().includes(search);
-     const matchStatus = !status || getEventStatus(e) === status;
-      const matchCategory = !category || e.category === category;
-      return matchSearch && matchStatus && matchCategory;
-    });
-    renderEvents(filtered);
-  };
 
-  // Close modals on outside click
   window.addEventListener("click", ev => {
     if (ev.target.id === "detailsModal")  window.closeDetailsModal();
     if (ev.target.id === "registerModal") window.closeRegisterModal();
@@ -668,8 +772,9 @@ window.logout = function () {
     sessionStorage.clear();
     window.location.replace("login.html");
 };
-  loadEvents();
+  loadHomeEvents();
 </script>
+
 
 </body>
 </html>
