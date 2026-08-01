@@ -586,7 +586,8 @@
   @keyframes cardIn { to { opacity: 1; transform: translateY(0) scale(1); } }
 
 
-  .g-card img {
+  .g-card img,
+  .g-card video {
     width: 100%; height: 100%;
     object-fit: cover;
     display: block;
@@ -595,11 +596,8 @@
   }
 
 
-  .g-card:hover {
-    box-shadow: 0 20px 36px -16px rgba(33,31,26,0.28);
-    transform: translateY(-4px);
-  }
-  .g-card:hover img { transform: scale(1.06); filter: saturate(1.05) contrast(1.03); }
+  .g-card:hover img,
+  .g-card:hover video { transform: scale(1.06); filter: saturate(1.05) contrast(1.03); }
 
 
   .g-card::before {
@@ -612,6 +610,26 @@
 
 
   .g-card:hover::before { opacity: 1; }
+
+
+  /* Video badge — shown top-left on any card whose cover is a video,
+     so browsers can tell at a glance before hovering */
+  .g-video-badge {
+    position: absolute;
+    left: 12px; top: 12px;
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    background: rgba(10,10,10,0.55);
+    backdrop-filter: blur(3px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 3;
+    transition: transform .4s var(--ease-spring), opacity .4s var(--ease-soft);
+    pointer-events: none;
+  }
+  .g-video-badge svg { width: 11px; height: 11px; margin-left: 1px; }
+  .g-card:hover .g-video-badge { opacity: 0; transform: scale(.8); }
 
 
   .g-tag {
@@ -785,6 +803,14 @@
     height: auto;
     display: block;
     transition: transform .7s var(--ease-spring);
+  }
+
+
+  .m-item video {
+    width: 100%;
+    height: auto;
+    display: block;
+    background: #0c0b09;
   }
 
 
@@ -981,6 +1007,15 @@
     const db = getFirestore(app);
     const COLLECTION_NAME = "galleryEntries";
 
+    // --- VIDEO DETECTION HELPER ---
+    // Any cover/gallery URL ending in a common video extension (allowing
+    // for query strings, e.g. Cloudinary's ?_a=... suffix) is treated as
+    // a video. No schema change required — works with existing entries.
+    function isVideoUrl(url) {
+      if (!url) return false;
+      return /\.(mp4|webm|mov|m4v|ogg)(\?.*)?$/i.test(url);
+    }
+
     // --- 1. CAROUSEL SCRIPT ---
    (function () {
   const images = [
@@ -1132,7 +1167,8 @@ const tornDivider = document.querySelector('.torn-divider');
       // Entries now live in Firestore (collection "galleryEntries"), shared
       // across every browser/device — no more localStorage, no more
       // per-browser copies. Cover/gallery photos themselves are Cloudinary
-      // URLs stored on each entry document.
+      // URLs stored on each entry document. Videos work the same way —
+      // just a Cloudinary video URL instead of an image URL.
       let events = [];
 
 
@@ -1247,17 +1283,35 @@ const tornDivider = document.querySelector('.torn-divider');
           card.className = 'g-card ' + (ev.size || '');
           card.dataset.year = ev.year;
           card.style.animationDelay = (i * 0.07) + 's';
+
+          const coverIsVideo = isVideoUrl(ev.cover);
+          const mediaHtml = coverIsVideo
+            ? `<video src="${ev.cover}" muted loop playsinline preload="metadata"></video>`
+            : `<img src="${ev.cover}" alt="${ev.title}">`;
+          const videoBadgeHtml = coverIsVideo
+            ? `<span class="g-video-badge"><svg viewBox="0 0 12 12" fill="none"><path d="M2 1.5L10 6L2 10.5V1.5Z" fill="#fbf9f3"/></svg></span>`
+            : '';
+
           card.innerHTML = `
-            <img src="${ev.cover}" alt="${ev.title}">
+            ${mediaHtml}
             <span class="corner-fold"></span>
             <span class="view-stamp">Open<br>Entry</span>
             <span class="g-stamp">${ev.year}</span>
+            ${videoBadgeHtml}
             <span class="g-tag">
               <span class="g-tag-title">${ev.title}</span>
               <span class="g-tag-label">${ev.tag}</span>
             </span>
           `;
           card.addEventListener('click', () => openEvent(ev.id));
+
+          // Ambient hover preview: play the cover video on hover, reset on leave
+          if (coverIsVideo) {
+            const vidEl = card.querySelector('video');
+            card.addEventListener('mouseenter', () => { vidEl.play().catch(() => {}); });
+            card.addEventListener('mouseleave', () => { vidEl.pause(); vidEl.currentTime = 0; });
+          }
+
           galleryGrid.appendChild(card);
         });
         countLive.textContent = events.length;
@@ -1286,10 +1340,21 @@ const tornDivider = document.querySelector('.torn-divider');
           const item = document.createElement('div');
           item.className = 'm-item';
           item.style.animationDelay = (i * 0.06) + 's';
-          const img = document.createElement('img');
-          img.src = src;
-          img.alt = ev.title + ' photo ' + (i + 1);
-          item.appendChild(img);
+
+          if (isVideoUrl(src)) {
+            const vid = document.createElement('video');
+            vid.src = src;
+            vid.controls = true;
+            vid.playsInline = true;
+            vid.preload = 'metadata';
+            item.appendChild(vid);
+          } else {
+            const img = document.createElement('img');
+            img.src = src;
+            img.alt = ev.title + ' photo ' + (i + 1);
+            item.appendChild(img);
+          }
+
           detailMasonry.appendChild(item);
         });
 
@@ -1303,6 +1368,8 @@ window.scrollTo({ top: viewDetail.offsetTop - 20, behavior:'smooth' });
 
 
     backBtn.addEventListener('click', () => {
+  // Pause any playing videos in the detail view before leaving it
+  detailMasonry.querySelectorAll('video').forEach(v => v.pause());
   viewDetail.classList.remove('active');
   viewHome.classList.add('active');
   heroSection.style.display = '';

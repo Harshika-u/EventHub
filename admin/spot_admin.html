@@ -364,7 +364,9 @@
   }
 
   .cover-preview.show { display: block; }
-  .cover-preview img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .cover-media { width: 100%; height: 100%; }
+  .cover-preview img,
+  .cover-preview video { width: 100%; height: 100%; object-fit: cover; display: block; }
 
   .cover-preview .remove-x {
     position: absolute;
@@ -376,9 +378,24 @@
     color: #fff;
     font-size: 13px;
     cursor: pointer;
+    z-index: 2;
     transition: background .25s var(--ease-soft), transform .25s var(--ease-spring);
   }
   .cover-preview .remove-x:hover { background: var(--danger); transform: scale(1.1); }
+
+  .media-video-tag {
+    position: absolute;
+    left: 8px; top: 8px;
+    padding: 3px 9px;
+    border-radius: 999px;
+    background: rgba(33,29,26,0.7);
+    color: #fbf9f3;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    z-index: 2;
+  }
 
   @keyframes cardIn { from { opacity:0; transform: scale(.94); } to { opacity:1; transform: scale(1); } }
 
@@ -400,7 +417,8 @@
     box-shadow: 0 2px 8px rgba(33,31,26,0.12);
   }
 
-  .thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .thumb img,
+  .thumb video { width: 100%; height: 100%; object-fit: cover; display: block; }
 
   .thumb .remove-x {
     position: absolute;
@@ -413,9 +431,21 @@
     font-size: 10px;
     line-height: 1;
     cursor: pointer;
+    z-index: 2;
     transition: background .25s var(--ease-soft), transform .25s var(--ease-spring);
   }
   .thumb .remove-x:hover { background: var(--danger); transform: scale(1.15); }
+
+  .thumb .thumb-video-badge {
+    position: absolute;
+    left: 4px; bottom: 4px;
+    width: 16px; height: 16px;
+    border-radius: 50%;
+    background: rgba(33,29,26,0.7);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 2;
+  }
+  .thumb .thumb-video-badge svg { width: 6px; height: 6px; margin-left: 1px; }
 
   /* ==========================================
      SECTION 6: SAVE BUTTON (stamp interaction)
@@ -494,7 +524,9 @@
 
   .preview-card:hover { transform: translateY(-4px) scale(1.01); }
 
-  .preview-card img {
+  .preview-media { width: 100%; height: 100%; }
+  .preview-card img,
+  .preview-card video {
     width: 100%; height: 100%;
     object-fit: cover;
     display: block;
@@ -502,7 +534,8 @@
     filter: saturate(.92) contrast(1.02);
   }
 
-  .preview-card:hover img { transform: scale(1.06); }
+  .preview-card:hover img,
+  .preview-card:hover video { transform: scale(1.06); }
 
   .preview-card::before {
     content: "";
@@ -533,6 +566,7 @@
     font-family: 'IBM Plex Mono', monospace;
     font-size: 11px;
     font-weight: 600;
+    z-index: 2;
   }
 
   .preview-tag {
@@ -541,6 +575,7 @@
     color: #fbf9f3;
     font-size: 14px;
     font-weight: 500;
+    z-index: 2;
   }
 
   .preview-note {
@@ -572,7 +607,7 @@
 
   .ledger-row {
     display: grid;
-    grid-template-columns: 56px 1fr auto auto auto;
+    grid-template-columns: 56px 1fr auto auto auto auto;
     align-items: center;
     gap: 16px;
     padding: 12px 14px;
@@ -599,12 +634,14 @@
   }
 
   .ledger-thumb {
+    position: relative;
     width: 56px; height: 56px;
     border-radius: 10px;
     overflow: hidden;
     background: #ddd;
   }
-  .ledger-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .ledger-thumb img,
+  .ledger-thumb video { width: 100%; height: 100%; object-fit: cover; display: block; }
 
   .ledger-info .l-title {
     font-family: 'Fraunces', serif;
@@ -629,6 +666,8 @@
     color: var(--olive);
     white-space: nowrap;
   }
+
+  .l-badge.media-video { background: #fee2e2; color: #b91c1c; }
 
   .icon-btn {
     width: 34px; height: 34px;
@@ -753,7 +792,7 @@
       </div>
     </div>
 
-    <p class="sync-note" id="syncNote">Photos upload to Cloudinary and entries save to Firestore — everything syncs live across every device, no matter who's logged in.</p>
+    <p class="sync-note" id="syncNote">Photos and videos upload to Cloudinary and entries save to Firestore — everything syncs live across every device, no matter who's logged in.</p>
 
     <div class="workspace">
 
@@ -793,25 +832,25 @@
             <button type="button" class="size-opt" data-size="size-big"><span class="shape"></span><span>Big</span></button>
           </div>
 
-          <span class="drop-label size-label">Cover photo</span>
+          <span class="drop-label size-label">Cover photo or video</span>
           <div class="cover-preview" id="coverPreview">
-            <img id="coverImg" alt="Cover preview">
+            <div class="cover-media" id="coverMedia"></div>
             <button type="button" class="remove-x" id="removeCover">✕</button>
           </div>
           <div class="dropzone" id="coverDrop">
             <svg width="26" height="26" viewBox="0 0 26 26" fill="none"><rect x="3" y="5" width="20" height="16" rx="2.5" stroke="#6b645d" stroke-width="1.3"/><circle cx="9" cy="11" r="1.6" fill="#6b645d"/><path d="M3 17l5.5-5 4 3.5L18 10l5 6" stroke="#6b645d" stroke-width="1.3" stroke-linejoin="round"/></svg>
-            <div class="dz-title">Drop cover image here</div>
+            <div class="dz-title">Drop cover image or video here</div>
             <div class="dz-sub">or click to browse — used as the grid thumbnail</div>
-            <input type="file" id="coverInput" accept="image/*">
+            <input type="file" id="coverInput" accept="image/*,video/*">
           </div>
 
-          <span class="drop-label size-label">Gallery photos</span>
+          <span class="drop-label size-label">Gallery photos & videos</span>
           <div class="thumb-grid" id="thumbGrid"></div>
           <div class="dropzone" id="galleryDrop">
             <svg width="26" height="26" viewBox="0 0 26 26" fill="none"><path d="M13 4v14M6 11l7-7 7 7" stroke="#6b645d" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 20h18" stroke="#6b645d" stroke-width="1.3" stroke-linecap="round"/></svg>
-            <div class="dz-title">Drop multiple photos here</div>
+            <div class="dz-title">Drop multiple photos or videos here</div>
             <div class="dz-sub">or click to browse — shown in the entry's detail view</div>
-            <input type="file" id="galleryInput" accept="image/*" multiple>
+            <input type="file" id="galleryInput" accept="image/*,video/*" multiple>
           </div>
 
           <button type="submit" class="save-btn" id="saveBtn">Archive Entry</button>
@@ -830,12 +869,12 @@
             <p>Fill in the form to see your card come to life here</p>
           </div>
           <div class="preview-card" id="previewCard" style="display:none;">
-            <img id="previewImg" alt="Preview">
+            <div class="preview-media" id="previewMedia"></div>
             <span class="preview-stamp" id="previewYear">2026</span>
             <span class="preview-tag" id="previewTag">Entry title</span>
           </div>
         </div>
-        <p class="preview-note">Cover photo, title and year update live as you type.</p>
+        <p class="preview-note">Cover photo/video, title and year update live as you type.</p>
       </div>
     </div>
 
@@ -857,7 +896,7 @@
     // ==========================================
     // SECTION A: FIREBASE CONFIG + INIT
     // (same EventHub project used across the whole site — Firestore only.
-    // Images are handled by Cloudinary now, see uploadToCloudinary below.)
+    // Images/videos are handled by Cloudinary now, see uploadToFirebase below.)
     // ==========================================
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import {
@@ -876,7 +915,7 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    // Cloudinary config for image hosting (unsigned upload preset).
+    // Cloudinary config for image/video hosting (unsigned upload preset).
     const CLOUDINARY_CLOUD_NAME = "danjlladp";
     const CLOUDINARY_UPLOAD_PRESET = "EventHub";
 
@@ -890,6 +929,16 @@
     };
 
     // ==========================================
+    // SECTION A.1: MEDIA TYPE HELPER
+    // Detects video by file extension so cover/gallery fields can hold
+    // either an image or a video URL — no Firestore schema change, and
+    // spot.html already does the same check on read.
+    // ==========================================
+    function isVideoUrl(url){
+      return /\.(mp4|webm|mov|m4v|ogg)(\?.*)?$/i.test(url || "");
+    }
+
+    // ==========================================
     // SECTION B: STATE
     // ==========================================
     let entries = []; // [{id, title, tag, accent, year, size, cover, gallery, createdAt}]
@@ -897,10 +946,11 @@
     let editingId = null;
 
     // Uploads a single File to Cloudinary via an unsigned upload preset
-    // and returns the hosted secure_url. Kept the original function name
-    // (uploadToFirebase) so the rest of the file didn't need to change.
+    // and returns the hosted secure_url. Uses the /auto/upload endpoint
+    // so Cloudinary detects image vs video itself — /image/upload alone
+    // would reject video files.
     async function uploadToFirebase(file){
-      const url = `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`;
+      const url = `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/auto/upload`;
       const formData = new FormData();
       formData.append('file', file);
       formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
@@ -993,8 +1043,17 @@
     const coverDrop = document.getElementById('coverDrop');
     const coverInput = document.getElementById('coverInput');
     const coverPreview = document.getElementById('coverPreview');
-    const coverImg = document.getElementById('coverImg');
+    const coverMedia = document.getElementById('coverMedia');
     const removeCover = document.getElementById('removeCover');
+
+    // Renders either an <img> or a looping muted <video> into the cover
+    // preview box, depending on the uploaded/edited URL.
+    function renderCoverMedia(url){
+      if (!url){ coverMedia.innerHTML = ''; return; }
+      coverMedia.innerHTML = isVideoUrl(url)
+        ? `<video src="${url}" muted loop autoplay playsinline></video><span class="media-video-tag">Video</span>`
+        : `<img src="${url}" alt="Cover preview">`;
+    }
 
     wireDropzone(coverDrop, coverInput, async (files) => {
       const file = files[0];
@@ -1004,7 +1063,7 @@
       try {
         const url = await uploadToFirebase(file);
         draft.cover = url;
-        coverImg.src = url;
+        renderCoverMedia(url);
         coverPreview.classList.add('show');
         updatePreview();
       } catch(err){
@@ -1018,6 +1077,7 @@
     removeCover.addEventListener('click', () => {
       draft.cover = '';
       coverPreview.classList.remove('show');
+      renderCoverMedia('');
       updatePreview();
     });
 
@@ -1031,7 +1091,14 @@
         const t = document.createElement('div');
         t.className = 'thumb';
         t.style.animationDelay = (i * 0.05) + 's';
-        t.innerHTML = `<img src="${src}" alt="Gallery photo ${i+1}"><button type="button" class="remove-x">✕</button>`;
+        const isVid = isVideoUrl(src);
+        const mediaHtml = isVid
+          ? `<video src="${src}" muted loop autoplay playsinline></video>`
+          : `<img src="${src}" alt="Gallery photo ${i+1}">`;
+        const badgeHtml = isVid
+          ? `<span class="thumb-video-badge"><svg viewBox="0 0 12 12" fill="none"><path d="M2 1.5L10 6L2 10.5V1.5Z" fill="#fbf9f3"/></svg></span>`
+          : '';
+        t.innerHTML = `${mediaHtml}${badgeHtml}<button type="button" class="remove-x">✕</button>`;
         t.querySelector('.remove-x').addEventListener('click', () => {
           draft.gallery.splice(i, 1);
           renderThumbs();
@@ -1044,7 +1111,7 @@
       const arr = Array.from(files);
       if (!arr.length) return;
 
-      setDropzoneBusy(galleryDrop, true, `Uploading ${arr.length} photo${arr.length > 1 ? 's' : ''}…`);
+      setDropzoneBusy(galleryDrop, true, `Uploading ${arr.length} file${arr.length > 1 ? 's' : ''}…`);
       let failCount = 0;
 
       for (const file of arr){
@@ -1059,7 +1126,7 @@
       }
 
       setDropzoneBusy(galleryDrop, false);
-      if (failCount) showToast(`${failCount} photo${failCount > 1 ? 's' : ''} failed to upload`);
+      if (failCount) showToast(`${failCount} file${failCount > 1 ? 's' : ''} failed to upload`);
     });
 
     // ==========================================
@@ -1067,7 +1134,7 @@
     // ==========================================
     const previewEmpty = document.getElementById('previewEmpty');
     const previewCard = document.getElementById('previewCard');
-    const previewImg = document.getElementById('previewImg');
+    const previewMedia = document.getElementById('previewMedia');
     const previewYear = document.getElementById('previewYear');
     const previewTag = document.getElementById('previewTag');
 
@@ -1092,8 +1159,13 @@
       previewCard.style.width = dims.width + 'px';
       previewCard.style.height = dims.height + 'px';
 
-      previewImg.src = draft.cover || '';
-      previewImg.style.background = draft.cover ? '' : '#ddd';
+      if (draft.cover) {
+        previewMedia.innerHTML = isVideoUrl(draft.cover)
+          ? `<video src="${draft.cover}" muted loop autoplay playsinline></video>`
+          : `<img src="${draft.cover}" alt="Preview">`;
+      } else {
+        previewMedia.innerHTML = '';
+      }
       previewTag.textContent = fTag.value.trim() || fTitle.value.trim() || 'Untitled entry';
       previewYear.textContent = fYear.value.trim() || '—';
     }
@@ -1132,13 +1204,18 @@
         const row = document.createElement('div');
         row.className = 'ledger-row';
         row.style.animationDelay = (i * 0.05) + 's';
+        const isVid = isVideoUrl(ev.cover);
+        const thumbMediaHtml = isVid
+          ? `<video src="${ev.cover}" muted loop autoplay playsinline></video>`
+          : `<img src="${ev.cover}" alt="${ev.title}">`;
         row.innerHTML = `
-          <div class="ledger-thumb"><img src="${ev.cover}" alt="${ev.title}"></div>
+          <div class="ledger-thumb">${thumbMediaHtml}</div>
           <div class="ledger-info">
             <div class="l-title">${ev.title}</div>
             <div class="l-meta">${ev.tag} · ${ev.year}</div>
           </div>
           <span class="l-badge">${sizeNames[ev.size] || 'Small'}</span>
+          ${isVid ? '<span class="l-badge media-video">▶ Video</span>' : '<span></span>'}
           <button type="button" class="icon-btn edit" title="Edit">
             <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M9.5 1.5l3 3L5 12H2v-3l7.5-7.5z" stroke="#211d1a" stroke-width="1.3" stroke-linejoin="round"/></svg>
           </button>
@@ -1186,7 +1263,7 @@
       sizeOpts.forEach(b => b.classList.toggle('active', b.dataset.size === ev.size));
       moveSizeIndicator(sizePicker.querySelector('.size-opt.active'));
 
-      coverImg.src = ev.cover;
+      renderCoverMedia(ev.cover);
       coverPreview.classList.add('show');
       renderThumbs();
       updatePreview();
@@ -1204,7 +1281,7 @@
       e.preventDefault();
 
       if (!draft.cover){
-        showToast('Add a cover photo before archiving');
+        showToast('Add a cover photo or video before archiving');
         return;
       }
 
@@ -1263,6 +1340,7 @@
 
       draft = { size: 'size-small', cover: '', gallery: [] };
       coverPreview.classList.remove('show');
+      renderCoverMedia('');
       sizeOpts.forEach(b => b.classList.toggle('active', b.dataset.size === 'size-small'));
       moveSizeIndicator(sizeOpts[0]);
       renderThumbs();
