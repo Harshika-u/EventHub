@@ -109,6 +109,15 @@
   resize: vertical;
 }
 
+/* Paired fields inside the register modal (Name/Class, Section/Roll, etc).
+   Was referenced in events.html but never defined — fields were stacking
+   without any grid/gap structure. */
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
 
 /* ═══════════════════════════════════════
    VIEW DETAILS MODAL
@@ -332,3 +341,46 @@
 
 
 .save-btn:hover { background: #0f172a; }
+
+/* ═══════════════════════════════════════
+   MOBILE — modals and grids
+════════════════════════════════════════ */
+@media (max-width: 640px) {
+  .modal-content {
+    padding: 20px;
+    border-radius: 14px;
+  }
+
+  .details-body {
+    padding: 18px 18px 20px;
+  }
+
+  .details-img-wrap img {
+    height: 180px;
+  }
+
+  .details-meta-grid {
+    grid-template-columns: 1fr 1fr;
+    padding: 12px 14px;
+    gap: 10px;
+  }
+
+  .reg-info-row {
+    gap: 12px;
+  }
+}
+
+@media (max-width: 420px) {
+  .form-row {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+
+  .details-meta-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .group-member-row .form-row {
+    grid-template-columns: 1fr 1fr;
+  }
+}

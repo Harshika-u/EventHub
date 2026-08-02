@@ -25,6 +25,15 @@ emailjs.init("YOUR_PUBLIC_KEY");
       <li><a href="spot.html">Gallery</a></li>
     </ul>
     <a href="#" class="nav-cta" onclick="logout()">Logout</a>
+    <button class="menu-toggle" id="menuToggle" onclick="toggleMobileMenu()" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+    <div class="mobile-menu" id="mobileMenu">
+      <a href="index1.html">Home</a>
+      <a href="events.html" class="active">Events</a>
+      <a href="spot.html">Gallery</a>
+      <a href="#" class="mobile-logout" onclick="logout()">Logout</a>
+    </div>
   </div>
 </div>
 
@@ -199,6 +208,12 @@ emailjs.init("YOUR_PUBLIC_KEY");
 
   const DIGITS_ONLY  = /^[0-9]+$/;
   const LETTERS_ONLY = /^[A-Za-z]+$/;
+
+  // Hamburger menu toggle (shared behavior with index1.html)
+  window.toggleMobileMenu = function () {
+    document.getElementById("menuToggle").classList.toggle("open");
+    document.getElementById("mobileMenu").classList.toggle("open");
+  };
 </script>
 
 <!-- FIREBASE -->
@@ -657,10 +672,14 @@ renderEvents(window._allEvents);
     renderEvents(filtered);
   };
 
-  // Close modals on outside click
+  // Close modals / mobile menu on outside click
   window.addEventListener("click", ev => {
     if (ev.target.id === "detailsModal")  window.closeDetailsModal();
     if (ev.target.id === "registerModal") window.closeRegisterModal();
+    if (!ev.target.closest(".nav-inner")) {
+      document.getElementById("mobileMenu")?.classList.remove("open");
+      document.getElementById("menuToggle")?.classList.remove("open");
+    }
   });
 window.logout = function () {
     localStorage.removeItem("student");
