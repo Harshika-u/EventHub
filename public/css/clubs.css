@@ -6,24 +6,25 @@
 .clubs-hero { max-width: 1180px; margin: 0 auto; padding: 70px 28px 40px; }
 .clubs-hero .eyebrow { margin-bottom: 14px; }
 .clubs-hero h1 {
-  font-family: var(--font-display); font-weight: 600; font-size: clamp(34px, 4.6vw, 54px);
+  font-family: var(--font-display); font-weight: 600; font-size: clamp(30px, 4.6vw, 54px);
   color: var(--ink); margin: 0 0 14px; line-height: 1.1;
 }
-.clubs-hero p { font-size: 16px; color: var(--slate); max-width: 56ch; line-height: 1.7; }
+.clubs-hero p { font-size: clamp(14px, 2.4vw, 16px); color: var(--slate); max-width: 56ch; line-height: 1.7; }
 
 /* ── BENTO GRID ──
    gap is the single control for spacing between every club card, both
-   the horizontal gutter and the vertical gutter between rows. Bumped up
-   from the original 22px so cards read as clearly separate tiles rather
-   than a tight mosaic, especially once grid-auto-flow: dense starts
-   packing mixed card sizes tightly against each other. */
+   the horizontal gutter and the vertical gutter between rows. Scales
+   down gradually across breakpoints so cards always read as clearly
+   separate tiles — even once grid-auto-flow: dense starts packing mixed
+   card sizes tightly against each other — without eating too much space
+   on small screens. */
 .bento-grid {
   max-width: 1180px; margin: 0 auto; padding: 18px 28px 110px;
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   grid-auto-rows: 210px;
   grid-auto-flow: dense;
-  gap: 30px;
+  gap: 38px;
 }
 .bento-card {
   position: relative;
@@ -32,11 +33,19 @@
   cursor: pointer;
   box-shadow: 0 14px 34px -14px rgba(27,42,74,.35), 0 4px 10px -4px rgba(27,42,74,.18);
   transition: transform .4s cubic-bezier(.2,.8,.2,1), box-shadow .4s ease;
+  /* Belt-and-suspenders: every card has a real photo behind it, but this
+     keeps things from ever going pure white if an image fails to load. */
+  background: var(--paper-line);
 }
 .bento-card:hover {
   transform: translateY(-6px) scale(1.012);
   box-shadow: 0 28px 60px -18px rgba(27,42,74,.45), 0 8px 18px -6px rgba(27,42,74,.25);
   z-index: 3;
+}
+/* Keyboard/touch focus parity with hover, for accessibility across input types */
+.bento-card:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 3px;
 }
 
 /* sizes: mix of spans for a true bento layout */
@@ -68,6 +77,8 @@
   backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
   border: 1px solid rgba(255,255,255,.25);
   padding: 6px 12px; border-radius: 999px;
+  max-width: calc(100% - 32px);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
 
 /* base info: title + one-liner. Always visible, no hover gating. */
@@ -78,16 +89,22 @@
 }
 .bento-info h3 {
   font-family: var(--font-display); font-weight: 700; margin: 0 0 4px;
-  font-size: 20px; line-height: 1.2;
+  font-size: clamp(17px, 2.1vw, 20px); line-height: 1.2;
 }
-.-lg .bento-info h3 { font-size: 27px; }
-.bento-info .line { font-size: 12.5px; color: rgba(255,255,255,.78); }
+.-lg .bento-info h3 { font-size: clamp(21px, 2.8vw, 27px); }
+.bento-info .line {
+  font-size: 12.5px; color: rgba(255,255,255,.78);
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+  overflow: hidden;
+}
 
 /* "View club" pinned to the bottom-right corner of every card, always
-   visible — no hover needed, works identically on mobile and desktop. */
+   visible — no hover needed, works identically on mobile and desktop.
+   min-height/min-width keeps it a comfortable tap target on touch devices. */
 .bento-cta {
   position: absolute; right: 14px; bottom: 14px; z-index: 3;
   display: inline-flex; align-items: center; gap: 4px;
+  min-height: 30px;
   font-family: var(--font-label); font-size: 10px; letter-spacing: .06em; text-transform: uppercase;
   color: #fff;
   background: rgba(255,255,255,.16);
@@ -108,24 +125,26 @@
   background: #fff; border-radius: 22px; max-width: 640px; width: 100%; max-height: 88vh; overflow-y: auto;
   box-shadow: 0 40px 100px rgba(0,0,0,.4);
   animation: clubModalIn .32s cubic-bezier(.2,.8,.2,1);
+  -webkit-overflow-scrolling: touch;
 }
 @keyframes clubModalIn { from { opacity: 0; transform: scale(.94) translateY(24px); } to { opacity: 1; transform: scale(1) translateY(0); } }
 .club-modal-banner {
   position: relative; height: 170px; display: flex; align-items: center; justify-content: center; font-size: 56px;
 }
 .club-modal-close {
-  position: absolute; top: 16px; right: 16px; width: 36px; height: 36px; border-radius: 50%;
+  position: absolute; top: 16px; right: 16px; width: 38px; height: 38px; border-radius: 50%;
   background: rgba(255,255,255,.85); backdrop-filter: blur(6px); border: none; cursor: pointer;
   font-size: 15px; color: var(--ink); display: flex; align-items: center; justify-content: center;
 }
 .club-modal-close:hover { background: #fff; }
 .club-modal-body { padding: 28px 30px 36px; }
-.club-modal-body h2 { font-family: var(--font-display); font-size: 27px; margin: 0 0 4px; color: var(--ink); }
+.club-modal-body h2 { font-family: var(--font-display); font-size: clamp(22px, 4vw, 27px); margin: 0 0 4px; color: var(--ink); word-break: break-word; }
 .club-modal-body .club-modal-tagline { color: var(--slate); font-size: 14px; margin-bottom: 22px; }
 .club-modal-tabs { display: flex; gap: 10px; flex-wrap: wrap; padding-bottom: 20px; margin-bottom: 22px; border-bottom: 1px solid var(--paper-line); }
 .club-modal-tabs button {
   font-family: var(--font-body); font-size: 13px; font-weight: 600; padding: 9px 16px; border-radius: 999px;
   border: 1px solid var(--paper-line); background: #fff; color: var(--slate); cursor: pointer; transition: all .15s ease;
+  min-height: 38px;
 }
 .club-modal-tabs button.active { background: var(--ink); border-color: var(--ink); color: #fff; }
 .club-modal-tabs button:hover:not(.active) { border-color: var(--gold); color: var(--ink); }
@@ -134,17 +153,17 @@
 .club-modal-pane h3 { font-family: var(--font-display); font-size: 17px; margin: 0 0 10px; color: var(--ink); }
 .club-modal-pane p { font-size: 14px; line-height: 1.75; color: var(--slate); }
 
-.faculty-card { display: flex; gap: 16px; background: var(--paper); border: 1px solid var(--paper-line); border-radius: 14px; padding: 18px; align-items: flex-start; }
+.faculty-card { display: flex; gap: 16px; background: var(--paper); border: 1px solid var(--paper-line); border-radius: 14px; padding: 18px; align-items: flex-start; flex-wrap: wrap; }
 .faculty-card img { width: 60px; height: 60px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
 .faculty-card h4 { margin: 0; font-size: 15px; color: var(--ink); }
 .faculty-card .role { font-size: 12.5px; color: var(--maroon); font-weight: 600; margin: 2px 0 6px; }
-.faculty-card .email { font-size: 12px; color: var(--slate-light); margin-bottom: 8px; display: block; }
+.faculty-card .email { font-size: 12px; color: var(--slate-light); margin-bottom: 8px; display: block; word-break: break-all; }
 .faculty-card .bio { font-size: 12.5px; color: var(--slate); line-height: 1.6; margin: 0; }
 
 .leads-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-.lead-card { background: var(--paper); border: 1px solid var(--paper-line); border-radius: 14px; padding: 16px; display: flex; gap: 12px; align-items: center; }
+.lead-card { background: var(--paper); border: 1px solid var(--paper-line); border-radius: 14px; padding: 16px; display: flex; gap: 12px; align-items: center; min-width: 0; }
 .lead-card .avatar { width: 46px; height: 46px; border-radius: 50%; background: var(--paper-line); flex-shrink: 0; object-fit: cover; }
-.lead-card h4 { margin: 0; font-size: 14px; color: var(--ink); }
+.lead-card h4 { margin: 0; font-size: 14px; color: var(--ink); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .lead-card .role { font-size: 12px; color: var(--maroon); font-weight: 600; }
 .lead-card .grade { display: inline-block; margin-top: 5px; font-size: 10.5px; background: var(--paper-line); padding: 2px 9px; border-radius: 999px; color: var(--slate); }
 
@@ -188,25 +207,71 @@
 
 .loading-text { grid-column: 1 / -1; text-align: center; color: var(--slate-light); font-size: 14px; padding: 40px 0; }
 
-/* ── RESPONSIVE ── */
+/* ── RESPONSIVE ──
+   Breakpoints: 860px (tablet, 2-col bento), 560px (phone, 1-col bento),
+   380px (small phone — tighter padding/gap/type without losing legibility). */
 @media (max-width: 860px) {
   .clubs-hero { padding: 50px 20px 32px; }
-  .bento-grid { grid-template-columns: repeat(2, 1fr); grid-auto-rows: 220px; padding: 14px 20px 90px; gap: 24px; }
+  .bento-grid { grid-template-columns: repeat(2, 1fr); grid-auto-rows: 220px; padding: 14px 20px 90px; gap: 28px; }
   .bento-card.-lg, .bento-card.-wide { grid-column: span 2; grid-row: span 1; }
   .bento-card.-tall { grid-row: span 1; }
   .club-modal-body { padding: 24px 22px 30px; }
 }
+
 @media (max-width: 560px) {
   .clubs-hero { padding: 40px 18px 28px; }
   .clubs-hero p { font-size: 14.5px; }
-  .bento-grid { grid-template-columns: 1fr; padding: 12px 18px 80px; gap: 20px; }
+  .bento-grid { grid-template-columns: 1fr; padding: 12px 18px 80px; gap: 24px; }
   .bento-card.-lg, .bento-card.-wide, .bento-card.-tall, .bento-card.-sm { grid-column: span 1; grid-row: span 1; height: 240px; }
   .bento-info { padding: 16px 74px 14px 16px; }
-  .bento-info h3, .-lg .bento-info h3 { font-size: 19px; }
   .bento-cta { right: 10px; bottom: 10px; padding: 6px 10px; }
   .leads-grid { grid-template-columns: 1fr; }
   .gallery-carousel { padding: 0 34px; }
   .gallery-track img { width: 150px; height: 150px; }
   .gallery-nav { top: 75px; width: 30px; height: 30px; font-size: 16px; }
   .club-modal-banner { height: 130px; }
+}
+
+@media (max-width: 380px) {
+  .clubs-hero { padding: 32px 14px 22px; }
+  .bento-grid { padding: 10px 14px 64px; gap: 18px; }
+  .bento-card.-lg, .bento-card.-wide, .bento-card.-tall, .bento-card.-sm { height: 210px; }
+  .bento-info { padding: 14px 66px 12px 14px; }
+  .bento-info h3 { font-size: 16.5px; }
+  .bento-tag { top: 12px; left: 12px; font-size: 9px; padding: 5px 10px; }
+  .bento-cta { font-size: 9px; padding: 6px 9px; }
+  .club-modal-overlay { padding: 12px; }
+  .club-modal { border-radius: 16px; }
+  .club-modal-body { padding: 20px 16px 26px; }
+  .club-modal-tabs button { padding: 8px 12px; font-size: 12px; }
+  .faculty-card { padding: 14px; gap: 12px; }
+  .gallery-carousel { padding: 0 28px; }
+  .gallery-track img { width: 130px; height: 130px; }
+  .gallery-nav { width: 28px; height: 28px; font-size: 14px; }
+}
+
+/* Landscape phones (short viewport height, wider than tall) — the bento
+   grid's fixed row heights can feel oversized here since there's little
+   vertical room; trim rows and vertical paddings a bit. */
+@media (max-height: 480px) and (orientation: landscape) {
+  .clubs-hero { padding: 24px 20px 18px; }
+  .bento-grid { grid-auto-rows: 170px; gap: 20px; padding-top: 10px; padding-bottom: 50px; }
+  .club-modal-overlay { padding: 14px; }
+  .club-modal { max-height: 94vh; }
+  .club-modal-banner { height: 100px; }
+}
+
+/* Large / ultra-wide screens — content stays capped at 1180px (already set
+   above) so it never stretches into unreadably long card rows; this just
+   allows a touch more breathing room in the gutters once there's space. */
+@media (min-width: 1400px) {
+  .bento-grid { gap: 44px; }
+}
+
+/* Respect reduced-motion preference for card hover/press animations */
+@media (prefers-reduced-motion: reduce) {
+  .bento-card, .bento-card img, .bento-scrim, .bento-cta, .club-modal {
+    transition: none !important;
+    animation: none !important;
+  }
 }
