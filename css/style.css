@@ -124,6 +124,8 @@ body {
   border: none;
   cursor: pointer;
   padding: 0;
+  grid-column: 3;
+  grid-row: 1;
   justify-self: end;
 }
 

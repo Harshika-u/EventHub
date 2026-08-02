@@ -987,7 +987,7 @@
     </div>
   </section>
 
-  <!-- LOGOUT (same behavior as events.html) -->
+  <!-- LOGOUT + MOBILE MENU (same behavior as events.html / index1.html) -->
   <script>
     window.logout = function () {
         localStorage.removeItem("student");
@@ -995,6 +995,18 @@
         sessionStorage.clear();
         window.location.replace("login.html");
     };
+
+    window.toggleMobileMenu = function () {
+        document.getElementById("menuToggle").classList.toggle("open");
+        document.getElementById("mobileMenu").classList.toggle("open");
+    };
+
+    window.addEventListener("click", ev => {
+      if (!ev.target.closest(".nav-inner")) {
+        document.getElementById("mobileMenu")?.classList.remove("open");
+        document.getElementById("menuToggle")?.classList.remove("open");
+      }
+    });
   </script>
 
   <!-- Firebase (modular SDK — Firestore only; images live on Cloudinary) -->
