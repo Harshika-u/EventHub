@@ -324,7 +324,7 @@
     <ul class="jgs-links">
       <li><a href="home.html#about">About</a></li>
       <li><a href="spotlight.html">Spotlight</a></li>
-      <li><a href="alumni.html">Alumni</a></li>
+      <li><a href="alumni.html" class="current">Alumni</a></li>
       <li><a href="clubs/clubs.html">Clubs</a></li>
       <li><a href="../indexlogin.html" class="cta">EventHub →</a></li>
     </ul>
@@ -332,8 +332,14 @@
       <span></span><span></span><span></span>
     </button>
   </div>
-  <div class="jgs-mobile-menu" id="jgsMobileMenu">
-    <ul>
+</nav>
+
+<!-- MOBILE MENU (3-line icon opens this drawer with all tabs + EventHub) -->
+<div class="jgs-mobile-backdrop" id="jgsMobileBackdrop"></div>
+<div class="jgs-mobile-menu" id="jgsMobileMenu">
+  <div class="jgs-mobile-menu-inner">
+    <button class="jgs-mobile-close" id="jgsMobileClose" aria-label="Close menu">&times;</button>
+    <ul class="jgs-mobile-links">
       <li><a href="home.html#about">About</a></li>
       <li><a href="spotlight.html">Spotlight</a></li>
       <li><a href="alumni.html">Alumni</a></li>
@@ -341,7 +347,7 @@
       <li><a href="../indexlogin.html" class="cta">EventHub →</a></li>
     </ul>
   </div>
-</nav>
+</div>
 
 <!-- HERO BANNER (single image, set by the admin in Alumni Admin) -->
 <div class="alumni-hero hero-full" id="heroBanner">
