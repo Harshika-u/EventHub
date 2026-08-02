@@ -39,8 +39,8 @@
 
 * { box-sizing: border-box; }
 
-html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
-body.jgs-public { margin: 0; font-family: var(--font-body); background: var(--bg-page); color: var(--ink); -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+html { overflow-x: hidden; }
+body.jgs-public { margin: 0; font-family: var(--font-body); background: var(--bg-page); color: var(--ink); -webkit-font-smoothing: antialiased; overflow-x: hidden; width: 100%; }
 img { max-width: 100%; display: block; }
 a { text-decoration: none; color: inherit; }
 
@@ -65,12 +65,11 @@ a { text-decoration: none; color: inherit; }
   transition: background .3s ease, border-color .3s ease;
 }
 .jgs-nav-inner { max-width: 1180px; margin: 0 auto; padding: 16px 28px; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
-.jgs-brand { display: flex; align-items: center; gap: 10px; font-family: var(--font-display); font-weight: 600; font-size: 19px; color: var(--ink); }
+.jgs-brand { display: flex; align-items: center; gap: 10px; font-family: var(--font-display); font-weight: 600; font-size: 19px; color: var(--ink); flex-shrink: 0; }
 .jgs-brand .crest {
   width: 34px; height: 34px; border-radius: 50%; background: var(--ink); color: var(--gold-soft);
   display: flex; align-items: center; justify-content: center; font-family: var(--font-label);
   font-size: 11px; letter-spacing: 0.05em; border: 1px solid var(--gold);
-  flex-shrink: 0;
 }
 .jgs-links { display: flex; align-items: center; gap: 30px; list-style: none; margin: 0; padding: 0; }
 .jgs-links a { font-size: 14px; font-weight: 500; color: var(--slate); padding-bottom: 4px; border-bottom: 1px solid transparent; transition: color .2s, border-color .2s; }
@@ -101,51 +100,78 @@ a { text-decoration: none; color: inherit; }
 .jgs-nav.nav-overlay.solid .jgs-links .cta { background: var(--ink); color: var(--ivory) !important; border-color: var(--ink); }
 .jgs-nav.nav-overlay.solid .jgs-links .cta:hover { background: var(--maroon); border-color: var(--maroon); }
 
-/* ── HAMBURGER MENU BUTTON (hidden on desktop, shown at mobile breakpoint) ── */
+/* ── HAMBURGER (mobile-only 3-line menu icon, right end of navbar) ──
+   Hidden on desktop; .jgs-links (the full link list) handles nav there.
+   Below 860px .jgs-links is hidden instead and this icon takes over,
+   opening the .jgs-mobile-menu drawer defined below. */
 .jgs-hamburger {
   display: none;
   flex-direction: column;
   justify-content: center;
-  align-items: center;
+  align-items: flex-end;
   gap: 5px;
-  width: 42px; height: 42px;
-  background: none; border: none; padding: 0; margin: 0;
-  cursor: pointer; z-index: 60; flex-shrink: 0;
-  -webkit-tap-highlight-color: transparent;
+  width: 40px;
+  height: 40px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  flex-shrink: 0;
+  z-index: 110;
 }
 .jgs-hamburger span {
-  display: block; width: 24px; height: 2px; border-radius: 2px;
+  display: block;
+  width: 100%;
+  height: 2px;
+  border-radius: 2px;
   background: var(--ink);
-  transition: transform .3s ease, opacity .2s ease, background-color .3s ease;
+  transition: background .2s ease, transform .3s ease, opacity .2s ease, width .2s ease;
 }
-/* On the transparent overlay nav (unscrolled) the bars need to be light so they read against the hero photo */
-.jgs-nav.nav-overlay .jgs-hamburger span { background: var(--ivory); }
-.jgs-nav.nav-overlay.solid .jgs-hamburger span { background: var(--ink); }
+/* On the transparent hero variant the bars need to be light until the nav goes solid */
+.jgs-nav.nav-overlay:not(.solid) .jgs-hamburger span { background: var(--ivory); }
+.jgs-hamburger.open span { background: var(--ink); }
 .jgs-hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
 .jgs-hamburger.open span:nth-child(2) { opacity: 0; }
 .jgs-hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
-/* Once the menu is open force the bars to dark ink, regardless of scroll state, since the panel behind them is always the light paper color */
-.jgs-hamburger.open span { background: var(--ink) !important; }
 
-/* ── MOBILE DROPDOWN MENU ── */
+/* ── MOBILE MENU DRAWER ──
+   Slides in from the right when the hamburger is tapped. Holds the same
+   links as the desktop navbar (About, Spotlight, Alumni, Clubs) plus the
+   EventHub CTA, sized for comfortable tapping on a phone. */
+.jgs-mobile-backdrop {
+  position: fixed; inset: 0; background: rgba(15,23,42,.55);
+  z-index: 99; opacity: 0; visibility: hidden; transition: opacity .3s ease, visibility .3s ease;
+}
+.jgs-mobile-backdrop.open { opacity: 1; visibility: visible; }
 .jgs-mobile-menu {
-  display: none;
-  max-height: 0;
-  overflow: hidden;
-  background: rgba(239, 234, 224, 0.98);
-  backdrop-filter: blur(10px);
-  transition: max-height .35s ease;
+  position: fixed; top: 0; right: 0; bottom: 0;
+  width: min(320px, 84vw);
+  background: var(--ivory);
+  box-shadow: -14px 0 44px rgba(27,42,74,.3);
+  z-index: 100;
+  transform: translateX(100%);
+  transition: transform .35s cubic-bezier(.2,.8,.2,1);
+  overflow-y: auto;
 }
-.jgs-mobile-menu ul { list-style: none; margin: 0; padding: 6px 24px 22px; display: flex; flex-direction: column; gap: 2px; }
-.jgs-mobile-menu a {
-  display: block; padding: 14px 4px; font-size: 15.5px; font-weight: 500; color: var(--ink);
-  border-bottom: 1px solid var(--paper-line);
+.jgs-mobile-menu.open { transform: translateX(0); }
+.jgs-mobile-menu-inner { padding: 26px 26px 40px; min-height: 100%; display: flex; flex-direction: column; }
+.jgs-mobile-close {
+  width: 38px; height: 38px; border-radius: 50%; border: 1px solid var(--paper-line);
+  background: var(--paper); font-size: 18px; line-height: 1; color: var(--ink); cursor: pointer;
+  display: flex; align-items: center; justify-content: center; margin-left: auto; margin-bottom: 34px;
 }
-.jgs-mobile-menu a.cta {
-  margin-top: 10px; text-align: center; background: var(--ink); color: var(--ivory) !important;
-  border-radius: var(--radius); border-bottom: none; padding: 14px;
+.jgs-mobile-links { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
+.jgs-mobile-links li a {
+  display: block; font-family: var(--font-body); font-size: 17px; font-weight: 600; color: var(--ink);
+  padding: 15px 4px; border-bottom: 1px solid var(--paper-line);
 }
-.jgs-mobile-menu.open { max-height: 420px; }
+.jgs-mobile-links li a:hover { color: var(--maroon); }
+.jgs-mobile-links li a.cta {
+  margin-top: 18px; background: var(--ink); color: var(--ivory) !important; text-align: center;
+  border-radius: var(--radius); border-bottom: none; padding: 15px 4px;
+}
+.jgs-mobile-links li a.cta:hover { background: var(--maroon); }
+body.jgs-menu-open { overflow: hidden; }
 
 /* ── HERO (full-bleed slider; overlay nav is fixed/out of flow) ── */
 .hero-full { position: relative; height: 100vh; min-height: 480px; overflow: hidden; }
@@ -155,7 +181,7 @@ a { text-decoration: none; color: inherit; }
 .hero-full-content { position: absolute; left: 6%; right: 6%; bottom: 15%; max-width: 620px; color: var(--ivory); z-index: 2; }
 .hero-full-title {
   font-family: var(--font-display); font-weight: 700; font-size: clamp(34px, 5.4vw, 64px);
-  line-height: 1.05; margin: 16px 0 14px; text-transform: uppercase;
+  line-height: 1; margin: 16px 0 14px; text-transform: uppercase;
 }
 .hero-full-sub { font-size: 15.5px; color: rgba(248,246,240,.88); max-width: 44ch; margin: 0 0 26px; line-height: 1.6; }
 .btn { font-family: var(--font-body); font-weight: 600; font-size: 14px; padding: 13px 24px; border-radius: var(--radius); border: 1px solid var(--ink); cursor: pointer; transition: transform .15s ease, background .2s, color .2s; display: inline-block; }
@@ -183,7 +209,7 @@ a { text-decoration: none; color: inherit; }
 .spotlight-item { display: flex; gap: 16px; margin-top: 20px; }
 .spotlight-item .zoom-hover { width: 110px; height: 110px; flex-shrink: 0; border-radius: 2px; }
 .spotlight-item img { width: 110px; height: 110px; object-fit: cover; border-radius: 2px; }
-.spotlight-item h4 { font-family: var(--font-display); font-size: 15px; line-height: 1.4; margin: 0; color: var(--ink); font-weight: 600; min-width: 0; }
+.spotlight-item h4 { font-family: var(--font-display); font-size: 15px; line-height: 1.4; margin: 0; color: var(--ink); font-weight: 600; }
 .spotlight-arrows { display: flex; gap: 10px; margin-top: 18px; }
 .spotlight-arrows button { width: 30px; height: 30px; border: 1px solid var(--paper-line); background: none; cursor: pointer; color: var(--slate); font-size: 13px; border-radius: 2px; }
 .spotlight-arrows button:hover { border-color: var(--maroon); color: var(--maroon); }
@@ -207,7 +233,7 @@ a { text-decoration: none; color: inherit; }
 .section { max-width: 1180px; margin: 0 auto; padding: 60px 28px; }
 
 /* ── ABOUT JGS (image + text, Northgate-style) ── */
-.about-jgs { background: var(--bg-about); padding: 100px 28px; overflow: hidden; }
+.about-jgs { background: var(--bg-about); padding: 100px 28px; }
 .about-jgs-inner { max-width: 1180px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 70px; align-items: center; }
 .about-jgs-heading {
   font-family: var(--font-display); font-weight: 500; font-size: clamp(32px, 3.6vw, 46px);
@@ -294,7 +320,7 @@ a { text-decoration: none; color: inherit; }
 .alumni-info span { font-family: var(--font-label); font-size: 10.5px; color: var(--slate-light); }
 
 /* ── FOOTER (CTA band + info columns, Northgate-style) ── */
-.jgs-footer { background: var(--bg-footer); color: var(--ivory); overflow: hidden; }
+.jgs-footer { background: var(--bg-footer); color: var(--ivory); }
 .footer-cta { max-width: 1180px; margin: 0 auto; padding: 90px 28px 60px; }
 .footer-cta .eyebrow.light { margin-bottom: 6px; }
 .footer-cta-heading {
@@ -322,39 +348,35 @@ a { text-decoration: none; color: inherit; }
 @media (max-width: 860px) {
   .jgs-links { display: none; }
   .jgs-hamburger { display: flex; }
-  .jgs-mobile-menu { display: block; }
-  .jgs-nav-inner { padding: 14px 20px; }
-  .jgs-brand { font-size: 17px; }
-
-  .hero-full-content { left: 6%; right: 6%; }
-  .hero-full-title { font-size: clamp(32px, 8vw, 52px); }
-
   .strip-grid { grid-template-columns: 1fr; }
   .strip-col { border-right: none; border-bottom: 1px solid var(--paper-line); }
-  .about-jgs-inner { grid-template-columns: 1fr; gap: 40px; }
-  .about-jgs { padding: 70px 20px; }
+  .about-jgs-inner { grid-template-columns: 1fr; }
+  .about-jgs { padding: 70px 24px; }
   .advantage-grid { grid-template-columns: repeat(2, 1fr); }
   .vm-cards { grid-template-columns: 1fr; }
   .alumni-row { grid-template-columns: repeat(2, 1fr); }
   .footer-info { grid-template-columns: 1fr 1fr; }
-  .footer-cta { padding: 70px 20px 50px; }
-  .footer-info { padding: 40px 20px 0; }
-  .footer-bottom { padding: 30px 20px 26px; }
+  .footer-info > div:first-child { grid-column: 1 / -1; }
+  .hero-full-content { left: 6%; right: 6%; bottom: 18%; }
+  .strip-col { padding: 30px 24px; }
 }
 
 @media (max-width: 560px) {
-  .hero-full-content { bottom: 13%; max-width: 100%; }
-  .hero-full-sub { font-size: 14.5px; }
-  .strip-col { padding: 28px 20px; }
-  .spotlight-item { flex-direction: column; }
-  .spotlight-item .zoom-hover, .spotlight-item img { width: 100%; height: 160px; }
+  .jgs-nav-inner { padding: 14px 18px; }
+  .hero-full { min-height: 560px; }
+  .hero-full-title { font-size: clamp(30px, 9vw, 44px); }
+  .hero-full-sub { font-size: 14px; }
   .advantage-grid { grid-template-columns: 1fr; }
-  .advantage-box { min-height: 0; }
-  .alumni-slide { flex: 0 0 76vw; }
   .alumni-row { grid-template-columns: 1fr; }
-  .footer-info { grid-template-columns: 1fr; gap: 28px; }
-  .footer-bottom { flex-direction: column; gap: 6px; }
-  .about-jgs-badge { padding: 14px 20px; left: 16px; bottom: 16px; }
+  .about-jgs { padding: 56px 20px; }
+  .about-jgs-heading { font-size: clamp(26px, 7vw, 34px); }
+  .advantages { padding: 30px 20px 60px; }
+  .footer-cta { padding: 60px 20px 40px; }
+  .footer-info { grid-template-columns: 1fr; padding: 40px 20px 0; }
+  .footer-bottom { padding: 30px 20px 24px; flex-direction: column; gap: 6px; }
+  .alumni-slide { flex: 0 0 210px; }
+  .alumni-slide-photo { margin-bottom: 10px; }
+  .strip-inner, .about-jgs-inner, .footer-info, .footer-cta, .footer-bottom { padding-left: 20px; padding-right: 20px; }
 }
 
 /* ══════════════════════════════════════════
@@ -555,12 +577,12 @@ a { text-decoration: none; color: inherit; }
   .hof-card { flex-basis: 220px; }
   .hof-arrow.prev { left: 4px; }
   .hof-arrow.next { right: 4px; }
-  .spot-featured { padding: 70px 20px; }
 }
 @media (max-width: 560px) {
   .hof-filters { overflow-x: auto; flex-wrap: nowrap; padding-bottom: 4px; }
   .hof-card { flex-basis: 78vw; }
-  .hof-modal { padding: 30px 22px; }
+  .spot-featured { padding: 60px 20px; }
+  .hof-section { padding: 20px 20px 80px; }
+  .hof-modal { padding: 28px 20px; }
   .hof-modal-top { flex-wrap: wrap; }
-  .spot-hero-title { font-size: clamp(38px, 12vw, 64px); }
 }

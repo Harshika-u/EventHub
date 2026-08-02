@@ -62,40 +62,49 @@ function initNavOverlay() {
   window.addEventListener('scroll', toggle, { passive: true });
 }
 
-/* ── NAV: hamburger toggle for the mobile dropdown menu ──
-   Works on any page that includes the .jgs-hamburger / #jgsMobileMenu
-   markup inside .jgs-nav, not just home.html. */
-function initMobileNav() {
-  const btn = document.getElementById('jgsHamburger');
+/* ── MOBILE MENU (3-line hamburger → slide-in drawer with all tabs) ──
+   Below the 860px breakpoint the full .jgs-links list is hidden by CSS,
+   so this hamburger + drawer is the only way to reach About / Spotlight /
+   Alumni / Clubs / EventHub on phones and small tablets. */
+function initMobileMenu() {
+  const hamburger = document.getElementById('jgsHamburger');
   const menu = document.getElementById('jgsMobileMenu');
-  if (!btn || !menu) return;
+  const backdrop = document.getElementById('jgsMobileBackdrop');
+  const closeBtn = document.getElementById('jgsMobileClose');
+  if (!hamburger || !menu) return;
 
-  function closeMenu() {
-    btn.classList.remove('open');
-    menu.classList.remove('open');
-    btn.setAttribute('aria-expanded', 'false');
-  }
   function openMenu() {
-    btn.classList.add('open');
     menu.classList.add('open');
-    btn.setAttribute('aria-expanded', 'true');
+    backdrop && backdrop.classList.add('open');
+    hamburger.classList.add('open');
+    hamburger.setAttribute('aria-expanded', 'true');
+    document.body.classList.add('jgs-menu-open');
+  }
+  function closeMenu() {
+    menu.classList.remove('open');
+    backdrop && backdrop.classList.remove('open');
+    hamburger.classList.remove('open');
+    hamburger.setAttribute('aria-expanded', 'false');
+    document.body.classList.remove('jgs-menu-open');
   }
 
-  btn.addEventListener('click', () => {
-    if (menu.classList.contains('open')) closeMenu(); else openMenu();
+  hamburger.addEventListener('click', () => {
+    menu.classList.contains('open') ? closeMenu() : openMenu();
   });
-
-  // Close the menu after tapping a link, and on resize back to desktop width.
+  closeBtn && closeBtn.addEventListener('click', closeMenu);
+  backdrop && backdrop.addEventListener('click', closeMenu);
   menu.querySelectorAll('a').forEach(a => a.addEventListener('click', closeMenu));
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeMenu(); });
+
+  // If the viewport is resized past the mobile breakpoint (e.g. rotating
+  // a tablet, or a desktop window shrink-then-grow), close the drawer so
+  // it doesn't stay open behind the now-visible desktop nav links.
   window.addEventListener('resize', () => {
-    if (window.innerWidth > 860) closeMenu();
+    if (window.innerWidth > 860 && menu.classList.contains('open')) closeMenu();
   });
 }
 
-/* ── ALUMNI CAROUSEL (fast sliding, peek-style) ──
-   Measures the actual rendered slide width/gap instead of assuming a fixed
-   260px card, so it centers correctly at any viewport size (including the
-   narrower cards used on small screens). */
+/* ── ALUMNI CAROUSEL (fast sliding, peek-style) ── */
 function initAlumniCarousel() {
   const viewport = document.getElementById('alumniViewport');
   const track = document.getElementById('alumniTrack');
@@ -105,20 +114,19 @@ function initAlumniCarousel() {
   const slides = Array.from(track.children);
   let active = 0;
 
-  function getMetrics() {
+  function getSlideMetrics() {
     const first = slides[0];
-    if (!first) return { width: 0, step: 0 };
+    if (!first) return { width: 260, gap: 24 };
     const styles = getComputedStyle(track);
-    const gap = parseFloat(styles.columnGap || styles.gap || '24') || 24;
-    const width = first.getBoundingClientRect().width;
-    return { width, step: width + gap };
+    const gap = parseFloat(styles.columnGap || styles.gap || '24');
+    return { width: first.getBoundingClientRect().width, gap };
   }
 
   function render() {
     slides.forEach((s, i) => s.classList.toggle('active', i === active));
-    const { width, step } = getMetrics();
+    const { width, gap } = getSlideMetrics();
     const vpWidth = viewport.clientWidth;
-    const offset = vpWidth / 2 - (active * step + width / 2);
+    const offset = vpWidth / 2 - (active * (width + gap) + width / 2);
     track.style.transform = `translateX(${offset}px)`;
   }
   prevBtn && prevBtn.addEventListener('click', () => { active = (active - 1 + slides.length) % slides.length; render(); });
@@ -186,7 +194,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initAlumniCards();
   initAlumniCarousel();
   initNavOverlay();
-  initMobileNav();
+  initMobileMenu();
   initReveal();
   initMarquee();
 });
