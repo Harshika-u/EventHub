@@ -299,13 +299,19 @@
   }
 
   @media (max-width:900px){
-    .alumni-hero-copy{padding:210px 16px 40px;}
+    .alumni-hero-copy{padding:150px 16px 40px;}
     .card-grid{ grid-template-columns:repeat(2, 1fr); gap:50px 36px; padding:0 36px; }
   }
   @media (max-width:640px){
     .spine{display:none;}
     .card-grid{ grid-template-columns:1fr; gap:44px; padding:0 24px; }
     .alumni-card{height:auto;}
+    .alumni-hero-copy{padding:130px 16px 36px;}
+    .alumni-hero-note{padding:14px 20px; font-size:12px;}
+    .wall-head{padding:60px 20px 40px;}
+    .modal-photo{height:220px;}
+    .modal-name{font-size:26px;}
+    .modal-body{padding:22px 20px 26px;}
   }
 </style>
 </head>
@@ -316,6 +322,18 @@
   <div class="jgs-nav-inner">
     <a href="home.html" class="jgs-brand"><span class="crest">ISC</span> JGS - ISC</a>
     <ul class="jgs-links">
+      <li><a href="home.html#about">About</a></li>
+      <li><a href="spotlight.html">Spotlight</a></li>
+      <li><a href="alumni.html">Alumni</a></li>
+      <li><a href="clubs/clubs.html">Clubs</a></li>
+      <li><a href="../indexlogin.html" class="cta">EventHub →</a></li>
+    </ul>
+    <button class="jgs-hamburger" id="jgsHamburger" aria-label="Open menu" aria-expanded="false" aria-controls="jgsMobileMenu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+  <div class="jgs-mobile-menu" id="jgsMobileMenu">
+    <ul>
       <li><a href="home.html#about">About</a></li>
       <li><a href="spotlight.html">Spotlight</a></li>
       <li><a href="alumni.html">Alumni</a></li>
@@ -535,6 +553,5 @@
   overlay.addEventListener('click', e=>{ if(e.target === overlay) closeModal(); });
   document.addEventListener('keydown', e=>{ if(e.key === 'Escape') closeModal(); });
 </script>
-
 </body>
 </html>

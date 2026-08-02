@@ -62,7 +62,40 @@ function initNavOverlay() {
   window.addEventListener('scroll', toggle, { passive: true });
 }
 
-/* ── ALUMNI CAROUSEL (fast sliding, peek-style) ── */
+/* ── NAV: hamburger toggle for the mobile dropdown menu ──
+   Works on any page that includes the .jgs-hamburger / #jgsMobileMenu
+   markup inside .jgs-nav, not just home.html. */
+function initMobileNav() {
+  const btn = document.getElementById('jgsHamburger');
+  const menu = document.getElementById('jgsMobileMenu');
+  if (!btn || !menu) return;
+
+  function closeMenu() {
+    btn.classList.remove('open');
+    menu.classList.remove('open');
+    btn.setAttribute('aria-expanded', 'false');
+  }
+  function openMenu() {
+    btn.classList.add('open');
+    menu.classList.add('open');
+    btn.setAttribute('aria-expanded', 'true');
+  }
+
+  btn.addEventListener('click', () => {
+    if (menu.classList.contains('open')) closeMenu(); else openMenu();
+  });
+
+  // Close the menu after tapping a link, and on resize back to desktop width.
+  menu.querySelectorAll('a').forEach(a => a.addEventListener('click', closeMenu));
+  window.addEventListener('resize', () => {
+    if (window.innerWidth > 860) closeMenu();
+  });
+}
+
+/* ── ALUMNI CAROUSEL (fast sliding, peek-style) ──
+   Measures the actual rendered slide width/gap instead of assuming a fixed
+   260px card, so it centers correctly at any viewport size (including the
+   narrower cards used on small screens). */
 function initAlumniCarousel() {
   const viewport = document.getElementById('alumniViewport');
   const track = document.getElementById('alumniTrack');
@@ -70,14 +103,22 @@ function initAlumniCarousel() {
   const nextBtn = document.getElementById('alumniNext');
   if (!viewport || !track) return;
   const slides = Array.from(track.children);
-  const slideWidth = 260;
-  const gap = 24;
   let active = 0;
+
+  function getMetrics() {
+    const first = slides[0];
+    if (!first) return { width: 0, step: 0 };
+    const styles = getComputedStyle(track);
+    const gap = parseFloat(styles.columnGap || styles.gap || '24') || 24;
+    const width = first.getBoundingClientRect().width;
+    return { width, step: width + gap };
+  }
 
   function render() {
     slides.forEach((s, i) => s.classList.toggle('active', i === active));
+    const { width, step } = getMetrics();
     const vpWidth = viewport.clientWidth;
-    const offset = vpWidth / 2 - (active * (slideWidth + gap) + slideWidth / 2);
+    const offset = vpWidth / 2 - (active * step + width / 2);
     track.style.transform = `translateX(${offset}px)`;
   }
   prevBtn && prevBtn.addEventListener('click', () => { active = (active - 1 + slides.length) % slides.length; render(); });
@@ -145,6 +186,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initAlumniCards();
   initAlumniCarousel();
   initNavOverlay();
+  initMobileNav();
   initReveal();
   initMarquee();
 });
