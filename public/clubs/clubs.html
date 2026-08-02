@@ -16,15 +16,21 @@
       <li><a href="../home.html#about">About</a></li>
       <li><a href="../spotlight.html">Spotlight</a></li>
       <li><a href="../alumni.html">Alumni</a></li>
-      <li><a href="clubs.html">Clubs</a></li>
+      <li><a href="clubs.html" class="current">Clubs</a></li>
       <li><a href="../../indexlogin.html" class="cta">EventHub →</a></li>
     </ul>
     <button class="jgs-hamburger" id="jgsHamburger" aria-label="Open menu" aria-expanded="false" aria-controls="jgsMobileMenu">
       <span></span><span></span><span></span>
     </button>
   </div>
-  <div class="jgs-mobile-menu" id="jgsMobileMenu">
-    <ul>
+</nav>
+
+<!-- MOBILE MENU (3-line icon opens this drawer with all tabs + EventHub) -->
+<div class="jgs-mobile-backdrop" id="jgsMobileBackdrop"></div>
+<div class="jgs-mobile-menu" id="jgsMobileMenu">
+  <div class="jgs-mobile-menu-inner">
+    <button class="jgs-mobile-close" id="jgsMobileClose" aria-label="Close menu">&times;</button>
+    <ul class="jgs-mobile-links">
       <li><a href="../home.html#about">About</a></li>
       <li><a href="../spotlight.html">Spotlight</a></li>
       <li><a href="../alumni.html">Alumni</a></li>
@@ -32,7 +38,7 @@
       <li><a href="../../indexlogin.html" class="cta">EventHub →</a></li>
     </ul>
   </div>
-</nav>
+</div>
 
 <section class="clubs-hero reveal">
   <div class="eyebrow">Student-run</div>
